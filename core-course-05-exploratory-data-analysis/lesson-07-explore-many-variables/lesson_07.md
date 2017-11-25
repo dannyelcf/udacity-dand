@@ -72,7 +72,7 @@ ggplot(pf.fc_by_age_gender, aes(x = age, y = mean_friend_count)) +
   scale_y_continuous(breaks = seq(0, 750, 50))
 ```
 
-![](lesson_07_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-4-1.png)
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Plotting%20Conditional%20Summaries-1.png)
 
 ### Thinking In Ratios
 
@@ -123,7 +123,7 @@ ggplot(pf.fc_by_age_gender.wide, aes(x = age, y = female/male)) +
   scale_y_continuous(breaks = seq(0, 4.5, .25))
 ```
 
-![](lesson_07_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-6-1.png)
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Ratio%20Plot-1.png)
 
 ### Third Quantitative Variable
 
