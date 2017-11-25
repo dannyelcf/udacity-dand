@@ -1,0 +1,72 @@
+---
+title: "Lesson 7: Explore Many Variables"
+author: "Dannyel Cardoso da Fonseca"  
+date: "`r format(Sys.Date())`"
+output: github_document
+---
+
+```{r echo=FALSE}
+setwd("~/Documents/GitHub/udacity-dand/core-course-05-exploratory-data-analysis/lesson-07-explore-many-variables")
+```
+
+### Load Libraries and Data
+
+```{r}
+library(ggplot2)
+library(dplyr, warn.conflicts = FALSE)
+
+pf <- read.delim('data/pseudo_facebook.tsv')
+```
+
+### Third Qualitative Variable
+
+```{r}
+pf.fc_by_age_gender <- pf %>% 
+                          filter(!is.na(gender)) %>% 
+                          group_by(age, gender) %>% 
+                          summarise(mean_friend_count = mean(friend_count),
+                                    median_friend_count = as.integer(median(friend_count)),
+                                    n = n()) %>%                   
+                          ungroup() %>% 
+                          arrange(age, gender)
+
+head(pf.fc_by_age_gender)
+```
+
+### Plotting Conditional Summaries
+
+```{r}
+ggplot(pf.fc_by_age_gender, aes(x = age, y = mean_friend_count)) +
+  geom_line(aes(color = gender)) +
+  scale_x_continuous(breaks = seq(10, 115, 5)) +
+  scale_y_continuous(breaks = seq(0, 750, 50))
+```
+
+### Reshaping Data
+
+```{r}
+library(tidyr)
+pf.fc_by_age_gender.wide <- pf.fc_by_age_gender %>% 
+                               select(age, gender, median_friend_count) %>% 
+                               spread(gender, median_friend_count)
+
+head(pf.fc_by_age_gender.wide)
+```
+
+### Ratio Plot
+
+```{r}
+ggplot(pf.fc_by_age_gender.wide, aes(x = age, y = female/male)) +
+  geom_line() +
+  geom_hline(yintercept = 1, linetype = 2, alpha = .3) +
+  scale_x_continuous(breaks = seq(10, 115, 5)) +
+  scale_y_continuous(breaks = seq(0, 4.5, .25))
+```
+
+### Third Quantitative Variable
+
+```{r}
+pf$year_joined <- 2014 - ceiling(pf$tenure/365)
+```
+
+
