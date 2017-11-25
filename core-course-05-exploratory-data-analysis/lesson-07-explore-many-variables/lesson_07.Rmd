@@ -9,7 +9,7 @@ output: github_document
 setwd("~/Documents/GitHub/udacity-dand/core-course-05-exploratory-data-analysis/lesson-07-explore-many-variables")
 ```
 
-### Load Libraries and Data
+### Load Libraries and Datasets
 
 ```{r}
 library(ggplot2)
@@ -24,7 +24,17 @@ Note: https://www.youtube.com/watch?v=jsg6lhrJN1g
 Note: https://www.youtube.com/watch?v=GFKRNBnFGVU
 
 ### Third Qualitative Variable
-Quiz: https://www.youtube.com/watch?v=Q2M8xyY47fc
+Note: https://www.youtube.com/watch?v=Q2M8xyY47fc
+
+**Quiz:** Write code to create a new data frame, called 'pf.fc_by_age_gender', that contains information on each age AND gender group.
+
+The data frame should contain the following variables:
+
+    mean_friend_count,
+    median_friend_count,
+    n (the number of users in each age and gender grouping)
+
+**Response:**
 ```{r}
 pf.fc_by_age_gender <- pf %>% 
                           filter(!is.na(gender)) %>% 
@@ -39,7 +49,11 @@ head(pf.fc_by_age_gender)
 ```
 
 ### Plotting Conditional Summaries
-Quiz: https://www.youtube.com/watch?v=8SqL0v_FSsc
+Note: https://www.youtube.com/watch?v=8SqL0v_FSsc
+
+**Quiz:** Create a line graph showing the median friend count over the ages for each gender. Be sure to use the data frame you just created, pf.fc_by_age_gender.
+
+**Response:**
 ```{r}
 ggplot(pf.fc_by_age_gender, aes(x = age, y = mean_friend_count)) +
   geom_line(aes(color = gender)) +
@@ -54,7 +68,7 @@ Note: https://www.youtube.com/watch?v=r4ZOwz3_oXs
 Note: https://www.youtube.com/watch?v=zlaeISxRESQ
 
 ### Reshaping Data
-Quiz: https://www.youtube.com/watch?v=zQj_waidR5w
+Note: https://www.youtube.com/watch?v=zQj_waidR5w
 ```{r}
 library(tidyr)
 pf.fc_by_age_gender.wide <- pf.fc_by_age_gender %>% 
@@ -65,7 +79,13 @@ head(pf.fc_by_age_gender.wide)
 ```
 
 ### Ratio Plot
-Quiz: https://www.youtube.com/watch?v=gfZ7C-QBF0k
+Note: https://www.youtube.com/watch?v=gfZ7C-QBF0k
+
+**Quiz:** Plot the ratio of the female to male median friend counts using the data frame pf.fc_by_age_gender.wide.
+
+Think about what geom you should use. Add a horizontal line to the plot with a y intercept of 1, which will be the base line. Look up the documentation for geom_hline to do that. Use the parameter linetype in geom_hline to make the line dashed.
+
+**Response:**
 ```{r}
 ggplot(pf.fc_by_age_gender.wide, aes(x = age, y = female/male)) +
   geom_line() +
@@ -75,13 +95,32 @@ ggplot(pf.fc_by_age_gender.wide, aes(x = age, y = female/male)) +
 ```
 
 ### Third Quantitative Variable
-Quiz: https://www.youtube.com/watch?v=gpwlI9Wa8xI
+Note: https://www.youtube.com/watch?v=gpwlI9Wa8xI
+
+**Quiz:** Create a variable called year_joined in the pf data frame using the variable tenure and 2014 as the reference year.
+
+The variable year joined should contain the year that a user joined facebook.
+
+**Response:**
 ```{r}
 pf$year_joined <- 2014 - ceiling(pf$tenure/365)
 ```
 
 ### Cut a Variable
-Quiz: https://www.youtube.com/watch?v=n0lluEhKUfQ
+Note: https://www.youtube.com/watch?v=n0lluEhKUfQ
+
+**Quiz:** Create a new variable in the data frame called year_joined.bucket by using the cut function on the variable year_joined.
+
+You need to create the following buckets for the new variable, year_joined.bucket
+
+    (2004, 2009]
+    (2009, 2011]
+    (2011, 2012]
+    (2012, 2014]
+
+Note that a parenthesis means exclude the year and a bracket means include the year.
+
+**Response:**
 ```{r}
 
 ```
