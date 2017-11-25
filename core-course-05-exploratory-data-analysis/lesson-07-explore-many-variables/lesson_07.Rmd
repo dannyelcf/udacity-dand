@@ -17,9 +17,14 @@ library(dplyr, warn.conflicts = FALSE)
 
 pf <- read.delim('data/pseudo_facebook.tsv')
 ```
+### Multivariate Data
+Note: https://www.youtube.com/watch?v=jsg6lhrJN1g
+
+### Perceived Audience Size By Age
+Note: https://www.youtube.com/watch?v=GFKRNBnFGVU
 
 ### Third Qualitative Variable
-
+Quiz: https://www.youtube.com/watch?v=Q2M8xyY47fc
 ```{r}
 pf.fc_by_age_gender <- pf %>% 
                           filter(!is.na(gender)) %>% 
@@ -34,7 +39,7 @@ head(pf.fc_by_age_gender)
 ```
 
 ### Plotting Conditional Summaries
-
+Quiz: https://www.youtube.com/watch?v=8SqL0v_FSsc
 ```{r}
 ggplot(pf.fc_by_age_gender, aes(x = age, y = mean_friend_count)) +
   geom_line(aes(color = gender)) +
@@ -42,8 +47,14 @@ ggplot(pf.fc_by_age_gender, aes(x = age, y = mean_friend_count)) +
   scale_y_continuous(breaks = seq(0, 750, 50))
 ```
 
-### Reshaping Data
+### Thinking In Ratios
+Note: https://www.youtube.com/watch?v=r4ZOwz3_oXs
 
+### Wide And Long Format
+Note: https://www.youtube.com/watch?v=zlaeISxRESQ
+
+### Reshaping Data
+Quiz: https://www.youtube.com/watch?v=zQj_waidR5w
 ```{r}
 library(tidyr)
 pf.fc_by_age_gender.wide <- pf.fc_by_age_gender %>% 
@@ -54,7 +65,7 @@ head(pf.fc_by_age_gender.wide)
 ```
 
 ### Ratio Plot
-
+Quiz: https://www.youtube.com/watch?v=gfZ7C-QBF0k
 ```{r}
 ggplot(pf.fc_by_age_gender.wide, aes(x = age, y = female/male)) +
   geom_line() +
@@ -64,9 +75,14 @@ ggplot(pf.fc_by_age_gender.wide, aes(x = age, y = female/male)) +
 ```
 
 ### Third Quantitative Variable
-
+Quiz: https://www.youtube.com/watch?v=gpwlI9Wa8xI
 ```{r}
 pf$year_joined <- 2014 - ceiling(pf$tenure/365)
 ```
 
+### Cut a Variable
+Quiz: https://www.youtube.com/watch?v=n0lluEhKUfQ
+```{r}
+
+```
 
