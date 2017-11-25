@@ -14,15 +14,15 @@ pf <- read.delim('data/pseudo_facebook.tsv')
 
 ### Multivariate Data
 
-Note: <https://www.youtube.com/watch?v=jsg6lhrJN1g>
+> Note: <https://www.youtube.com/watch?v=jsg6lhrJN1g>
 
 ### Perceived Audience Size By Age
 
-Note: <https://www.youtube.com/watch?v=GFKRNBnFGVU>
+> Note: <https://www.youtube.com/watch?v=GFKRNBnFGVU>
 
 ### Third Qualitative Variable
 
-Note: <https://www.youtube.com/watch?v=Q2M8xyY47fc>
+> Note: <https://www.youtube.com/watch?v=Q2M8xyY47fc>
 
 **Quiz:** Write code to create a new data frame, called 'pf.fc\_by\_age\_gender', that contains information on each age AND gender group.
 
@@ -59,7 +59,7 @@ head(pf.fc_by_age_gender)
 
 ### Plotting Conditional Summaries
 
-Note: <https://www.youtube.com/watch?v=8SqL0v_FSsc>
+> Note: <https://www.youtube.com/watch?v=8SqL0v_FSsc>
 
 **Quiz:** Create a line graph showing the median friend count over the ages for each gender. Be sure to use the data frame you just created, pf.fc\_by\_age\_gender.
 
@@ -76,15 +76,15 @@ ggplot(pf.fc_by_age_gender, aes(x = age, y = mean_friend_count)) +
 
 ### Thinking In Ratios
 
-Note: <https://www.youtube.com/watch?v=r4ZOwz3_oXs>
+> Note: <https://www.youtube.com/watch?v=r4ZOwz3_oXs>
 
 ### Wide And Long Format
 
-Note: <https://www.youtube.com/watch?v=zlaeISxRESQ>
+> Note: <https://www.youtube.com/watch?v=zlaeISxRESQ>
 
 ### Reshaping Data
 
-Note: <https://www.youtube.com/watch?v=zQj_waidR5w>
+> Note: <https://www.youtube.com/watch?v=zQj_waidR5w>
 
 ``` r
 library(tidyr)
@@ -107,7 +107,7 @@ head(pf.fc_by_age_gender.wide)
 
 ### Ratio Plot
 
-Note: <https://www.youtube.com/watch?v=gfZ7C-QBF0k>
+> Note: <https://www.youtube.com/watch?v=gfZ7C-QBF0k>
 
 **Quiz:** Plot the ratio of the female to male median friend counts using the data frame pf.fc\_by\_age\_gender.wide.
 
@@ -127,7 +127,7 @@ ggplot(pf.fc_by_age_gender.wide, aes(x = age, y = female/male)) +
 
 ### Third Quantitative Variable
 
-Note: <https://www.youtube.com/watch?v=gpwlI9Wa8xI>
+> Note: <https://www.youtube.com/watch?v=gpwlI9Wa8xI>
 
 **Quiz:** Create a variable called year\_joined in the pf data frame using the variable tenure and 2014 as the reference year.
 
@@ -141,7 +141,7 @@ pf$year_joined <- 2014 - ceiling(pf$tenure/365)
 
 ### Cut a Variable
 
-Note: <https://www.youtube.com/watch?v=n0lluEhKUfQ>
+> Note: <https://www.youtube.com/watch?v=n0lluEhKUfQ>
 
 **Quiz:** Create a new variable in the data frame called year\_joined.bucket by using the cut function on the variable year\_joined.
 
