@@ -1,7 +1,7 @@
 Lesson 7: Explore Many Variables
 ================
 Dannyel Cardoso da Fonseca
-2017-11-25
+2017-11-26
 
 ### Load Libraries and Datasets
 
@@ -9,7 +9,7 @@ Dannyel Cardoso da Fonseca
 library(ggplot2)
 library(dplyr, warn.conflicts = FALSE)
 
-pf <- read.delim('data/pseudo_facebook.tsv')
+pf <- read.delim('lesson_07_files/data/pseudo_facebook.tsv')
 ```
 
 ### Multivariate Data

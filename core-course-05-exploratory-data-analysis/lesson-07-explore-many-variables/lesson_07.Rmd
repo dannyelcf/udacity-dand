@@ -15,7 +15,7 @@ setwd("~/Documents/GitHub/udacity-dand/core-course-05-exploratory-data-analysis/
 library(ggplot2)
 library(dplyr, warn.conflicts = FALSE)
 
-pf <- read.delim('data/pseudo_facebook.tsv')
+pf <- read.delim('lesson_07_files/data/pseudo_facebook.tsv')
 ```
 ### Multivariate Data
 > Note: https://www.youtube.com/watch?v=jsg6lhrJN1g
