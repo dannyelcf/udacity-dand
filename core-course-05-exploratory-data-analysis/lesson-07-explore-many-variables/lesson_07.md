@@ -177,3 +177,22 @@ unique(pf$year_joined.bucket)
 
     ## [1] (2012,2014] (2011,2012] (2009,2011] (2004,2009] <NA>       
     ## Levels: (2004,2009] (2009,2011] (2011,2012] (2012,2014]
+
+### Plotting It All Together
+
+> Note: <https://www.youtube.com/watch?v=CiS4rBbr6tw>
+
+**Quiz:** Create a line graph of friend\_count vs. age so that each year\_joined.bucket is a line tracking the median user friend\_count across age. This means you should have four different lines on your plot.
+
+You should subset the data to exclude the users whose year\_joined.bucket is NA.
+
+**Response:**
+
+``` r
+ggplot(subset(pf, !is.na(year_joined.bucket)), aes(x = age, y = friend_count)) +
+  geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = mean) +
+  scale_x_continuous(breaks = seq(10, 120, 10)) +
+  scale_y_continuous(breaks = seq(0, 2000, 100))
+```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Plotting%20It%20All%20Together-1.png)
