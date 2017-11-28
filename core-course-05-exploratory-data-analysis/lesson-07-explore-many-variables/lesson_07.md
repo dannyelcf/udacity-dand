@@ -190,7 +190,7 @@ You should subset the data to exclude the users whose year\_joined.bucket is NA.
 
 ``` r
 ggplot(subset(pf, !is.na(year_joined.bucket)), aes(x = age, y = friend_count)) +
-  geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = mean) +
+  geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
   scale_x_continuous(breaks = seq(10, 120, 10)) +
   scale_y_continuous(breaks = seq(0, 2000, 100))
 ```
