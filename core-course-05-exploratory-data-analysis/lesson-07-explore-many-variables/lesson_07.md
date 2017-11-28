@@ -1,7 +1,7 @@
 Lesson 7: Explore Many Variables
 ================
 Dannyel Cardoso da Fonseca
-2017-11-26
+2017-11-28
 
 ### Load Libraries and Datasets
 
@@ -137,7 +137,20 @@ The variable year joined should contain the year that a user joined facebook.
 
 ``` r
 pf$year_joined <- 2014 - ceiling(pf$tenure/365)
+
+pf.fc_by_year_joined <- pf %>% 
+                          filter(!is.na(year_joined)) %>% 
+                          group_by(year_joined) %>% 
+                          summarise(count = n())
+
+ggplot(pf.fc_by_year_joined, aes(x = year_joined, y = count)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = count), vjust = -1, size=3) +
+  scale_x_continuous(breaks = seq(2005, 2014, 1)) +
+  scale_y_continuous(breaks = seq(0, 50000, 3000))
 ```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Third%20Quantitative%20Variable-1.png)
 
 ### Cut a Variable
 
@@ -155,3 +168,12 @@ You need to create the following buckets for the new variable, year\_joined.buck
 Note that a parenthesis means exclude the year and a bracket means include the year.
 
 **Response:**
+
+``` r
+pf$year_joined.bucket <- cut(pf$year_joined, breaks = c(2004, 2009, 2011, 2012, 2014))
+
+unique(pf$year_joined.bucket)
+```
+
+    ## [1] (2012,2014] (2011,2012] (2009,2011] (2004,2009] <NA>       
+    ## Levels: (2004,2009] (2009,2011] (2011,2012] (2012,2014]

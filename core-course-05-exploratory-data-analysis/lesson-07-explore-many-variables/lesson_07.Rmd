@@ -105,6 +105,17 @@ The variable year joined should contain the year that a user joined facebook.
 **Response:**
 ```{r Third Quantitative Variable}
 pf$year_joined <- 2014 - ceiling(pf$tenure/365)
+
+pf.fc_by_year_joined <- pf %>% 
+                          filter(!is.na(year_joined)) %>% 
+                          group_by(year_joined) %>% 
+                          summarise(count = n())
+
+ggplot(pf.fc_by_year_joined, aes(x = year_joined, y = count)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = count), vjust = -1, size=3) +
+  scale_x_continuous(breaks = seq(2005, 2014, 1)) +
+  scale_y_continuous(breaks = seq(0, 50000, 3000))
 ```
 
 ### Cut a Variable
@@ -123,6 +134,8 @@ Note that a parenthesis means exclude the year and a bracket means include the y
 
 **Response:**
 ```{r Cut a Variable}
+pf$year_joined.bucket <- cut(pf$year_joined, breaks = c(2004, 2009, 2011, 2012, 2014))
 
+unique(pf$year_joined.bucket)
 ```
 
