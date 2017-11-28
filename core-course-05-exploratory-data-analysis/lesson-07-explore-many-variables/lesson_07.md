@@ -196,3 +196,29 @@ ggplot(subset(pf, !is.na(year_joined.bucket)), aes(x = age, y = friend_count)) +
 ```
 
 ![](lesson_07_files/figure-markdown_github-ascii_identifiers/Plotting%20It%20All%20Together-1.png)
+
+### Plot the Grand Mean
+
+> Note: <https://www.youtube.com/watch?v=pxaXkCjukGM>
+
+**Quiz:** Write code to do the following:
+
+1.  Add another geom\_line to code below to plot the grand mean of the friend count vs age.
+
+2.  Exclude any users whose year\_joined.bucket is NA.
+
+3.  Use a different line type for the grand mean.
+
+> As a reminder, the parameter linetype can take the values 0-6: 0 = blank, 1 = solid, 2 = dashed 3 = dotted, 4 = dotdash, 5 = longdash 6 = twodash
+
+**Response:**
+
+``` r
+ggplot(subset(pf, !is.na(year_joined.bucket)), aes(x = age, y = friend_count)) +
+  geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = mean) +
+  geom_line(stat = "summary", fun.y = mean, linetype = 5) + # grand mean
+  scale_x_continuous(breaks = seq(10, 120, 10)) +
+  scale_y_continuous(breaks = seq(0, 2000, 100))
+```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Plot%20the%20Grand%20Mean-1.png)
