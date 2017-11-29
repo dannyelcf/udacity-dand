@@ -1,7 +1,7 @@
 Lesson 7: Explore Many Variables
 ================
 Dannyel Cardoso da Fonseca
-2017-11-28
+2017-11-29
 
 ### Load Libraries and Datasets
 
@@ -222,3 +222,33 @@ ggplot(subset(pf, !is.na(year_joined.bucket)), aes(x = age, y = friend_count)) +
 ```
 
 ![](lesson_07_files/figure-markdown_github-ascii_identifiers/Plot%20the%20Grand%20Mean-1.png)
+
+### Friending Rate
+
+> Note: <https://www.youtube.com/watch?v=ZO7y9tsSQ0A>
+
+**Quiz:** Calculate how many friends does a user have for each day since they have started using the service?
+
+What is the median friend rate?
+
+What is the maximum friend rate?
+
+**Response:**
+
+``` r
+with(subset(pf, tenure > 0), summary(friend_count/tenure))
+```
+
+    ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+    ##   0.0000   0.0775   0.2205   0.6096   0.5658 417.0000
+
+``` r
+ggplot(subset(pf, tenure > 0), aes(y = friend_count/tenure, x = "")) +
+  geom_boxplot() +
+  geom_point(stat = "summary", fun.y = mean, color = "red") +
+  coord_cartesian(ylim = c(0, 1.5)) +
+  scale_y_continuous(breaks = seq(0, 1.5, .1)) +
+  xlab("")
+```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Friending%20Rate-1.png)
