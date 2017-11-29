@@ -227,7 +227,7 @@ ggplot(subset(pf, !is.na(year_joined.bucket)), aes(x = age, y = friend_count)) +
 
 > Note: <https://www.youtube.com/watch?v=ZO7y9tsSQ0A>
 
-**Quiz:** Calculate how many friends does a user have for each day since they have started using the service?
+**Quiz:** Calculate how many friends does a user have for each day since they have started using the service.
 
 What is the median friend rate?
 
@@ -252,3 +252,24 @@ ggplot(subset(pf, tenure > 0), aes(y = friend_count/tenure, x = "")) +
 ```
 
 ![](lesson_07_files/figure-markdown_github-ascii_identifiers/Friending%20Rate-1.png)
+
+### Friendships Initiated
+
+> Note: <https://www.youtube.com/watch?v=Keh5GwaSWdk>
+
+**Quiz:** Create a line graph of mean of friendships\_initiated per day (of tenure) vs. tenure colored by year\_joined.bucket.
+
+You need to make use of the variables tenure, friendships\_initiated, and year\_joined.bucket.
+
+You also need to subset the data to only consider user with at least one day of tenure.
+
+**Response:**
+
+``` r
+ggplot(subset(pf, tenure > 0), aes(x = tenure, y = friendships_initiated/tenure)) +
+  geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = mean) +
+  scale_x_continuous(breaks = seq(0, 3500, 250)) +
+  scale_y_continuous(breaks = seq(0, 10, .5))
+```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Friendships%20Initiated-1.png)
