@@ -1,7 +1,7 @@
 Lesson 7: Explore Many Variables
 ================
 Dannyel Cardoso da Fonseca
-2017-11-29
+2017-11-30
 
 ### Load Libraries and Datasets
 
@@ -273,3 +273,48 @@ ggplot(subset(pf, tenure > 0), aes(x = tenure, y = friendships_initiated/tenure)
 ```
 
 ![](lesson_07_files/figure-markdown_github-ascii_identifiers/Friendships%20Initiated-1.png)
+
+### Bias Variance Trade off Revisited
+
+> Note: <https://www.youtube.com/watch?v=CSVf96g0XGM>
+
+**Quiz:** Instead of geom\_line(), use geom\_smooth() to add a smoother to the plot. You can use the defaults for geom\_smooth() but do color the line by year\_joined.bucket
+
+**Response:**
+
+``` r
+library(gridExtra, warn.conflicts = FALSE)
+
+p1 <- ggplot(subset(pf, tenure > 0), aes(x = 7 * round(tenure / 7), y = friendships_initiated/tenure)) +
+        geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = mean) +
+        scale_x_continuous(breaks = seq(0, 3500, 250)) +
+        scale_y_continuous(breaks = seq(0, 10, 1.5)) +
+        ylab("fs_initiated/tenure")
+
+p2 <- ggplot(subset(pf, tenure > 0), aes(x = 30 * round(tenure / 30), y = friendships_initiated/tenure)) +
+        geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = mean) +
+        scale_x_continuous(breaks = seq(0, 3500, 250)) +
+        scale_y_continuous(breaks = seq(0, 10, 1)) +
+        ylab("fs_initiated/tenure")
+
+p3 <- ggplot(subset(pf, tenure > 0), aes(x = 90 * round(tenure / 90), y = friendships_initiated/tenure)) +
+        geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = mean) +
+        scale_x_continuous(breaks = seq(0, 3500, 250)) +
+        scale_y_continuous(breaks = seq(0, 10, .5)) +
+        ylab("fs_initiated/tenure")
+
+grid.arrange(p1, p2, p3, ncol = 1)
+```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Bias%20Variance%20Trade%20off%20Revisited-1.png)
+
+``` r
+ggplot(subset(pf, tenure > 0), aes(x = 7 * round(tenure / 7), y = friendships_initiated /tenure)) +
+  geom_smooth(aes(color = year_joined.bucket)) +
+  scale_x_continuous(breaks = seq(0, 3500, 250)) +
+  scale_y_continuous(breaks = seq(0, 4, .5)) 
+```
+
+    ## `geom_smooth()` using method = 'gam'
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Bias%20Variance%20Trade%20off%20Revisited-2.png)
