@@ -1,7 +1,7 @@
 Lesson 7: Explore Many Variables
 ================
 Dannyel Cardoso da Fonseca
-2017-11-30
+2017-12-01
 
 ### Load Libraries and Datasets
 
@@ -10,6 +10,8 @@ library(ggplot2)
 library(dplyr, warn.conflicts = FALSE)
 
 pf <- read.delim('lesson_07_files/data/pseudo_facebook.tsv')
+yo <- read.csv("lesson_07_files/data/yogurt.csv")
+yo$id <- as.factor(yo$id)
 ```
 
 ### Multivariate Data
@@ -318,3 +320,41 @@ ggplot(subset(pf, tenure > 0), aes(x = 7 * round(tenure / 7), y = friendships_in
     ## `geom_smooth()` using method = 'gam'
 
 ![](lesson_07_files/figure-markdown_github-ascii_identifiers/Bias%20Variance%20Trade%20off%20Revisited-2.png)
+
+### Sean's NFL Fan Sentiment Study
+
+> Note: <https://www.youtube.com/watch?v=ahaxt6UKxQw>
+
+### Introducing The Yogurt Dataset
+
+> Note: <https://www.youtube.com/watch?v=5J9GxnJVo78>
+
+### Histograms Revisited
+
+> Note: <https://www.youtube.com/watch?v=7PyV7HxpSYA>
+
+**Quiz:** Create a histogram of yogurt prices.
+
+Use the qplot or ggplot syntax. Don't add any extra code for labels, titles, or colors. We're just looking for the basic syntax here.
+
+**Response:**
+
+``` r
+ggplot(yo, aes(x = price)) +
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Histograms%20Revisited%201-1.png)
+
+I can note that the amount of yogurt increases as the price of yogurt increases. But the growth of yogurt quantity is not linear. It is intercalated between very low quantity and high quantity as the price increases.
+
+``` r
+ggplot(yo, aes(x = price)) +
+  geom_histogram(binwidth = 10)
+```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Histograms%20Revisited%202-1.png)
+
+Now, I can note that the amount of yogurt increases as the price of yogurt increases in an exponential way.

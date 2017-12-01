@@ -16,6 +16,8 @@ library(ggplot2)
 library(dplyr, warn.conflicts = FALSE)
 
 pf <- read.delim('lesson_07_files/data/pseudo_facebook.tsv')
+yo <- read.csv("lesson_07_files/data/yogurt.csv")
+yo$id <- as.factor(yo$id)
 ```
 ### Multivariate Data
 > Note: https://www.youtube.com/watch?v=jsg6lhrJN1g
@@ -248,3 +250,33 @@ ggplot(subset(pf, tenure > 0), aes(x = 7 * round(tenure / 7), y = friendships_in
   scale_x_continuous(breaks = seq(0, 3500, 250)) +
   scale_y_continuous(breaks = seq(0, 4, .5)) 
 ```
+
+### Sean's NFL Fan Sentiment Study
+> Note: https://www.youtube.com/watch?v=ahaxt6UKxQw
+
+### Introducing The Yogurt Dataset
+> Note: https://www.youtube.com/watch?v=5J9GxnJVo78
+
+### Histograms Revisited
+> Note: https://www.youtube.com/watch?v=7PyV7HxpSYA
+
+**Quiz:** Create a histogram of yogurt prices.
+
+Use the qplot or ggplot syntax. Don't add any extra code for labels, titles, or colors. We're just looking for the basic syntax here.
+
+**Response:**
+```{r Histograms Revisited 1}
+ggplot(yo, aes(x = price)) +
+  geom_histogram()
+```
+
+I can note that the amount of yogurt increases as the price of yogurt increases. But the growth of yogurt quantity is not linear. It is intercalated between very low quantity and high quantity as the price increases.
+
+```{r Histograms Revisited 2}
+ggplot(yo, aes(x = price)) +
+  geom_histogram(binwidth = 10)
+```
+
+Now, I can note that the amount of yogurt increases as the price of yogurt increases in an exponential way. 
+
+
