@@ -458,10 +458,52 @@ ggplot(subset(yo, id %in% sample.ids), aes(x = time, y = price)) +
 
 > Note: <https://www.youtube.com/watch?v=w6CLWh1dLCU>
 
-    pf_subset <- pf[, c(2:15)]
-    names(pf_subset)
+``` r
+pf_subset <- pf[, c(2:15)]
+names(pf_subset)
+```
 
-    set.seed(1836)
-    ggpairs(pf_subset[sample.int(nrow(pf_subset), 1000), ])
+    ##  [1] "age"                   "dob_day"              
+    ##  [3] "dob_year"              "dob_month"            
+    ##  [5] "gender"                "tenure"               
+    ##  [7] "friend_count"          "friendships_initiated"
+    ##  [9] "likes"                 "likes_received"       
+    ## [11] "mobile_likes"          "mobile_likes_received"
+    ## [13] "www_likes"             "www_likes_received"
+
+``` r
+set.seed(1836)
+pf_subset_1000 <- pf_subset[sample.int(nrow(pf_subset), 1000), ]
+```
+
+    ggpairs(pf_subset_1000)
 
 ![](lesson_07_files/figure-markdown_github-ascii_identifiers/Scatterplot%20Matrices.png)
+
+**Quiz:** Using the same sample of data, what is the correlation of coefficient of friendships initiated and friend count?
+
+**Response:**
+
+``` r
+with(pf_subset_1000, cor(friendships_initiated, friend_count))
+```
+
+    ## [1] 0.769011
+
+**Quiz:** Using the same sample of data, what is the correlation of coefficient of age and mobile likes?
+
+**Response:**
+
+``` r
+with(pf_subset_1000, cor(age, mobile_likes))
+```
+
+    ## [1] -0.04754751
+
+**Quiz:** What type of plots are below the diagonal of scatterplot matrix?
+
+**Response:** Scatterplots and faceted histograms.
+
+**Quiz:** What type of plots are created for the pairs of variables that included gender?
+
+**Response:** Faceted boxplots and faceted histograms.
