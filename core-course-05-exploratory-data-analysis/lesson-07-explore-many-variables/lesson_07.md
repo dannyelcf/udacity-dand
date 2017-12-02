@@ -423,3 +423,24 @@ ggplot(yo, aes(x = time, y = price)) +
 ![](lesson_07_files/figure-markdown_github-ascii_identifiers/Prices%20Over%20Time-1.png)
 
 I noticed that price increased between U$59 and U$69 over time and sometimes the price has dropped.
+
+### Sampling Observations
+
+> Note: <https://www.youtube.com/watch?v=PsRMReOqccg>
+
+### Looking At Samples Of Households
+
+> Note: <https://www.youtube.com/watch?v=kQePh6UTB90>
+
+``` r
+set.seed(4230)
+sample.ids <- sample(levels(yo$id), 16)
+
+ggplot(subset(yo, id %in% sample.ids), aes(x = time, y = price)) +
+  facet_wrap(~id) +
+  geom_line() +
+  geom_point(aes(size = all.purchases), pch = 1) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Looking%20At%20Samples%20Of%20Households-1.png)
