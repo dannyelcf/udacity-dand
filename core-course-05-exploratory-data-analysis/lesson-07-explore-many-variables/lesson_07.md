@@ -380,3 +380,46 @@ summary(yo$all.purchases)
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##   1.000   1.000   2.000   1.971   2.000  21.000
+
+``` r
+table(yo$all.purchases)
+```
+
+    ## 
+    ##    1    2    3    4    5    6    7    8    9   10   11   12   21 
+    ## 1140  745  228  133   42   60    8   17    1    3    1    1    1
+
+``` r
+ggplot(yo, aes(x = all.purchases)) +
+  geom_histogram(binwidth = 1) +
+  scale_x_continuous(breaks = seq(0, 25, 1)) +
+  scale_y_continuous(breaks = seq(0, 1200, 100))
+```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Number%20of%20Purchases-1.png)
+
+### Prices Over Time
+
+> Note: <https://www.youtube.com/watch?v=DIrLvDqhjCg>
+
+**Quiz:** Create a scatterplot of price vs time.
+
+This will be an example of a time series plot.
+
+Resolve overplotting issues by using techniques you learned in Lesson 4.
+
+What are some things that you notice?
+
+**Response:**
+
+``` r
+ggplot(yo, aes(x = time, y = price)) +
+  geom_point(alpha = 1/30, position = position_jitter(), color = "blue") +
+  geom_line(alpha = 1/30) +
+  scale_x_continuous(breaks = seq(9500, 11000, 100)) +
+  scale_y_continuous(breaks = seq(18, 70, 2))
+```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Prices%20Over%20Time-1.png)
+
+I noticed that price increased between U$59 and U$69 over time and sometimes the price has dropped.
