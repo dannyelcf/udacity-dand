@@ -1,13 +1,14 @@
 Lesson 7: Explore Many Variables
 ================
 Dannyel Cardoso da Fonseca
-2017-12-01
+2017-12-02
 
 ### Load Libraries and Datasets
 
 ``` r
 library(ggplot2)
 library(dplyr, warn.conflicts = FALSE)
+library(gridExtra, warn.conflicts = FALSE)
 
 pf <- read.delim('lesson_07_files/data/pseudo_facebook.tsv')
 yo <- read.csv("lesson_07_files/data/yogurt.csv")
@@ -285,8 +286,6 @@ ggplot(subset(pf, tenure > 0), aes(x = tenure, y = friendships_initiated/tenure)
 **Response:**
 
 ``` r
-library(gridExtra, warn.conflicts = FALSE)
-
 p1 <- ggplot(subset(pf, tenure > 0), aes(x = 7 * round(tenure / 7), y = friendships_initiated/tenure)) +
         geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = mean) +
         scale_x_continuous(breaks = seq(0, 3500, 250)) +
@@ -358,3 +357,26 @@ ggplot(yo, aes(x = price)) +
 ![](lesson_07_files/figure-markdown_github-ascii_identifiers/Histograms%20Revisited%202-1.png)
 
 Now, I can note that the amount of yogurt increases as the price of yogurt increases in an exponential way.
+
+### Number of Purchases
+
+> Note: <https://www.youtube.com/watch?v=wZDgVcAW_es>
+
+**Quiz:** Create a new variable called all.purchases, which gives the total counts of yogurt for each observation or household.
+
+One way to do this is using the transform function. You can look up the function transform and run the examples of code at the bottom of the documentation to figure out what it does.
+
+The transform function produces a data frame so if you use it then save the result to 'yo'!
+
+Or you can figure out another way to create the variable.
+
+**Response:**
+
+``` r
+yo <- transform(yo, all.purchases = strawberry + blueberry + pina.colada + plain + mixed.berry)
+
+summary(yo$all.purchases)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##   1.000   1.000   2.000   1.971   2.000  21.000

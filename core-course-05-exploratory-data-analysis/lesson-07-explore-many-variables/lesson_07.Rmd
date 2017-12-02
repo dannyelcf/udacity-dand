@@ -14,6 +14,7 @@ setwd("~/Documents/GitHub/udacity-dand/core-course-05-exploratory-data-analysis/
 ```{r Load Libraries and Datasets}
 library(ggplot2)
 library(dplyr, warn.conflicts = FALSE)
+library(gridExtra, warn.conflicts = FALSE)
 
 pf <- read.delim('lesson_07_files/data/pseudo_facebook.tsv')
 yo <- read.csv("lesson_07_files/data/yogurt.csv")
@@ -223,8 +224,6 @@ ggplot(subset(pf, tenure > 0), aes(x = tenure, y = friendships_initiated/tenure)
 
 **Response:**
 ```{r Bias Variance Trade off Revisited}
-library(gridExtra, warn.conflicts = FALSE)
-
 p1 <- ggplot(subset(pf, tenure > 0), aes(x = 7 * round(tenure / 7), y = friendships_initiated/tenure)) +
         geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = mean) +
         scale_x_continuous(breaks = seq(0, 3500, 250)) +
@@ -279,4 +278,20 @@ ggplot(yo, aes(x = price)) +
 
 Now, I can note that the amount of yogurt increases as the price of yogurt increases in an exponential way. 
 
+### Number of Purchases
+> Note: https://www.youtube.com/watch?v=wZDgVcAW_es
 
+**Quiz:** Create a new variable called all.purchases, which gives the total counts of yogurt for each observation or household.
+
+One way to do this is using the transform function. You can look up the function transform and run the examples of code at the bottom of the documentation to figure out what it does.
+
+The transform function produces a data frame so if you use it then save the result to 'yo'! 
+
+Or you can figure out another way to create the variable.
+
+**Response:**
+```{r Number of Purchases}
+yo <- transform(yo, all.purchases = strawberry + blueberry + pina.colada + plain + mixed.berry)
+
+summary(yo$all.purchases)
+```
