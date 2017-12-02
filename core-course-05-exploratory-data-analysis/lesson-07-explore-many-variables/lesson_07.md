@@ -9,6 +9,7 @@ Dannyel Cardoso da Fonseca
 library(ggplot2)
 library(dplyr, warn.conflicts = FALSE)
 library(gridExtra, warn.conflicts = FALSE)
+library(GGally, warn.conflicts = FALSE)
 
 pf <- read.delim('lesson_07_files/data/pseudo_facebook.tsv')
 yo <- read.csv("lesson_07_files/data/yogurt.csv")
@@ -444,3 +445,23 @@ ggplot(subset(yo, id %in% sample.ids), aes(x = time, y = price)) +
 ```
 
 ![](lesson_07_files/figure-markdown_github-ascii_identifiers/Looking%20At%20Samples%20Of%20Households-1.png)
+
+### The Limits Of Cross Sectional Data
+
+> Note: <https://www.youtube.com/watch?v=D7m25cvqUpw>
+
+### Many Variables
+
+> Note: <https://www.youtube.com/watch?v=okzOTH15r3Y>
+
+### Scatterplot Matrices
+
+> Note: <https://www.youtube.com/watch?v=w6CLWh1dLCU>
+
+    pf_subset <- pf[, c(2:15)]
+    names(pf_subset)
+
+    set.seed(1836)
+    ggpairs(pf_subset[sample.int(nrow(pf_subset), 1000), ])
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Scatterplot%20Matrices.png)
