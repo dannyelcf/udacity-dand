@@ -50,3 +50,13 @@ ggplot(diamonds, aes(x = table, y = price)) +
 ```
 
 ![](lesson_08_files/figure-markdown_github-ascii_identifiers/Price%20vs.%20Table%20Colored%20by%20Cut-1.png)
+
+### Typical Table Value
+
+**Quiz:** What is the typical table range for the majority of diamonds of ideal cut?
+
+**Response:** 53 to 57.
+
+**Quiz:** What is the typical table range for the majority of diamonds of premium cut?
+
+**Response:** 58 to 61.
