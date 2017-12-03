@@ -1,12 +1,13 @@
 Lesson 7: Explore Many Variables
 ================
 Dannyel Cardoso da Fonseca
-2017-12-02
+2017-12-03
 
 ### Load Libraries and Datasets
 
 ``` r
 library(ggplot2)
+library(tidyr, warn.conflicts = FALSE)
 library(dplyr, warn.conflicts = FALSE)
 library(gridExtra, warn.conflicts = FALSE)
 library(GGally, warn.conflicts = FALSE)
@@ -14,6 +15,8 @@ library(GGally, warn.conflicts = FALSE)
 pf <- read.delim('lesson_07_files/data/pseudo_facebook.tsv')
 yo <- read.csv("lesson_07_files/data/yogurt.csv")
 yo$id <- as.factor(yo$id)
+nci <- read.table('lesson_07_files/data/nci.tsv')
+colnames(nci) <- c(1:64)
 ```
 
 ### Multivariate Data
@@ -507,3 +510,40 @@ with(pf_subset_1000, cor(age, mobile_likes))
 **Quiz:** What type of plots are created for the pairs of variables that included gender?
 
 **Response:** Faceted boxplots and faceted histograms.
+
+### Even More Variables
+
+> Note: <https://www.youtube.com/watch?v=P7BHYXxu4Jg>
+
+### Heat Maps
+
+> Note: <https://www.youtube.com/watch?v=zSSNWZuVG8Y>
+
+``` r
+nci.long.sample <- gather(nci[1:200,], "case", "value") %>% 
+                     group_by(case) %>% 
+                     mutate(gene = row_number()) %>% 
+                     ungroup() %>% 
+                     mutate(case = as.integer(case)) %>% 
+                     select(case, gene, value)
+  
+head(nci.long.sample)
+```
+
+    ## # A tibble: 6 x 3
+    ##    case  gene  value
+    ##   <int> <int>  <dbl>
+    ## 1     1     1  0.300
+    ## 2     1     2  1.180
+    ## 3     1     3  0.550
+    ## 4     1     4  1.140
+    ## 5     1     5 -0.265
+    ## 6     1     6 -0.070
+
+``` r
+ggplot(nci.long.sample, aes(x = case, y = gene, fill = value)) +
+  geom_tile() +
+  scale_fill_gradientn(colors = colorRampPalette(c("blue", "red"))(100))
+```
+
+![](lesson_07_files/figure-markdown_github-ascii_identifiers/Heat%20Maps-1.png)

@@ -13,6 +13,7 @@ setwd("~/Documents/GitHub/udacity-dand/core-course-05-exploratory-data-analysis/
 
 ```{r Load Libraries and Datasets}
 library(ggplot2)
+library(tidyr, warn.conflicts = FALSE)
 library(dplyr, warn.conflicts = FALSE)
 library(gridExtra, warn.conflicts = FALSE)
 library(GGally, warn.conflicts = FALSE)
@@ -20,6 +21,8 @@ library(GGally, warn.conflicts = FALSE)
 pf <- read.delim('lesson_07_files/data/pseudo_facebook.tsv')
 yo <- read.csv("lesson_07_files/data/yogurt.csv")
 yo$id <- as.factor(yo$id)
+nci <- read.table('lesson_07_files/data/nci.tsv')
+colnames(nci) <- c(1:64)
 ```
 ### Multivariate Data
 > Note: https://www.youtube.com/watch?v=jsg6lhrJN1g
@@ -386,3 +389,23 @@ with(pf_subset_1000, cor(age, mobile_likes))
 
 **Response:** Faceted boxplots and faceted histograms.
 
+### Even More Variables
+> Note: https://www.youtube.com/watch?v=P7BHYXxu4Jg
+
+### Heat Maps
+> Note: https://www.youtube.com/watch?v=zSSNWZuVG8Y
+
+```{r Heat Maps}
+nci.long.sample <- gather(nci[1:200,], "case", "value") %>% 
+                     group_by(case) %>% 
+                     mutate(gene = row_number()) %>% 
+                     ungroup() %>% 
+                     mutate(case = as.integer(case)) %>% 
+                     select(case, gene, value)
+  
+head(nci.long.sample)
+
+ggplot(nci.long.sample, aes(x = case, y = gene, fill = value)) +
+  geom_tile() +
+  scale_fill_gradientn(colors = colorRampPalette(c("blue", "red"))(100))
+```
