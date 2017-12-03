@@ -46,7 +46,7 @@ ggplot(diamonds, aes(x = table, y = price)) +
   geom_point(aes(color = cut), position = position_jitter(width = .1), alpha = .3, na.rm = TRUE) +
   scale_x_continuous(limits = c(50, 80), breaks = seq(50, 80, 2)) +
   scale_y_continuous(breaks = seq(0, 20000, 1000)) +
-  scale_fill_brewer(type = 'qual')
+  scale_color_brewer(type = 'qual')
 ```
 
 ![](lesson_08_files/figure-markdown_github-ascii_identifiers/Price%20vs.%20Table%20Colored%20by%20Cut-1.png)
@@ -59,7 +59,7 @@ ggplot(diamonds, aes(x = table, y = price)) +
 
 **Quiz:** What is the typical table range for the majority of diamonds of premium cut?
 
-**Response:** 58 to 61.
+**Response:** 58 to 62.
 
 ### Price vs. Volume and Diamond Clarity
 
@@ -71,4 +71,18 @@ The plot should look something like this. <http://i.imgur.com/excUpea.jpg>
 
 > Note: In the link, a color palette of type 'div' was used to color the scatterplot using scale\_color\_brewer(type = 'div')
 
-**Response:** 53 to 57.
+**Response:**
+
+``` r
+diamonds <- transform(diamonds, volume = x * y * z)
+levels(diamonds$clarity) <- rev(levels(diamonds$clarity))
+volume_99_quantile <- quantile(diamonds$volume, .99)
+
+ggplot(subset(diamonds, volume > 0), aes(x = volume, y = price)) +
+  geom_point(aes(color = clarity), position = position_jitter(width = .1), alpha = .3, na.rm = TRUE) +
+  scale_x_continuous(limits = c(0, volume_99_quantile), breaks = seq(0, volume_99_quantile, 25)) +
+  scale_y_log10() +
+  scale_color_brewer(type = 'div')
+```
+
+![](lesson_08_files/figure-markdown_github-ascii_identifiers/Price%20vs.%20Volume%20and%20Diamond%20Clarity-1.png)
