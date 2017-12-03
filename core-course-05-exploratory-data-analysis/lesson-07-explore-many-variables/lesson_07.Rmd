@@ -409,3 +409,7 @@ ggplot(nci.long.sample, aes(x = case, y = gene, fill = value)) +
   geom_tile() +
   scale_fill_gradientn(colors = colorRampPalette(c("blue", "red"))(100))
 ```
+
+### Analyzing Three or More Variables
+> Note: https://www.youtube.com/watch?v=VUfaXWrr3oY
+

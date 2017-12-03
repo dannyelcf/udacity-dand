@@ -547,3 +547,7 @@ ggplot(nci.long.sample, aes(x = case, y = gene, fill = value)) +
 ```
 
 ![](lesson_07_files/figure-markdown_github-ascii_identifiers/Heat%20Maps-1.png)
+
+### Analyzing Three or More Variables
+
+> Note: <https://www.youtube.com/watch?v=VUfaXWrr3oY>
