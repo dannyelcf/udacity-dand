@@ -1,0 +1,36 @@
+---
+title: "Lesson 8: Problem Set - Explore Many Variables"
+author: "Dannyel Cardoso da Fonseca"  
+date: "`r format(Sys.Date())`"
+output: github_document
+---
+
+```{r echo=FALSE}
+setwd("~/Documents/GitHub/udacity-dand/core-course-05-exploratory-data-analysis/lesson-08-problem-set-explore-many-variables")
+```
+
+### Load Libraries and Datasets
+
+```{r Load Libraries and Datasets}
+library(ggplot2)
+
+data(diamonds)
+```
+
+### Price Histograms with Facet and Color
+
+**Quiz:** Create a histogram of diamond prices. Facet the histogram by diamond color and use cut to color the histogram bars.
+
+The plot should look something like this: http://i.imgur.com/b5xyrOu.jpg
+
+> Note: In the link, a color palette of type 'qual' was used to color the histogram using scale_fill_brewer(type = 'qual')
+
+**Response:**
+
+```{r Price Histograms with Facet and Color}
+ggplot(diamonds, aes(x = price, fill = cut)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~color) +
+  scale_x_log10() +
+  scale_fill_brewer(type = 'qual')
+```
