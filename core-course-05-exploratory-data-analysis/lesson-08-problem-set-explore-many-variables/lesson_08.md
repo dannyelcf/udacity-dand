@@ -60,3 +60,15 @@ ggplot(diamonds, aes(x = table, y = price)) +
 **Quiz:** What is the typical table range for the majority of diamonds of premium cut?
 
 **Response:** 58 to 61.
+
+### Price vs. Volume and Diamond Clarity
+
+**Quiz:** Create a scatterplot of diamond price vs. volume (x \* y \* z) and color the points by the clarity of diamonds. Use scale on the y-axis to take the log10 of price. You should also omit the top 1% of diamond volumes from the plot.
+
+> Note: Volume is a very rough approximation of a diamond's actual volume.
+
+The plot should look something like this. <http://i.imgur.com/excUpea.jpg>
+
+> Note: In the link, a color palette of type 'div' was used to color the scatterplot using scale\_color\_brewer(type = 'div')
+
+**Response:** 53 to 57.
