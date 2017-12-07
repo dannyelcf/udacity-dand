@@ -1,7 +1,7 @@
 Lesson 8: Problem Set - Explore Many Variables
 ================
 Dannyel Cardoso da Fonseca
-2017-12-03
+2017-12-07
 
 ### Load Libraries and Datasets
 
@@ -9,6 +9,7 @@ Dannyel Cardoso da Fonseca
 library(ggplot2)
 
 data(diamonds)
+pf <- read.delim('lesson_08_files/data/pseudo_facebook.tsv')
 ```
 
 ### Price Histograms with Facet and Color
@@ -86,3 +87,15 @@ ggplot(subset(diamonds, volume > 0), aes(x = volume, y = price)) +
 ```
 
 ![](lesson_08_files/figure-markdown_github-ascii_identifiers/Price%20vs.%20Volume%20and%20Diamond%20Clarity-1.png)
+
+### Proportion of Friendships Initiated
+
+**Quiz:** Many interesting variables are derived from two or more others. For example, we might wonder how much of a person's network on a service like Facebook the user actively initiated. Two users with the same degree (or number of friends) might be very different if one initiated most of those connections on the service, while the other initiated very few. So it could be useful to consider this proportion of existing friendships that the user initiated. This might be a good predictor of how active a user is compared with their peers, or other traits, such as personality (i.e., is this person an extrovert?).
+
+Your task is to create a new variable called 'prop\_initiated' in the Pseudo-Facebook data set. The variable should contain the proportion of friendships that the user initiated.
+
+**Response:**
+
+``` r
+pf <- transform(pf, prop_initiated = ifelse(friend_count == 0, 0, friendships_initiated/friend_count))
+```
