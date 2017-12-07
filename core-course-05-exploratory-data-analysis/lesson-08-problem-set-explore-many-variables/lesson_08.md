@@ -185,11 +185,11 @@ ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0),
 **Response:**
 
 ``` r
-summary(pf$prop_initiated)
+summary(subset(pf, year_joined.bucket == "(2012,2014]")$prop_initiated)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##  0.0000  0.4400  0.6184  0.5958  0.7795  1.0000
+    ##  0.0000  0.5000  0.6912  0.6430  0.8438  1.0000
 
 **Quiz:** Why do you think this group's proportion of friendships initiated is higher than others?
 

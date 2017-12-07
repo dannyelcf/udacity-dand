@@ -159,7 +159,7 @@ ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0),
 
 **Response:** 
 ```{r Largest Group Mean prop_initiated 1}
-summary(pf$prop_initiated)
+summary(subset(pf, year_joined.bucket == "(2012,2014]")$prop_initiated)
 ```
 
 **Quiz:** Why do you think this group's proportion of friendships initiated is higher than others?
