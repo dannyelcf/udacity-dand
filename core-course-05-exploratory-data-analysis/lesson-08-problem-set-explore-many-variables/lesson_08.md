@@ -7,6 +7,7 @@ Dannyel Cardoso da Fonseca
 
 ``` r
 library(ggplot2)
+library(gridExtra, warn.conflicts = FALSE)
 
 data(diamonds)
 pf <- read.delim('lesson_08_files/data/pseudo_facebook.tsv')
@@ -160,7 +161,7 @@ ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0),
 ``` r
 # add a smoother to the plot
 ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), 
-       aes(tenure, y = prop_initiated)) +
+       aes(x = tenure, y = prop_initiated)) +
   geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
   geom_smooth() +
   scale_x_continuous(breaks = seq(0, 3500, 250)) +
@@ -176,3 +177,40 @@ ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0),
 **Quiz:** On average, which group initiated the greatest proportion of its Facebook friendships? The plot with the smoother that you created in the last exercice can help you to answer this question.
 
 **Response:** People who joined after 2012.
+
+### Largest Group Mean prop\_initiated
+
+**Quiz:** For the group with the largest proportion of friendships initiated, what is the group's average (mean) proportion of friendships initiated?
+
+**Response:**
+
+``` r
+summary(pf$prop_initiated)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##  0.0000  0.4400  0.6184  0.5958  0.7795  1.0000
+
+**Quiz:** Why do you think this group's proportion of friendships initiated is higher than others?
+
+**Response:**
+
+``` r
+p1 <- ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), 
+             aes(x = 30 * round(tenure / 30), y = prop_initiated)) +
+        geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
+        scale_x_continuous(breaks = seq(0, 3500, 250)) +
+        scale_y_continuous(breaks = seq(0, 1, .1))
+
+p2 <- ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), 
+             aes(x = 30 * round(tenure / 30), y = age)) +
+        geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
+        scale_x_continuous(breaks = seq(0, 3500, 250)) +
+        scale_y_continuous(breaks = seq(0, 150, 10))
+
+grid.arrange(p1, p2, ncol = 1)
+```
+
+![](lesson_08_files/figure-markdown_github-ascii_identifiers/Largest%20Group%20Mean%20prop_initiated%202-1.png)
+
+Seeing the line graphs of the median proportion of friendships initiated ('prop\_initiated') vs. tenure and of the median proportion of age vs. tenure we may note that prop\_initiated and age are inversely proportional. People who joined after 2012 are totally young (in average 25 years old) and tend to start more friends than older people.

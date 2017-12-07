@@ -13,6 +13,7 @@ setwd("~/Documents/GitHub/udacity-dand/core-course-05-exploratory-data-analysis/
 
 ```{r Load Libraries and Datasets}
 library(ggplot2)
+library(gridExtra, warn.conflicts = FALSE)
 
 data(diamonds)
 pf <- read.delim('lesson_08_files/data/pseudo_facebook.tsv')
@@ -139,7 +140,7 @@ ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0),
 
 # add a smoother to the plot
 ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), 
-       aes(tenure, y = prop_initiated)) +
+       aes(x = tenure, y = prop_initiated)) +
   geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
   geom_smooth() +
   scale_x_continuous(breaks = seq(0, 3500, 250)) +
@@ -152,6 +153,35 @@ ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0),
 
 **Response:** People who joined after 2012.
 
+### Largest Group Mean prop_initiated
+
+**Quiz:** For the group with the largest proportion of friendships initiated, what is the group's average (mean) proportion of friendships initiated?
+
+**Response:** 
+```{r Largest Group Mean prop_initiated 1}
+summary(pf$prop_initiated)
+```
+
+**Quiz:** Why do you think this group's proportion of friendships initiated is higher than others?
+
+**Response:** 
+```{r Largest Group Mean prop_initiated 2}
+p1 <- ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), 
+             aes(x = 30 * round(tenure / 30), y = prop_initiated)) +
+        geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
+        scale_x_continuous(breaks = seq(0, 3500, 250)) +
+        scale_y_continuous(breaks = seq(0, 1, .1))
+
+p2 <- ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), 
+             aes(x = 30 * round(tenure / 30), y = age)) +
+        geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
+        scale_x_continuous(breaks = seq(0, 3500, 250)) +
+        scale_y_continuous(breaks = seq(0, 150, 10))
+
+grid.arrange(p1, p2, ncol = 1)
+```
+
+Seeing the line graphs of the median proportion of friendships initiated ('prop_initiated') vs. tenure and of the median proportion of age vs. tenure we may note that prop_initiated and age are inversely proportional. People who joined after 2012 are totally young (in average 25 years old) and tend to start more friends than older people.
 
 
 
