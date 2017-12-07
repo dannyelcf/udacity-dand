@@ -131,10 +131,42 @@ unique(pf$year_joined.bucket)
     ## Levels: (2004,2009] (2009,2011] (2011,2012] (2012,2014]
 
 ``` r
-ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), aes(x = tenure, y = prop_initiated)) +
+ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), 
+       aes(x = tenure, y = prop_initiated)) +
   geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
   scale_x_continuous(breaks = seq(0, 3500, 250)) +
   scale_y_continuous(breaks = seq(0, 1, .1))
 ```
 
 ![](lesson_08_files/figure-markdown_github-ascii_identifiers/prop_initiated%20vs.%20tenure-1.png)
+
+### Smoothing prop\_initiated vs. tenure
+
+**Quiz:** Smooth the last plot you created of of prop\_initiated vs tenure colored by year\_joined.bucket. You can bin together ranges of tenure or add a smoother to the plot.
+
+**Response:**
+
+``` r
+# bin together ranges of tenure
+ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), 
+       aes(x = 30 * round(tenure / 30), y = prop_initiated)) +
+  geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
+  scale_x_continuous(breaks = seq(0, 3500, 250)) +
+  scale_y_continuous(breaks = seq(0, 1, .1))
+```
+
+![](lesson_08_files/figure-markdown_github-ascii_identifiers/Smoothing%20prop_initiated%20vs.%20tenure-1.png)
+
+``` r
+# add a smoother to the plot
+ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), 
+       aes(tenure, y = prop_initiated)) +
+  geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
+  geom_smooth() +
+  scale_x_continuous(breaks = seq(0, 3500, 250)) +
+  scale_y_continuous(breaks = seq(0, 1, .1))
+```
+
+    ## `geom_smooth()` using method = 'gam'
+
+![](lesson_08_files/figure-markdown_github-ascii_identifiers/Smoothing%20prop_initiated%20vs.%20tenure-2.png)
