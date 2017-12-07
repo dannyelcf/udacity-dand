@@ -146,3 +146,12 @@ ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0),
   scale_y_continuous(breaks = seq(0, 1, .1))
 ```
 
+### Greatest prop_initiated Group
+
+**Quiz:** On average, which group initiated the greatest proportion of its Facebook friendships? The plot with the smoother that you created in the last exercice can help you to answer this question. 
+
+**Response:** People who joined after 2012.
+
+
+
+

@@ -170,3 +170,9 @@ ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0),
     ## `geom_smooth()` using method = 'gam'
 
 ![](lesson_08_files/figure-markdown_github-ascii_identifiers/Smoothing%20prop_initiated%20vs.%20tenure-2.png)
+
+### Greatest prop\_initiated Group
+
+**Quiz:** On average, which group initiated the greatest proportion of its Facebook friendships? The plot with the smoother that you created in the last exercice can help you to answer this question.
+
+**Response:** People who joined after 2012.
