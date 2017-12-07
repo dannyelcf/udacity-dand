@@ -96,3 +96,31 @@ Your task is to create a new variable called 'prop_initiated' in the Pseudo-Face
 pf <- transform(pf, prop_initiated = ifelse(friend_count == 0, 0, friendships_initiated/friend_count))
 ```
 
+### prop_initiated vs. tenure
+
+**Quiz:** Create a line graph of the median proportion of friendships initiated ('prop_initiated') vs. tenure and color the line segment by year_joined.bucket.
+
+Recall, we created year_joined.bucket in Lesson 7 by first creating year_joined from the variable tenure. Then, we used the cut function on year_joined to create four bins or cohorts of users.
+
+    (2004, 2009]
+    (2009, 2011]
+    (2011, 2012]
+    (2012, 2014]
+
+The plot should look something like this http://i.imgur.com/vNjPtDh.jpg OR this http://i.imgur.com/IBN1ufQ.jpg
+
+**Response:**
+```{r prop_initiated vs. tenure}
+pf <- transform(pf, year_joined = 2014 - ceiling(tenure/365))
+unique(pf$year_joined)
+
+pf <- transform(pf, year_joined.bucket = cut(year_joined, breaks = c(2004, 2009, 2011, 2012, 2014)))
+unique(pf$year_joined.bucket)
+
+ggplot(subset(pf, !is.na(year_joined.bucket) & tenure > 0), aes(x = tenure, y = prop_initiated)) +
+  geom_line(aes(color = year_joined.bucket), stat = "summary", fun.y = median) +
+  scale_x_continuous(breaks = seq(0, 3500, 250)) +
+  scale_y_continuous(breaks = seq(0, 1, .1))
+```
+
+
