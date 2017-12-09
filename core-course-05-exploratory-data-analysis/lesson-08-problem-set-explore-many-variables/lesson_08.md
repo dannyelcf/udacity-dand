@@ -1,7 +1,7 @@
 Lesson 8: Problem Set - Explore Many Variables
 ================
 Dannyel Cardoso da Fonseca
-2017-12-07
+2017-12-09
 
 ### Load Libraries and Datasets
 
@@ -214,3 +214,25 @@ grid.arrange(p1, p2, ncol = 1)
 ![](lesson_08_files/figure-markdown_github-ascii_identifiers/Largest%20Group%20Mean%20prop_initiated%202-1.png)
 
 Seeing the line graphs of the median proportion of friendships initiated ('prop\_initiated') vs. tenure and of the median proportion of age vs. tenure we may note that prop\_initiated and age are inversely proportional. People who joined after 2012 are totally young (in average 25 years old) and tend to start more friends than older people.
+
+### Price/Carat Binned, Faceted, & Colored
+
+**Quiz:** Create a scatter plot of the price/carat ratio of diamonds. The variable x should be assigned to cut. The points should be colored by diamond color, and the plot should be faceted by clarity.
+
+The plot should look something like this <http://i.imgur.com/YzbWkHT.jpg>.
+
+> Note: In the link, a color palette of type 'div' was used to color the histogram using scale\_color\_brewer(type = 'div')
+
+**Response:**
+
+``` r
+levels(diamonds$clarity) <- rev(levels(diamonds$clarity))
+
+ggplot(subset(diamonds, volume > 0), aes(x = cut, y = price/carat)) +
+  geom_point(aes(color = color), position = position_jitter(width = .3), alpha = .7, na.rm = TRUE) +
+  facet_wrap(~clarity) +
+  scale_color_brewer(type = 'div') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+![](lesson_08_files/figure-markdown_github-ascii_identifiers/Price/Carat%20Binned,%20Faceted,%20&%20Colored-1.png)
