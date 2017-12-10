@@ -45,3 +45,11 @@ ggplot(diamonds, aes(x = carat, y = price)) +
 ```
 
 ![](lesson_09_files/figure-markdown_github-ascii_identifiers/Scatterplot%20Review-1.png)
+
+### Price and Carat Relationship
+
+> Note: <https://www.youtube.com/watch?v=gG4xwgj1yVA>
+
+**Quiz:** What do you notice about the relationship between price and carat?
+
+**Response:** Apparently, as carat increases the price increase as well.

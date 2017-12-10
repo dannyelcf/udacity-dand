@@ -7,7 +7,6 @@ output: github_document
 
 ```{r echo=FALSE}
 setwd("~/Documents/GitHub/udacity-dand/core-course-05-exploratory-data-analysis/lesson-09-diamonds-and-price-predictions")
-
 ```
 
 ### Load Libraries and Datasets
@@ -46,3 +45,17 @@ ggplot(diamonds, aes(x = carat, y = price)) +
   scale_y_continuous(limits = c(0, quantile(diamonds$price, .99)),
                      breaks = seq(0, 20000, 1500))
 ```
+
+### Price and Carat Relationship
+> Note: https://www.youtube.com/watch?v=gG4xwgj1yVA
+
+**Quiz:** What do you notice about the relationship between price and carat?
+
+**Response:** Apparently, as carat increases the price increase as well.
+
+
+
+
+
+
+
