@@ -52,4 +52,16 @@ ggplot(diamonds, aes(x = carat, y = price)) +
 
 **Quiz:** What do you notice about the relationship between price and carat?
 
-**Response:** Apparently, as carat increases the price increase as well.
+**Response:** Apparently, as carat increases the price increase as well, in a non-linear way. As carat increases price dispersion increases as well.
+
+``` r
+ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_point(alpha = 1/10, na.rm = TRUE) +
+  geom_smooth(method = "lm", na.rm = TRUE) +
+  scale_x_continuous(limits = c(0, quantile(diamonds$carat, .99)),
+                     breaks = seq(0, 2.5, 0.25)) +
+  scale_y_continuous(limits = c(0, quantile(diamonds$price, .99)),
+                     breaks = seq(0, 20000, 1500))
+```
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/Price%20and%20Carat%20Relationship-1.png)
