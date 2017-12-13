@@ -62,7 +62,12 @@ ggplot(diamonds, aes(x = carat, y = price)) +
                      breaks = seq(0, 20000, 1500))
 ```
 
+### Frances Gerety
+> Note: https://www.youtube.com/watch?v=GXT_vXBA0vQ
 
+**Quiz:** Frances Gerety coined a famous slogan.
+
+**Response:** "A diamond is forever."
 
 
 

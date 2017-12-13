@@ -1,7 +1,7 @@
 Lesson 9: Diamonds & Price Predictions
 ================
 Dannyel Cardoso da Fonseca
-2017-12-10
+2017-12-13
 
 ### Load Libraries and Datasets
 
@@ -65,3 +65,11 @@ ggplot(diamonds, aes(x = carat, y = price)) +
 ```
 
 ![](lesson_09_files/figure-markdown_github-ascii_identifiers/Price%20and%20Carat%20Relationship-1.png)
+
+### Frances Gerety
+
+> Note: <https://www.youtube.com/watch?v=GXT_vXBA0vQ>
+
+**Quiz:** Frances Gerety coined a famous slogan.
+
+**Response:** "A diamond is forever."
