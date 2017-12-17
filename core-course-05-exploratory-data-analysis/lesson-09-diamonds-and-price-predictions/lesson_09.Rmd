@@ -14,6 +14,7 @@ setwd("~/Documents/GitHub/udacity-dand/core-course-05-exploratory-data-analysis/
 ```{r Load Libraries and Datasets}
 library(ggplot2)
 library(gridExtra, warn.conflicts = FALSE)
+library(GGally)
 theme_set(theme_light())
 
 data(diamonds)
@@ -68,6 +69,52 @@ ggplot(diamonds, aes(x = carat, y = price)) +
 **Quiz:** Frances Gerety coined a famous slogan.
 
 **Response:** "A diamond is forever."
+
+### The Rise of Diamonds
+> Note: https://www.youtube.com/watch?v=MD9RIDRVc-A
+
+### ggpairs Function
+> Note: https://www.youtube.com/watch?v=iJEBxsKDDoE
+
+**Quiz:** What do you notice in the plot matrix from the ggpairs() function?
+
+    # sample 10,000 diamonds from the data set.
+    set.seed(20022012)
+    diamond_samp <- diamonds[sample(1:length(diamonds$price), 10000), ]
+    ggpairs(diamond_samp, axisLabels = 'internal',
+      lower = list(continuous = wrap("points", shape = I('.'))),
+      upper = list(combo = wrap("box", outlier.shape = I('.'))))
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/ggpairs_landscape.png)
+
+**Response:**
+
+* **Relationship among x y and z dimensions**: it is obvious that there is a strong correlation among dimensions of diamond. That correlation is linear. As one dimension increases the others increase as well, in the same proportion.
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_among_x_y_z.png)
+
+* **Relationship between price and diamond dimensions**: in data set, apparently, there is a strong correlation between price and diamond dimensions. That correlation appears to be logarithmic.
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_price_with_x_y_z.png)
+
+* **Relationship of carat with color and clarity**: in data set, weightiest diamonds have worst colour and worst clarity. But the worst color diamonds are proportionately in smaller quantity while the diamonds of color clarity are proportionately in greater quantity. Summing up, the best clarity diamonds there are in smaller quantity and tend to be lighter and have better color.
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_carat_with_color_clarity.png)
+
+* **Relationship among carat, price and diamond dimensions**: in data set, there is a strong correlation among carat, price and diamond dimensions. The correlation seems to be exponential between carat and diamond price and appears to be logarithmic between carat and diamond dimensions.
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_carat_with_price_x_y_z.png)
+
+* **Relationship among color, clarity and diamond dimensions**: in data set, there is a certain correlation among color, clarity and diamond dimensions. This can be seen in the faceted boxplot. Diamonds with larger dimensions tend to have worst colors and clarities while diamonds with smaller dimensions tend to have best colors and clarities.
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_color_and_clarity_with_x_y_z.png)
+
+* **Relationship among price, cut, color and clarity**: in data set, apparently, there is no significant correlation among price, cut, color and clarity. There is a little variability in the faceted bloxplots and faceted histogram.
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_cut_color_clarity_with_price.png)
+
+
+
 
 
 
