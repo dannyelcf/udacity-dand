@@ -8,7 +8,7 @@ Dannyel Cardoso da Fonseca
 ``` r
 library(ggplot2)
 library(gridExtra, warn.conflicts = FALSE)
-library(GGally)
+library(GGally, warn.conflicts = FALSE)
 theme_set(theme_light())
 
 data(diamonds)
@@ -92,30 +92,58 @@ ggplot(diamonds, aes(x = carat, y = price)) +
       lower = list(continuous = wrap("points", shape = I('.'))),
       upper = list(combo = wrap("box", outlier.shape = I('.'))))
 
-![](lesson_09_files/figure-markdown_github-ascii_identifiers/ggpairs_landscape.png)
+...<img src="lesson_09_files/figure-markdown_github-ascii_identifiers/ggpairs_landscape.png" style="width:75.0%" />
 
 **Response:**
 
 -   **Relationship among x y and z dimensions**: it is obvious that there is a strong correlation among dimensions of diamond. That correlation is linear. As one dimension increases the others increase as well, in the same proportion.
 
-![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_among_x_y_z.png)
+<img src="lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_among_x_y_z.png" style="width:75.0%" />
 
 -   **Relationship between price and diamond dimensions**: in data set, apparently, there is a strong correlation between price and diamond dimensions. That correlation appears to be logarithmic.
 
-![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_price_with_x_y_z.png)
+<img src="lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_price_with_x_y_z.png" style="width:75.0%" />
 
 -   **Relationship of carat with color and clarity**: in data set, weightiest diamonds have worst colour and worst clarity. But the worst color diamonds are proportionately in smaller quantity while the diamonds of color clarity are proportionately in greater quantity. Summing up, the best clarity diamonds there are in smaller quantity and tend to be lighter and have better color.
 
-![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_carat_with_color_clarity.png)
+<img src="lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_carat_with_color_clarity.png" style="width:75.0%" />
 
 -   **Relationship among carat, price and diamond dimensions**: in data set, there is a strong correlation among carat, price and diamond dimensions. The correlation seems to be exponential between carat and diamond price and appears to be logarithmic between carat and diamond dimensions.
 
-![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_carat_with_price_x_y_z.png)
+<img src="lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_carat_with_price_x_y_z.png" style="width:75.0%" />
 
 -   **Relationship among color, clarity and diamond dimensions**: in data set, there is a certain correlation among color, clarity and diamond dimensions. This can be seen in the faceted boxplot. Diamonds with larger dimensions tend to have worst colors and clarities while diamonds with smaller dimensions tend to have best colors and clarities.
 
-![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_color_and_clarity_with_x_y_z.png)
+<img src="lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_color_and_clarity_with_x_y_z.png" style="width:75.0%" />
 
 -   **Relationship among price, cut, color and clarity**: in data set, apparently, there is no significant correlation among price, cut, color and clarity. There is a little variability in the faceted bloxplots and faceted histogram.
 
-![](lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_cut_color_clarity_with_price.png)
+<img src="lesson_09_files/figure-markdown_github-ascii_identifiers/relationship_cut_color_clarity_with_price.png" style="width:75.0%" />
+
+### The Demand of Diamonds
+
+> Note: <https://www.youtube.com/watch?v=h-YgETh80h4>
+
+**Quiz:** Create two histograms of the price variable and place on one output image.
+
+The first plot should be a histogram of price and the second plot should transform the price variable using log10.
+
+**Response:**
+
+``` r
+p1 <- ggplot(diamonds, aes(x = price)) +
+        geom_histogram(bins = 30) +
+        scale_x_continuous(breaks = seq(0, 20000, 1500)) +
+        scale_y_continuous(breaks = seq(0, 15000, 2000)) +
+        ggtitle('Price')
+
+p2 <- ggplot(diamonds, aes(x = price)) +
+        geom_histogram(bins = 30) +
+        scale_x_log10() +
+        scale_y_continuous(breaks = seq(0, 4000, 500)) +
+        ggtitle('Price (log10)')
+
+grid.arrange(p1, p2)
+```
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/The%20Demand%20of%20Diamonds-1.png)
