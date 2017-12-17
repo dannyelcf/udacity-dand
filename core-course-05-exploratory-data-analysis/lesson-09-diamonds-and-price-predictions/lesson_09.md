@@ -147,3 +147,11 @@ grid.arrange(p1, p2)
 ```
 
 ![](lesson_09_files/figure-markdown_github-ascii_identifiers/The%20Demand%20of%20Diamonds-1.png)
+
+### Connecting Demand and Price Distribution
+
+> Note: <https://www.youtube.com/watch?v=Rj6g9jpX9MQ>
+
+**Quiz:** When looking at these plots, what do you notice? Think specifically about the two peaks in the transformed plot and how it relates to the demand for diamonds.
+
+**Response:** I notice that about half of diamonds have prices that are below $3,000. Above this value, diamond prices disperse into a long tail in the histogram. After log10 transformation I notice that the long tail is highly representative appearing to be the majority of diamond prices. The target audience of the first peak is the large mass of people, with lower purchasing power. Already the target audience of the second peak are people with greater purchasing power and who seeks to differentiate themselves from the great mass of people.
