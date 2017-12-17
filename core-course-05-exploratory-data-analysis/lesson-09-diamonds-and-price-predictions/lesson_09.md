@@ -92,7 +92,7 @@ ggplot(diamonds, aes(x = carat, y = price)) +
       lower = list(continuous = wrap("points", shape = I('.'))),
       upper = list(combo = wrap("box", outlier.shape = I('.'))))
 
-...<img src="lesson_09_files/figure-markdown_github-ascii_identifiers/ggpairs_landscape.png" style="width:75.0%" />
+<img src="lesson_09_files/figure-markdown_github-ascii_identifiers/ggpairs_landscape.png" style="width:75.0%" />
 
 **Response:**
 
