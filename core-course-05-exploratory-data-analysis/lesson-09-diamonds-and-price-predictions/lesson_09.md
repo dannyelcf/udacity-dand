@@ -1,7 +1,7 @@
 Lesson 9: Diamonds & Price Predictions
 ================
 Dannyel Cardoso da Fonseca
-2017-12-18
+2017-12-21
 
 ### Load Libraries and Datasets
 
@@ -162,10 +162,11 @@ grid.arrange(p1, p2)
 > Note: <https://www.youtube.com/watch?v=h1wbEPuADz0>
 
 ``` r
+# carat = weight of the diamond = f(volume) = f(x.y.z)
 cuberoot_trans <- function() {
   trans_new("cuberoot",
-            transform = function(x) { x^(1/3) },
-            inverse = function(x) { x^3 })
+            transform = function(x) x ^ (1/3), # cubic root
+            inverse = function(x) x ^ 3)
 }
 
 ggplot(diamonds, aes(x = carat, y = price)) +
@@ -180,3 +181,25 @@ ggplot(diamonds, aes(x = carat, y = price)) +
 ```
 
 ![](lesson_09_files/figure-markdown_github-ascii_identifiers/Scatterplot%20Transformation-1.png)
+
+### Overplotting Revisited
+
+> Note: <https://www.youtube.com/watch?v=P6ZOr7JiMLk>
+
+**Quiz:** Add a layer to adjust the features of the scatterplot. Set the transparency to one half, the size to three-fourths, and jitter the points.
+
+**Response:**
+
+``` r
+ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_point(alpha = 1/2, size = 3/4, position = position_jitter(), na.rm = TRUE) +
+  scale_x_continuous(trans = cuberoot_trans(), 
+                     limits = c(.2, 3),
+                     breaks = c(.2, .5, 1, 2, 3)) +
+  scale_y_continuous(trans = log10_trans(), 
+                     limits = c(350,15000),
+                     breaks = c(350, 1000, 5000, 10000, 15000)) +
+  ggtitle("Price (log10) by cube root of carat")
+```
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/Overplotting%20Revisited-1.png)
