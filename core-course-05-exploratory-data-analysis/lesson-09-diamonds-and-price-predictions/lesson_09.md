@@ -311,3 +311,9 @@ ggplot(diamonds, aes(x = carat, y = price, color = color)) +
 **Quiz:** Based on the plot, do you think that the diamond color influences price? Why?
 
 **Response:** Yes! Color influences prices in the same way that clarity do. The diamond with best color is more expensive than diamond with the worst color in a given carat.
+
+### Linear Models in R
+
+> Note: <https://www.youtube.com/watch?v=a2GCyz_N0oY>
+
+<img src="lesson_09_files/figure-markdown_github-ascii_identifiers/19%20-%20Quiz%20-%20Linear%20Models%20in%20R.png" style="width:75.0%" />
