@@ -1,7 +1,7 @@
 Lesson 9: Diamonds & Price Predictions
 ================
 Dannyel Cardoso da Fonseca
-2017-12-21
+2017-12-22
 
 ### Load Libraries and Datasets
 
@@ -10,6 +10,7 @@ library(ggplot2, warn.conflicts = FALSE)
 library(gridExtra, warn.conflicts = FALSE)
 library(GGally, warn.conflicts = FALSE)
 library(scales, warn.conflicts = FALSE)
+library(RColorBrewer, warn.conflicts = FALSE)
 theme_set(theme_light())
 
 data(diamonds)
@@ -203,3 +204,35 @@ ggplot(diamonds, aes(x = carat, y = price)) +
 ```
 
 ![](lesson_09_files/figure-markdown_github-ascii_identifiers/Overplotting%20Revisited-1.png)
+
+### Plot Colors for Qualitative Factors
+
+> Note: <https://www.youtube.com/watch?v=2ZVGl6LrOPw>
+
+### Price vs. Carat and Clarity
+
+> Note: <https://www.youtube.com/watch?v=J0Ls7F-lN4o>
+
+**Quiz:** Adjust the code below to color the points by clarity.
+
+A layer called scale\_color\_brewer() has been added to adjust the legend and provide custom colors.
+
+**Response:**
+
+``` r
+ggplot(diamonds, aes(x = carat, y = price, color = clarity)) +
+  geom_point(alpha = 1/2, size = 3/4, position = position_jitter(), na.rm = TRUE) +
+  scale_color_brewer(type = 'div',
+                     guide = guide_legend(title = 'Clarity', 
+                                          reverse = TRUE,
+                                          override.aes = list(alpha = 1, size = 2))) +
+  scale_x_continuous(trans = cuberoot_trans(), 
+                     limits = c(.2, 3),
+                     breaks = c(.2, .5, 1, 2, 3)) +
+  scale_y_continuous(trans = log10_trans(), 
+                     limits = c(350,15000),
+                     breaks = c(350, 1000, 5000, 10000, 15000)) +
+  ggtitle('Price (log10) by Cube-Root of Carat and Clarity')
+```
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/Price%20vs.%20Carat%20and%20Clarity-1.png)
