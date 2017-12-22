@@ -242,7 +242,11 @@ ggplot(diamonds, aes(x = carat, y = price, color = cut)) +
   ggtitle('Price (log10) by Cube-Root of Carat and Cut')
 ```
 
+### Cut and Price
+> Note: https://www.youtube.com/watch?v=MZyle39D5Ks
 
+**Quiz:** Based on the plot, do you think cut accounts some of the change in price? Why?
 
+**Response:** Practically not! In the dispersion of the price in a given carat, the Ideal and Premium predominate since the lowest price until the highest price. 
 
 
