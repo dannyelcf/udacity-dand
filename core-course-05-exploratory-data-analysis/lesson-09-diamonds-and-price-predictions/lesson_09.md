@@ -244,3 +244,29 @@ ggplot(diamonds, aes(x = carat, y = price, color = clarity)) +
 **Quiz:** Based on the plot, do you think clarity explain some of the change in price? Why?
 
 **Response:** Yes! The dispersion of the price in a given carat is explained by the clarity of the diamond. The best clarity is more expensive than the worst clarity in a given carat.
+
+### Price vs Carat and Cut
+
+> Note: <https://www.youtube.com/watch?v=RF9V7l00a28>
+
+**Quiz:** Let’s look at cut and see if we find a similar result.
+
+**Response:**
+
+``` r
+ggplot(diamonds, aes(x = carat, y = price, color = cut)) +
+  geom_point(alpha = 1/2, size = 3/4, position = position_jitter(), na.rm = TRUE) +
+  scale_color_brewer(type = 'div',
+                     guide = guide_legend(title = 'Cut', 
+                                          reverse = TRUE,
+                                          override.aes = list(alpha = 1, size = 2))) +
+  scale_x_continuous(trans = cuberoot_trans(), 
+                     limits = c(.2, 3),
+                     breaks = c(.2, .5, 1, 2, 3)) +
+  scale_y_continuous(trans = log10_trans(), 
+                     limits = c(350,15000),
+                     breaks = c(350, 1000, 5000, 10000, 15000)) +
+  ggtitle('Price (log10) by Cube-Root of Carat and Cut')
+```
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/Price%20vs%20Carat%20and%20Cut-1.png)
