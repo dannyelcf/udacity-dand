@@ -278,3 +278,28 @@ ggplot(diamonds, aes(x = carat, y = price, color = cut)) +
 **Quiz:** Based on the plot, do you think cut accounts some of the change in price? Why?
 
 **Response:** Practically not! In the dispersion of the price in a given carat, the Ideal and Premium predominate since the lowest price until the highest price.
+
+### Price vs Carat and Color
+
+> Note: <https://www.youtube.com/watch?v=ow70HVqX4OY>
+
+**Quiz:** Finally, let’s use diamond color to color our plot.
+
+**Response:**
+
+``` r
+ggplot(diamonds, aes(x = carat, y = price, color = color)) +
+  geom_point(alpha = 1/2, size = 3/4, position = position_jitter(), na.rm = TRUE) +
+  scale_color_brewer(type = 'div',
+                     guide = guide_legend(title = 'Color', 
+                                          override.aes = list(alpha = 1, size = 2))) +
+  scale_x_continuous(trans = cuberoot_trans(), 
+                     limits = c(.2, 3),
+                     breaks = c(.2, .5, 1, 2, 3)) +
+  scale_y_continuous(trans = log10_trans(), 
+                     limits = c(350,15000),
+                     breaks = c(350, 1000, 5000, 10000, 15000)) +
+  ggtitle('Price (log10) by Cube-Root of Carat and Color')
+```
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/Price%20vs%20Carat%20and%20Color-1.png)
