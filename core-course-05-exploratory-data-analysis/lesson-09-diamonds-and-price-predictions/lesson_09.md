@@ -303,3 +303,11 @@ ggplot(diamonds, aes(x = carat, y = price, color = color)) +
 ```
 
 ![](lesson_09_files/figure-markdown_github-ascii_identifiers/Price%20vs%20Carat%20and%20Color-1.png)
+
+### Color and Price
+
+> Note: <https://www.youtube.com/watch?v=-9CHGW25yMg>
+
+**Quiz:** Based on the plot, do you think that the diamond color influences price? Why?
+
+**Response:** Yes! Color influences prices in the same way that clarity do. The diamond with best color is more expensive than diamond with the worst color in a given carat.
