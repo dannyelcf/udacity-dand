@@ -236,3 +236,11 @@ ggplot(diamonds, aes(x = carat, y = price, color = clarity)) +
 ```
 
 ![](lesson_09_files/figure-markdown_github-ascii_identifiers/Price%20vs.%20Carat%20and%20Clarity-1.png)
+
+### Clarity and Price
+
+> Note: <https://www.youtube.com/watch?v=UnkrtPPx9-c>
+
+**Quiz:** Based on the plot, do you think clarity explain some of the change in price? Why?
+
+**Response:** Yes! The dispersion of the price in a given carat is explained by the clarity of the diamond. The best clarity is more expensive than the worst clarity in a given carat.
