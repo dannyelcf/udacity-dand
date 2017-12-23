@@ -484,3 +484,15 @@ mtable(m1, m2, m3, m4, m5, sdigits = 3)
     ##   BIC              15957.685       7306.220       3761.997     -8317.942     -67953.736     
     ##   N                53940          53940          53940         53940          53940         
     ## ============================================================================================
+
+### Model Problems
+
+> Note: <https://www.youtube.com/watch?v=Och80L_uNjU>
+
+**Quiz:** What could be some problems when using this model? What else should we think about when using this model?
+
+**Response:**
+
+> Note: <https://www.youtube.com/watch?v=MV_e0z9kFjM>
+
+"To start, this data is from 2008. When I fitted models using this data and predicted the price of the diamonds that I found in the market, I kept getting predictions that were way too low. After some additional digging, I found that global diamonds were poor. It turns out that prices plummeted in 2008 due to the global financial crisis and since then, prices at least for wholesale polished diamonds, have grown at about 6% per year, compound annual rate... And finally, after looking at the data on price scope, I realized that diamond prices grew unevenly across different karat sizes since 2008. Therefore, the initially estimated model could not simply be adjusted by inflation."
