@@ -1,7 +1,7 @@
 Lesson 9: Diamonds & Price Predictions
 ================
 Dannyel Cardoso da Fonseca
-2017-12-22
+2017-12-23
 
 ### Load Libraries and Datasets
 
@@ -11,6 +11,16 @@ library(gridExtra, warn.conflicts = FALSE)
 library(GGally, warn.conflicts = FALSE)
 library(scales, warn.conflicts = FALSE)
 library(RColorBrewer, warn.conflicts = FALSE)
+library(memisc, warn.conflicts = FALSE)
+```
+
+    ## Warning: package 'memisc' was built under R version 3.4.3
+
+    ## Loading required package: lattice
+
+    ## Loading required package: MASS
+
+``` r
 theme_set(theme_light())
 
 data(diamonds)
@@ -317,3 +327,160 @@ ggplot(diamonds, aes(x = carat, y = price, color = color)) +
 > Note: <https://www.youtube.com/watch?v=a2GCyz_N0oY>
 
 <img src="lesson_09_files/figure-markdown_github-ascii_identifiers/19%20-%20Quiz%20-%20Linear%20Models%20in%20R.png" style="width:75.0%" />
+
+### Building the Linear Model
+
+> Note: <https://www.youtube.com/watch?v=zyIc0sXYk2A>
+
+``` r
+m1 <- lm(I(log(price)) ~ I(carat^(1/3)), data = diamonds)
+m1 
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)), data = diamonds)
+    ## 
+    ## Coefficients:
+    ##    (Intercept)  I(carat^(1/3))  
+    ##          2.821           5.558
+
+``` r
+m2 <- update(m1, ~ . + carat)
+m2
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat, data = diamonds)
+    ## 
+    ## Coefficients:
+    ##    (Intercept)  I(carat^(1/3))           carat  
+    ##          1.039           8.568          -1.137
+
+``` r
+m3 <- update(m2, ~ . + cut)
+m3
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut, data = diamonds)
+    ## 
+    ## Coefficients:
+    ##    (Intercept)  I(carat^(1/3))           carat           cut.L  
+    ##        0.87436         8.70286        -1.16327         0.22437  
+    ##          cut.Q           cut.C           cut^4  
+    ##       -0.06241         0.05100         0.01801
+
+``` r
+m4 <- update(m3, ~ . + color)
+m4
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut + color, 
+    ##     data = diamonds)
+    ## 
+    ## Coefficients:
+    ##    (Intercept)  I(carat^(1/3))           carat           cut.L  
+    ##        0.93176         8.43797        -0.99189         0.22409  
+    ##          cut.Q           cut.C           cut^4         color.L  
+    ##       -0.06191         0.05154         0.01826        -0.37342  
+    ##        color.Q         color.C         color^4         color^5  
+    ##       -0.12906         0.00143         0.02857        -0.01640  
+    ##        color^6  
+    ##       -0.02348
+
+``` r
+m5 <- update(m4, ~ . + clarity)
+m5
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut + color + 
+    ##     clarity, data = diamonds)
+    ## 
+    ## Coefficients:
+    ##    (Intercept)  I(carat^(1/3))           carat           cut.L  
+    ##       0.414792        9.144314       -1.092551        0.119825  
+    ##          cut.Q           cut.C           cut^4         color.L  
+    ##      -0.031025        0.013578       -0.001884       -0.440905  
+    ##        color.Q         color.C         color^4         color^5  
+    ##      -0.092790       -0.013299        0.012047       -0.003204  
+    ##        color^6       clarity.L       clarity.Q       clarity.C  
+    ##       0.001330        0.907144       -0.239602        0.130897  
+    ##      clarity^4       clarity^5       clarity^6       clarity^7  
+    ##      -0.062759        0.025752       -0.002090        0.031982
+
+``` r
+mtable(m1, m2, m3, m4, m5, sdigits = 3)
+```
+
+    ## 
+    ## Calls:
+    ## m1: lm(formula = I(log(price)) ~ I(carat^(1/3)), data = diamonds)
+    ## m2: lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat, data = diamonds)
+    ## m3: lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut, data = diamonds)
+    ## m4: lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut + color, 
+    ##     data = diamonds)
+    ## m5: lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut + color + 
+    ##     clarity, data = diamonds)
+    ## 
+    ## ============================================================================================
+    ##                        m1             m2             m3             m4            m5        
+    ## --------------------------------------------------------------------------------------------
+    ##   (Intercept)          2.821***       1.039***       0.874***      0.932***       0.415***  
+    ##                       (0.006)        (0.019)        (0.019)       (0.017)        (0.010)    
+    ##   I(carat^(1/3))       5.558***       8.568***       8.703***      8.438***       9.144***  
+    ##                       (0.007)        (0.032)        (0.031)       (0.028)        (0.016)    
+    ##   carat                              -1.137***      -1.163***     -0.992***      -1.093***  
+    ##                                      (0.012)        (0.011)       (0.010)        (0.006)    
+    ##   cut: .L                                            0.224***      0.224***       0.120***  
+    ##                                                     (0.004)       (0.004)        (0.002)    
+    ##   cut: .Q                                           -0.062***     -0.062***      -0.031***  
+    ##                                                     (0.004)       (0.003)        (0.002)    
+    ##   cut: .C                                            0.051***      0.052***       0.014***  
+    ##                                                     (0.003)       (0.003)        (0.002)    
+    ##   cut: ^4                                            0.018***      0.018***      -0.002     
+    ##                                                     (0.003)       (0.002)        (0.001)    
+    ##   color: .L                                                       -0.373***      -0.441***  
+    ##                                                                   (0.003)        (0.002)    
+    ##   color: .Q                                                       -0.129***      -0.093***  
+    ##                                                                   (0.003)        (0.002)    
+    ##   color: .C                                                        0.001         -0.013***  
+    ##                                                                   (0.003)        (0.002)    
+    ##   color: ^4                                                        0.029***       0.012***  
+    ##                                                                   (0.003)        (0.002)    
+    ##   color: ^5                                                       -0.016***      -0.003*    
+    ##                                                                   (0.003)        (0.001)    
+    ##   color: ^6                                                       -0.023***       0.001     
+    ##                                                                   (0.002)        (0.001)    
+    ##   clarity: .L                                                                     0.907***  
+    ##                                                                                  (0.003)    
+    ##   clarity: .Q                                                                    -0.240***  
+    ##                                                                                  (0.003)    
+    ##   clarity: .C                                                                     0.131***  
+    ##                                                                                  (0.003)    
+    ##   clarity: ^4                                                                    -0.063***  
+    ##                                                                                  (0.002)    
+    ##   clarity: ^5                                                                     0.026***  
+    ##                                                                                  (0.002)    
+    ##   clarity: ^6                                                                    -0.002     
+    ##                                                                                  (0.002)    
+    ##   clarity: ^7                                                                     0.032***  
+    ##                                                                                  (0.001)    
+    ## --------------------------------------------------------------------------------------------
+    ##   R-squared            0.924          0.935          0.939         0.951          0.984     
+    ##   adj. R-squared       0.924          0.935          0.939         0.951          0.984     
+    ##   sigma                0.280          0.259          0.250         0.224          0.129     
+    ##   F               652012.063     387489.366     138654.523     87959.467     173791.084     
+    ##   p                    0.000          0.000          0.000         0.000          0.000     
+    ##   Log-likelihood   -7962.499      -3631.319      -1837.416      4235.240      34091.272     
+    ##   Deviance          4242.831       3613.360       3380.837      2699.212        892.214     
+    ##   AIC              15930.999       7270.637       3690.832     -8442.481     -68140.544     
+    ##   BIC              15957.685       7306.220       3761.997     -8317.942     -67953.736     
+    ##   N                53940          53940          53940         53940          53940         
+    ## ============================================================================================

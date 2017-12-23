@@ -17,6 +17,7 @@ library(gridExtra, warn.conflicts = FALSE)
 library(GGally, warn.conflicts = FALSE)
 library(scales, warn.conflicts = FALSE)
 library(RColorBrewer, warn.conflicts = FALSE)
+library(memisc, warn.conflicts = FALSE)
 theme_set(theme_light())
 
 data(diamonds)
@@ -282,7 +283,27 @@ ggplot(diamonds, aes(x = carat, y = price, color = color)) +
 
 ![](lesson_09_files/figure-markdown_github-ascii_identifiers/19 - Quiz - Linear Models in R.png){width="75%"}
 
+### Building the Linear Model
+> Note: https://www.youtube.com/watch?v=zyIc0sXYk2A
 
+```{r Building the Linear Model}
+m1 <- lm(I(log(price)) ~ I(carat^(1/3)), data = diamonds)
+m1 
+
+m2 <- update(m1, ~ . + carat)
+m2
+
+m3 <- update(m2, ~ . + cut)
+m3
+
+m4 <- update(m3, ~ . + color)
+m4
+
+m5 <- update(m4, ~ . + clarity)
+m5
+
+mtable(m1, m2, m3, m4, m5, sdigits = 3)
+```
 
 
 
