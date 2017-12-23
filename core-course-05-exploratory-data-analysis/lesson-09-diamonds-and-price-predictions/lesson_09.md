@@ -11,16 +11,9 @@ library(gridExtra, warn.conflicts = FALSE)
 library(GGally, warn.conflicts = FALSE)
 library(scales, warn.conflicts = FALSE)
 library(RColorBrewer, warn.conflicts = FALSE)
-library(memisc, warn.conflicts = FALSE)
-```
-
-    ## Warning: package 'memisc' was built under R version 3.4.3
-
-    ## Loading required package: lattice
-
-    ## Loading required package: MASS
-
-``` r
+library(lattice, warn.conflicts = FALSE)
+library(MASS, warn.conflicts = FALSE)
+suppressWarnings(library(memisc, warn.conflicts = FALSE))
 theme_set(theme_light())
 
 data(diamonds)
@@ -673,3 +666,119 @@ mtable(m1, m2, m3, m4, m5, sdigits = 3)
     ##   BIC              3995.256      3660.539      2978.208     -1712.879     -8832.055     
     ##   N                9990          9990          9990          9990          9990         
     ## ========================================================================================
+
+### Predictions
+
+> <https://www.youtube.com/watch?v=hW_1ASU-j8A>
+
+**Quiz:** Example diamond from BlueNile: &gt; Note: Round 1.00 Very Good I VS1 $5,601
+
+``` r
+this.diamond = data.frame(carat = 1.00, cut = "V.Good", color = "I", clarity = "VS1")
+this.diamond
+```
+
+    ##   carat    cut color clarity
+    ## 1     1 V.Good     I     VS1
+
+``` r
+model.estimate = predict(m5, newdata = this.diamond, interval = "prediction", level = .95)
+model.estimate
+```
+
+    ##        fit      lwr      upr
+    ## 1 8.531352 8.228985 8.833718
+
+``` r
+exp(model.estimate)
+```
+
+    ##        fit      lwr      upr
+    ## 1 5071.296 3748.027 6861.754
+
+Evaluate how well the model predicts the BlueNile diamond's price. Think about the fitted point estimate as well as the upper and lower bound of the 95% CI.
+
+**Response:** The example diamond is a touch pricier than expected value by the full model.
+
+> Note: The prediction interval here may be slightly conservative, as the model errors are heteroskedastic over carat (and hence price) even after our log and cube-root transformations. See the output of the following code.
+
+``` r
+summary(m4)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut + color, 
+    ##     data = diamondsbig.sample)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -1.14425 -0.12792  0.01131  0.13857  0.83820 
+    ## 
+    ## Coefficients:
+    ##                 Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)     1.296463   0.057962   22.37   <2e-16 ***
+    ## I(carat^(1/3))  8.163656   0.101021   80.81   <2e-16 ***
+    ## carat          -0.794162   0.044219  -17.96   <2e-16 ***
+    ## cutIdeal        0.194080   0.007051   27.52   <2e-16 ***
+    ## cutV.Good       0.098736   0.007585   13.02   <2e-16 ***
+    ## colorE         -0.090846   0.007993  -11.37   <2e-16 ***
+    ## colorF         -0.122732   0.008118  -15.12   <2e-16 ***
+    ## colorG         -0.182627   0.008246  -22.15   <2e-16 ***
+    ## colorH         -0.251581   0.008995  -27.97   <2e-16 ***
+    ## colorI         -0.364610   0.009314  -39.15   <2e-16 ***
+    ## colorJ         -0.501823   0.010192  -49.24   <2e-16 ***
+    ## colorK         -0.692501   0.012992  -53.30   <2e-16 ***
+    ## colorL         -0.839209   0.018922  -44.35   <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.2208 on 9977 degrees of freedom
+    ##   (10 observations deleted due to missingness)
+    ## Multiple R-squared:  0.936,  Adjusted R-squared:  0.9359 
+    ## F-statistic: 1.215e+04 on 12 and 9977 DF,  p-value: < 2.2e-16
+
+``` r
+dat = data.frame(m4$model, m4$residuals)
+head(dat)
+```
+
+    ##        I.log.price.. I.carat..1.3.. carat    cut color m4.residuals
+    ## 46670   6.523562....   0.683990....  0.32  Ideal     G -0.11408....
+    ## 402078  8.891649....   1.068529....  1.22  Ideal     F -0.23039....
+    ## 245147  7.746300....   0.843432....  0.60  Ideal     F -0.03050....
+    ## 173012  7.272398....   0.736806....  0.40  Ideal     D 0.084487....
+    ## 129005  6.964135....   0.676789....  0.31  Ideal     E 0.285549....
+    ## 52618   6.563855....   0.697953....  0.34 V.Good     F -0.13644....
+
+``` r
+with(dat, sd(m4.residuals))
+```
+
+    ## [1] 0.2206735
+
+``` r
+with(subset(dat, carat > .9 & carat < 1.1), sd(m4.residuals))
+```
+
+    ## [1] 0.2207649
+
+``` r
+dat$resid <- as.numeric(dat$m4.residuals)
+
+ggplot(dat, aes(x = round(carat, 2), y = resid)) +
+  geom_line(stat = "summary", fun.y = sd, na.rm = TRUE) +
+  scale_x_continuous(breaks = seq(0, 2.5, .1))
+```
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/Predictions%202-1.png)
+
+``` r
+ggplot(subset(dat, carat > .9 & carat < 1.1), aes(x = round(carat, 2), y = resid)) +
+  geom_line(stat = "summary", fun.y = sd, na.rm = TRUE) +
+  scale_x_continuous(breaks = seq(0, 2, .01))
+```
+
+![](lesson_09_files/figure-markdown_github-ascii_identifiers/Predictions%202-2.png)
+
+How could we do better? If we care most about diamonds with carat weights between 0.50 and 1.50, we might restrict the data we use to fit our model to diamonds that are that size - we have enough data.

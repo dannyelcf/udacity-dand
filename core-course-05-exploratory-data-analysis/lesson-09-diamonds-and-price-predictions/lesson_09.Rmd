@@ -17,7 +17,9 @@ library(gridExtra, warn.conflicts = FALSE)
 library(GGally, warn.conflicts = FALSE)
 library(scales, warn.conflicts = FALSE)
 library(RColorBrewer, warn.conflicts = FALSE)
-library(memisc, warn.conflicts = FALSE)
+library(lattice, warn.conflicts = FALSE)
+library(MASS, warn.conflicts = FALSE)
+suppressWarnings(library(memisc, warn.conflicts = FALSE))
 theme_set(theme_light())
 
 data(diamonds)
@@ -353,4 +355,46 @@ m5
 mtable(m1, m2, m3, m4, m5, sdigits = 3)
 ```
 
+### Predictions
+> https://www.youtube.com/watch?v=hW_1ASU-j8A
 
+**Quiz:** Example diamond from BlueNile:
+> Note: Round 1.00 Very Good I VS1 $5,601
+
+```{r Predictions}
+this.diamond = data.frame(carat = 1.00, cut = "V.Good", color = "I", clarity = "VS1")
+this.diamond
+
+model.estimate = predict(m5, newdata = this.diamond, interval = "prediction", level = .95)
+model.estimate
+
+exp(model.estimate)
+```
+
+Evaluate how well the model predicts the BlueNile diamond's price. Think about the fitted point estimate as well as the upper and lower bound of the 95% CI.
+
+**Response:** The example diamond is a touch pricier than expected value by the full model.
+
+> Note: The prediction interval here may be slightly conservative, as the model errors are heteroskedastic over carat (and hence price) even after our log and cube-root transformations. See the output of the following code.
+
+```{r Predictions 2}
+summary(m4)
+
+dat = data.frame(m4$model, m4$residuals)
+head(dat)
+
+with(dat, sd(m4.residuals))
+with(subset(dat, carat > .9 & carat < 1.1), sd(m4.residuals))
+
+dat$resid <- as.numeric(dat$m4.residuals)
+
+ggplot(dat, aes(x = round(carat, 2), y = resid)) +
+  geom_line(stat = "summary", fun.y = sd, na.rm = TRUE) +
+  scale_x_continuous(breaks = seq(0, 2.5, .1))
+
+ggplot(subset(dat, carat > .9 & carat < 1.1), aes(x = round(carat, 2), y = resid)) +
+  geom_line(stat = "summary", fun.y = sd, na.rm = TRUE) +
+  scale_x_continuous(breaks = seq(0, 2, .01))
+```
+
+How could we do better? If we care most about diamonds with carat weights between 0.50 and 1.50, we might restrict the data we use to fit our model to diamonds that are that size - we have enough data.
