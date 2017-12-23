@@ -24,6 +24,7 @@ library(memisc, warn.conflicts = FALSE)
 theme_set(theme_light())
 
 data(diamonds)
+diamondsbig <- read.csv('lesson_09_files/data/diamondsbig.csv')
 ```
 
 ### Welcome!
@@ -496,3 +497,179 @@ mtable(m1, m2, m3, m4, m5, sdigits = 3)
 > Note: <https://www.youtube.com/watch?v=MV_e0z9kFjM>
 
 "To start, this data is from 2008. When I fitted models using this data and predicted the price of the diamonds that I found in the market, I kept getting predictions that were way too low. After some additional digging, I found that global diamonds were poor. It turns out that prices plummeted in 2008 due to the global financial crisis and since then, prices at least for wholesale polished diamonds, have grown at about 6% per year, compound annual rate... And finally, after looking at the data on price scope, I realized that diamond prices grew unevenly across different karat sizes since 2008. Therefore, the initially estimated model could not simply be adjusted by inflation."
+
+### A Bigger, Better Data Set
+
+> Note: <https://www.youtube.com/watch?v=q46nO0mznXM>
+
+**Quiz:** Your task is to build five linear models like Solomon did for the diamonds data set only this time you'll use a sample of diamonds from the diamondsbig data set.
+
+Since the data set is so large, you are going to use a sample of the data set to compute the models. You can use the entire data set on your machine which will produce slightly different coefficients and statistics for the models.
+
+Be sure to make use of the same variables (logprice, carat, etc.) and model names (m1, m2, m3, m4, m5).
+
+**Response:**
+
+``` r
+# Only want GIA Certified diamonds that are under $10,000
+diamondsbig.filtered <- diamondsbig[diamondsbig$price < 10000 & diamondsbig$cert == "GIA",]
+
+# Sample from this large dataset
+set.seed(20022012)
+diamondsbig.sample <- diamondsbig.filtered[sample(1:nrow(diamondsbig.filtered), 10000), ]
+
+m1 <- lm(I(log(price)) ~ I(carat^(1/3)), data = diamondsbig.sample)
+m1 
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)), data = diamondsbig.sample)
+    ## 
+    ## Coefficients:
+    ##    (Intercept)  I(carat^(1/3))  
+    ##          2.655           5.854
+
+``` r
+m2 <- update(m1, ~ . + carat)
+m2
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat, data = diamondsbig.sample)
+    ## 
+    ## Coefficients:
+    ##    (Intercept)  I(carat^(1/3))           carat  
+    ##          1.317           8.260          -1.063
+
+``` r
+m3 <- update(m2, ~ . + cut)
+m3
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut, data = diamondsbig.sample)
+    ## 
+    ## Coefficients:
+    ##    (Intercept)  I(carat^(1/3))           carat        cutIdeal  
+    ##         0.8946          8.6855         -1.2358          0.2295  
+    ##      cutV.Good  
+    ##         0.1400
+
+``` r
+m4 <- update(m3, ~ . + color)
+m4
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut + color, 
+    ##     data = diamondsbig.sample)
+    ## 
+    ## Coefficients:
+    ##    (Intercept)  I(carat^(1/3))           carat        cutIdeal  
+    ##        1.29646         8.16366        -0.79416         0.19408  
+    ##      cutV.Good          colorE          colorF          colorG  
+    ##        0.09874        -0.09085        -0.12273        -0.18263  
+    ##         colorH          colorI          colorJ          colorK  
+    ##       -0.25158        -0.36461        -0.50182        -0.69250  
+    ##         colorL  
+    ##       -0.83921
+
+``` r
+m5 <- update(m4, ~ . + clarity)
+m5
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut + color + 
+    ##     clarity, data = diamondsbig.sample)
+    ## 
+    ## Coefficients:
+    ##    (Intercept)  I(carat^(1/3))           carat        cutIdeal  
+    ##        0.56377         8.43894        -0.80168         0.13378  
+    ##      cutV.Good          colorE          colorF          colorG  
+    ##        0.06940        -0.07776        -0.09926        -0.15974  
+    ##         colorH          colorI          colorJ          colorK  
+    ##       -0.23096        -0.36081        -0.51806        -0.70096  
+    ##         colorL       clarityI2       clarityIF      claritySI1  
+    ##       -0.83704        -0.10684         0.78734         0.44801  
+    ##     claritySI2      clarityVS1      clarityVS2     clarityVVS1  
+    ##        0.33028         0.62173         0.56170         0.72346  
+    ##    clarityVVS2  
+    ##        0.66262
+
+``` r
+mtable(m1, m2, m3, m4, m5, sdigits = 3)
+```
+
+    ## 
+    ## Calls:
+    ## m1: lm(formula = I(log(price)) ~ I(carat^(1/3)), data = diamondsbig.sample)
+    ## m2: lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat, data = diamondsbig.sample)
+    ## m3: lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut, data = diamondsbig.sample)
+    ## m4: lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut + color, 
+    ##     data = diamondsbig.sample)
+    ## m5: lm(formula = I(log(price)) ~ I(carat^(1/3)) + carat + cut + color + 
+    ##     clarity, data = diamondsbig.sample)
+    ## 
+    ## ========================================================================================
+    ##                        m1            m2            m3            m4            m5       
+    ## ----------------------------------------------------------------------------------------
+    ##   (Intercept)         2.655***      1.317***      0.895***      1.296***      0.564***  
+    ##                      (0.018)       (0.074)       (0.073)       (0.058)       (0.042)    
+    ##   I(carat^(1/3))      5.854***      8.260***      8.686***      8.164***      8.439***  
+    ##                      (0.021)       (0.130)       (0.127)       (0.101)       (0.071)    
+    ##   carat                            -1.063***     -1.236***     -0.794***     -0.802***  
+    ##                                    (0.057)       (0.055)       (0.044)       (0.031)    
+    ##   cut: Ideal                                      0.230***      0.194***      0.134***  
+    ##                                                  (0.009)       (0.007)       (0.005)    
+    ##   cut: V.Good                                     0.140***      0.099***      0.069***  
+    ##                                                  (0.010)       (0.008)       (0.005)    
+    ##   color: E/D                                                   -0.091***     -0.078***  
+    ##                                                                (0.008)       (0.006)    
+    ##   color: F/D                                                   -0.123***     -0.099***  
+    ##                                                                (0.008)       (0.006)    
+    ##   color: G/D                                                   -0.183***     -0.160***  
+    ##                                                                (0.008)       (0.006)    
+    ##   color: H/D                                                   -0.252***     -0.231***  
+    ##                                                                (0.009)       (0.006)    
+    ##   color: I/D                                                   -0.365***     -0.361***  
+    ##                                                                (0.009)       (0.007)    
+    ##   color: J/D                                                   -0.502***     -0.518***  
+    ##                                                                (0.010)       (0.007)    
+    ##   color: K/D                                                   -0.693***     -0.701***  
+    ##                                                                (0.013)       (0.009)    
+    ##   color: L/D                                                   -0.839***     -0.837***  
+    ##                                                                (0.019)       (0.013)    
+    ##   clarity: I2                                                                -0.107**   
+    ##                                                                              (0.041)    
+    ##   clarity: IF                                                                 0.787***  
+    ##                                                                              (0.012)    
+    ##   clarity: SI1                                                                0.448***  
+    ##                                                                              (0.010)    
+    ##   clarity: SI2                                                                0.330***  
+    ##                                                                              (0.010)    
+    ##   clarity: VS1                                                                0.622***  
+    ##                                                                              (0.010)    
+    ##   clarity: VS2                                                                0.562***  
+    ##                                                                              (0.010)    
+    ##   clarity: VVS1                                                               0.723***  
+    ##                                                                              (0.010)    
+    ##   clarity: VVS2                                                               0.663***  
+    ##                                                                              (0.010)    
+    ## ----------------------------------------------------------------------------------------
+    ##   R-squared           0.885         0.889         0.897         0.936         0.969     
+    ##   adj. R-squared      0.885         0.889         0.897         0.936         0.969     
+    ##   sigma               0.295         0.290         0.280         0.221         0.154     
+    ##   F               77219.722     40133.134     21701.757     12153.775     15495.122     
+    ##   p                   0.000         0.000         0.000         0.000         0.000     
+    ##   Log-likelihood  -1983.814     -1811.851     -1461.476       920.905      4517.330     
+    ##   Deviance          870.113       840.667       783.719       486.432       236.771     
+    ##   AIC              3973.628      3631.701      2934.952     -1813.810     -8990.661     
+    ##   BIC              3995.256      3660.539      2978.208     -1712.879     -8832.055     
+    ##   N                9990          9990          9990          9990          9990         
+    ## ========================================================================================

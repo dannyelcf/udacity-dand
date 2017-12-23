@@ -21,6 +21,7 @@ library(memisc, warn.conflicts = FALSE)
 theme_set(theme_light())
 
 data(diamonds)
+diamondsbig <- read.csv('lesson_09_files/data/diamondsbig.csv')
 ```
 
 ### Welcome!
@@ -315,4 +316,41 @@ mtable(m1, m2, m3, m4, m5, sdigits = 3)
 > Note: https://www.youtube.com/watch?v=MV_e0z9kFjM
 
 "To start, this data is from 2008. When I fitted models using this data and predicted the price of the diamonds that I found in the market, I kept getting predictions that were way too low. After some additional digging, I found that global diamonds were poor. It turns out that prices plummeted in 2008 due to the global financial crisis and since then, prices at least for wholesale polished diamonds, have grown at about 6% per year, compound annual rate... And finally, after looking at the data on price scope, I realized that diamond prices grew unevenly across different karat sizes since 2008. Therefore, the initially estimated model could not simply be adjusted by inflation."
+
+### A Bigger, Better Data Set
+> Note: https://www.youtube.com/watch?v=q46nO0mznXM
+
+**Quiz:** Your task is to build five linear models like Solomon did for the diamonds data set only this time you'll use a sample of diamonds from the diamondsbig data set.
+
+Since the data set is so large, you are going to use a sample of the data set to compute the models. You can use the entire data set on your machine which will produce slightly different coefficients and statistics for the models.
+
+Be sure to make use of the same variables (logprice, carat, etc.) and model names (m1, m2, m3, m4, m5).
+
+**Response:**
+```{r A Bigger, Better Data Set}
+# Only want GIA Certified diamonds that are under $10,000
+diamondsbig.filtered <- diamondsbig[diamondsbig$price < 10000 & diamondsbig$cert == "GIA",]
+
+# Sample from this large dataset
+set.seed(20022012)
+diamondsbig.sample <- diamondsbig.filtered[sample(1:nrow(diamondsbig.filtered), 10000), ]
+
+m1 <- lm(I(log(price)) ~ I(carat^(1/3)), data = diamondsbig.sample)
+m1 
+
+m2 <- update(m1, ~ . + carat)
+m2
+
+m3 <- update(m2, ~ . + cut)
+m3
+
+m4 <- update(m3, ~ . + color)
+m4
+
+m5 <- update(m4, ~ . + clarity)
+m5
+
+mtable(m1, m2, m3, m4, m5, sdigits = 3)
+```
+
 
