@@ -3,3 +3,18 @@ EDA in Issues Tracking Data Set
 ================================================================================
 *by Dannyel Cardoso da Fonseca* 
 
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Load Packages"}
+library(ggplot2)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Set Up"}
+# NOTE: To run this notebook set up current work directory to this file location
+
+# Set up default theme for plots
+theme_set(theme_classic())
+```
+
+```{r echo=FALSE, "Load Data Set"}
+# Load the Issues Tracking Data Set
+issues <- read.csv("issues_tracking.csv")
+```
