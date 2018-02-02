@@ -1,4 +1,6 @@
-
+---
+output: github_document
+---
 EDA in Issues Tracking Data Set
 ================================================================================
 *by Dannyel Cardoso da Fonseca* 
@@ -17,4 +19,18 @@ theme_set(theme_classic())
 ```{r echo=FALSE, "Load Data Set"}
 # Load the Issues Tracking Data Set
 issues <- read.csv("issues_tracking.csv")
+```
+
+# Univariate Plots Section
+
+> **Tip**: In this section, you should perform some preliminary exploration of
+your dataset. Run some summaries of the data and create univariate plots to
+understand the structure of the individual variables in your dataset. Don't
+forget to add a comment after each plot or closely-related group of plots!
+There should be multiple code chunks and text sections; the first one below is
+just to help you get started.
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(issues, aes(x = issue_type, y = ..count..)) +
+    geom_bar()
 ```
