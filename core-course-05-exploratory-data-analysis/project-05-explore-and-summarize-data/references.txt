@@ -1,0 +1,8 @@
+In ggplot(issues, aes(x = reorder(issue_type, 
+                               issue_type,
+                               function(x) -length(x)), 
+                   y = ..count..)) +
+  geom_bar() +
+  xlab("issue_type")
+
+Reorder categorical variables was adapted from https://stackoverflow.com/a/9231857/8645131
