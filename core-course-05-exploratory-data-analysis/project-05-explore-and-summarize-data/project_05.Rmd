@@ -35,7 +35,7 @@ just to help you get started.
 issues %>% 
   count(issue_type) %>% 
   ggplot(aes(x = reorder(issue_type, -n), y = n/sum(n))) + 
-    geom_bar(stat = "identity") +
+    geom_bar(stat = "identity", alpha = .5) +
     geom_text(aes(label = n), vjust = -1) +
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .1)) +
     labs(title = "Frequency of Issue Types",
