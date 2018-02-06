@@ -31,7 +31,7 @@ forget to add a comment after each plot or closely-related group of plots!
 There should be multiple code chunks and text sections; the first one below is
 just to help you get started.
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, fig.retina=2, Univariate_Plots}
 issues %>% 
   count(issue_type) %>% 
   ggplot(aes(x = reorder(issue_type, -n), y = n/sum(n))) + 
