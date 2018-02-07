@@ -134,8 +134,8 @@ issues <-
 issues <- 
   issues %>%
   mutate(issue_stakeholder = recode(issue_stakeholder,
-                                    "CERCOMP" = "CONTRACTING",
-                                    "EMPRESA" = "OUTSOURCED")) %>% 
+                                    "CERCOMP" = "CUSTOMER",
+                                    "EMPRESA" = "COMPANY")) %>% 
   mutate(issue_stakeholder = factor(issue_stakeholder))
 
 # Rename issue_status values. Translate them from Portuguese to English.
@@ -151,67 +151,81 @@ issues <-
                                "AGUARD. AUTORIZAÇÃO PARA APRIMORAMENTO" = "WAITING FOR AUTHORIZATION FOR ENHANCEMENT",
                                "PENDENTE FECHAMENTO CLIENTE" = "CUSTOMER CLOSING PENDING",           
                                "VALIDADA PARA PRODUÇÃO" = "VALIDATED FOR PRODUCTION",               
-                               "AGUARDANDO RETORNO - SIG" = "WAITING FOR RETURN - OUTSOURCED",               
+                               "AGUARDANDO RETORNO - SIG" = "WAITING FOR RETURN - COMPANY",               
                                "ERRO DE VALIDAÇÃO" = "VALIDATION ERROR")) %>% 
   mutate(issue_status = factor(issue_status))
 
-unique(issues$log_action)
-# "ALTERAÇÃO DE TAREFA"                         
-# "RESPOSTA AOS INTERESSADOS NA TAREFA"        
-# "SOLICITAÇÃO DE INTEGRAÇÃO EM VERSÃO"         
-# "COMPLEMENTO DE INFORMAÇÕES"                 
-# "ALTERAÇÃO DE RESPONSABILIDADE"               
-# "SOLICITAÇÃO DE ATUALIZAÇÃO DE BASE DE DADOS"
-# "DESENVOLVIMENTO/EVOLUÇÃO"                    
-# "REGISTRO DE AGUARDANDO RETORNO"             
-# "TAREFA CANCELADA"                           
-# "CONCLUSÃO DO CHAMADO"                        
-# "VALIDAÇÃO"                                  
-# "TESTE REALIZADO"                             
-# "SOLICITAÇÃO DE TESTES"                      
-# "NOVA SUB-TAREFA"      
+# Rename log_action values. Translate them from Portuguese to English.
+# Cast log_action from character to unordered factor.
+issues <- 
+  issues %>%
+  mutate(log_action = recode(log_action,
+                             "ALTERAÇÃO DE TAREFA" = "ISSUE ALTERATION",
+                             "RESPOSTA AOS INTERESSADOS NA TAREFA" = "RESPONSE TO STAKEHOLDERS ON THE ISSUE",
+                             "SOLICITAÇÃO DE INTEGRAÇÃO EM VERSÃO" = "REQUEST FOR INTEGRATION IN VERSION",
+                             "COMPLEMENTO DE INFORMAÇÕES" = "COMPLEMENT OF INFORMATION",
+                             "ALTERAÇÃO DE RESPONSABILIDADE" = "CHANGE OF RESPONSIBILITY",
+                             "SOLICITAÇÃO DE ATUALIZAÇÃO DE BASE DE DADOS" = "REQUEST FOR UPDATING DATABASE",
+                             "DESENVOLVIMENTO/EVOLUÇÃO" = "DEVELOPMENT/EVOLUTION",
+                             "REGISTRO DE AGUARDANDO RETORNO" = "LOGGING OF WAITING FOR RETURN",
+                             "TAREFA CANCELADA" = "ISSUE CANCELED",
+                             "CONCLUSÃO DO CHAMADO" = "CONCLUSION OF THE ISSUE",
+                             "VALIDAÇÃO" = "VALIDATION",
+                             "TESTE REALIZADO" = "TEST DONE",
+                             "SOLICITAÇÃO DE TESTES" = "REQUEST FOR TESTING",
+                             "NOVA SUB-TAREFA" = "NEW SUBTASK")) %>% 
+  mutate(log_action = factor(log_action))
 
-unique(issues$log_status)
-# "FINALIZADA"
-# "PENDENTE FECHAMENTO CLIENTE"
-# "SOLICITADO ATUALIZAÇÃO PRODUÇÃO"
-# "VALIDADA PELO CLIENTE"
-# "EM DESENVOLVIMENTO"
-# "ERRO DE VALIDAÇÃO"
-# "PENDENTE VALIDAÇÃO DO CLIENTE"
-# "RETORNADA INFORMAÇÃO"
-# "AGUARD. RETORNO"
-# "AGUARDANDO RETORNO - CLIENTE"
-# "CONCLUÍDO"
-# "AGUARDANDO RETORNO - SIG"
-# "ABERTA"
-# "CANCELADA"
-# "VALIDADA PARA PRODUÇÃO"
-# "EM PRÉ-PRODUÇÃO"
-# "PENDENTE INICIAR"
-# "ERRO DE TESTE"
-# "PENDENTE ATUALIZAÇÃO EM HOMOLOGAÇÃO/TESTES"
-# "VALIDADA INTERNAMENTE"
-# "PENDENTE DE DISTRIBUIÇÃO"
-# "AGUARD. VALIDAÇÃO TÉCNICA INTERNA"
-# "EM HOMOLOGAÇÃO/TESTES"
-# "AUTORIZADO DESENVOLVIMENTO"
-# "EM TESTE"
-# "PENDENTE DE ANÁLISE TÉCNICA"
-# "RETORNADA POR FALTA DE INFORMAÇÃO"
-# "VALIDADO POR TESTES"
-# "SUSPENSA"
-# "REABERTA"
-# "AGUARD. APROVAÇÃO DO CLIENTE"
-# "TESTE SOLICITADO"
-# "EM PRODUÇÃO"
-# "INICIADA EXECUÇÃO"
+# Rename log_status values. Translate them from Portuguese to English.
+# Cast log_status from character to unordered factor.
+issues <- 
+  issues %>%
+  mutate(log_status = recode(log_status,
+                             "FINALIZADA" = "FINISHED",
+                             "PENDENTE FECHAMENTO CLIENTE" = "CUSTOMER CLOSING PENDING",
+                             "SOLICITADO ATUALIZAÇÃO PRODUÇÃO" = "REQUESTED PRODUCTION UPDATE",
+                             "VALIDADA PELO CLIENTE" = "VALIDATED BY CUSTOMER",
+                             "EM DESENVOLVIMENTO" = "UNDER DEVELOPMENT",
+                             "ERRO DE VALIDAÇÃO" = "VALIDATION ERROR",
+                             "PENDENTE VALIDAÇÃO DO CLIENTE" = "CUSTOMER VALIDATION PENDING",
+                             "RETORNADA INFORMAÇÃO" = "RETURNED INFORMATION",
+                             "AGUARD. RETORNO" = "WAITING FOR RETURN",
+                             "AGUARDANDO RETORNO - CLIENTE" = "WAITING FOR RETURN - CUSTOMER",
+                             "CONCLUÍDO" = "COMPLETED",
+                             "AGUARDANDO RETORNO - SIG" = "WAITING FOR RETURN - COMPANY",
+                             "ABERTA" = "OPEN",
+                             "CANCELADA" = "CANCELED",
+                             "VALIDADA PARA PRODUÇÃO" = "VALIDATED FOR PRODUCTION",
+                             "EM PRÉ-PRODUÇÃO" = "IN PRE-PRODUCTION",
+                             "PENDENTE INICIAR" = "PENDING START",
+                             "ERRO DE TESTE" = "TEST ERROR",
+                             "PENDENTE ATUALIZAÇÃO EM HOMOLOGAÇÃO/TESTES" = "PENDING UPGRADE IN HOMOLOGATION/TESTS",
+                             "VALIDADA INTERNAMENTE" = "VALIDATED INTERNALLY",
+                             "PENDENTE DE DISTRIBUIÇÃO" = "DISTRIBUTION PENDING",
+                             "AGUARD. VALIDAÇÃO TÉCNICA INTERNA" = "WAITING FOR INTERNAL TECHNICAL VALIDATION",
+                             "EM HOMOLOGAÇÃO/TESTES" = "IN HOMOLOGATION/TESTS",
+                             "AUTORIZADO DESENVOLVIMENTO" = "AUTHORIZED DEVELOPMENT",
+                             "EM TESTE" = "IN TEST",
+                             "PENDENTE DE ANÁLISE TÉCNICA" = "TECHNICAL ANALYSIS PENDING",
+                             "RETORNADA POR FALTA DE INFORMAÇÃO" = "RETURNED FOR LACK OF INFORMATION",
+                             "VALIDADO POR TESTES" = "VALIDATED BY TEST",
+                             "SUSPENSA" = "SUSPENDED",
+                             "REABERTA" = "REOPENED",
+                             "AGUARD. APROVAÇÃO DO CLIENTE" = "WAITING FOR CUSTOMER APPROVAL",
+                             "TESTE SOLICITADO" = "TEST REQUESTED",
+                             "EM PRODUÇÃO" = "IN PRODUCTION",
+                             "INICIADA EXECUÇÃO" = "STARTED EXECUTION")) %>% 
+  mutate(log_status = factor(log_status))
 
 # Cast issue_system and issue_subsystem from character to unordered factor.
 issues <- 
   issues %>%
   mutate(issue_system = factor(issue_system),
          issue_subsystem = factor(issue_subsystem))
+
+# To avoid Evaluation error: (converted from warning) unknown timezone 
+# 'zone/tz/2017c.1.0/zoneinfo/America/Sao_Paulo'.
+Sys.setenv(TZ = "America/Sao_Paulo")
 
 # Cast issue_creation_date variable from character to POSIXct (datetime)
 issues <- 
@@ -241,7 +255,7 @@ issues <-
            issue_time_spent %>% 
              str_replace(",", ".") %>% 
              str_replace("h", "") %>% 
-             as.double() * 60,
+             as.double() * 3600,
            NA)
   ))
 
