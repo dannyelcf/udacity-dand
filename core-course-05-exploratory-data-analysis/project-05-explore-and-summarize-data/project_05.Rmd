@@ -8,6 +8,7 @@ EDA in Issues Tracking Data Set
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Load Packages"}
 library(ggplot2)
 library(dplyr)
+library(lubridate)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Set Up"}
@@ -23,7 +24,50 @@ theme_set(theme_classic())
 
 ```{r echo=FALSE, "Load Data Set"}
 # Load the Issues Tracking Data Set
-issues <- read.csv("issues_tracking.csv", stringsAsFactors=FALSE, na.strings = "")
+setClass('date_ymd_hms')
+setAs("character","date_ymd_hms", function(from) ymd_hms(from))
+setClass('date_ymd')
+setAs("character", "date_ymd", function(from) ymd(from))
+setClass('time_period')
+setAs("character", "time_period", function(from) seconds_to_period(from))
+setClass('factor_issue_priority_scale')
+setAs("character", "factor_issue_priority_scale", 
+      function(from) {
+        factor(from, levels = c("SUSPENDED",
+                                "LOW",
+                                "MEDIUM",
+                                "HIGH",
+                                "URGENT",
+                                "BLOCKING"))
+      })
+issues <- read.csv("issues_tracking.csv", 
+                   stringsAsFactors=FALSE, 
+                   na.strings = "",
+                   colClasses = c("integer", # issue_id
+                                  "integer", # issue_number
+                                  "character", # issue_title
+                                  "factor", # issue_type
+                                  "date_ymd_hms", # issue_creation_date
+                                  "factor", # issue_system
+                                  "date_ymd", # issue_start_date
+                                  "factor", # issue_subsystem
+                                  "date_ymd", # issue_deadline_date
+                                  "character", # issue_created_by
+                                  "factor", # issue_stakeholder
+                                  "factor", # issue_status
+                                  "time_period", # issue_time_spent
+                                  "integer", # issue_priority_number
+                                  "integer", # issue_progress
+                                  "factor_issue_priority_scale",  # issue_priority_scale
+                                  "character", # log_build_info
+                                  "date_ymd_hms",  # log_creation_date
+                                  "factor", # log_action
+                                  "factor", # log_status
+                                  "integer", # log_progress
+                                  "time_period", # log_time_spent
+                                  "character", # log_created_by 
+                                  "integer" # log_svn_revision 
+                                  ))
 ```
 
 # Univariate Plots Section
@@ -46,5 +90,4 @@ issues %>%
          x = "issue_type",
          y = "frequency")
 
-#subset(issues, log_svn_revision != "")
 ```

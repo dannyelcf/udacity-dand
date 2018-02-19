@@ -9,6 +9,12 @@ issues <-
            stringsAsFactors = FALSE,
            na.strings = "")
 
+# Drop column "gerente_relacionamento_tarefa" (issue_relationship_manager). 
+# Its content is always NA.
+issues <-
+  issues %>%
+  select(-one_of("gerente_relacionamento_tarefa"))
+
 # Rename columns of issues data set. Translate their names from Portuguese to
 # English.
 issues <-
@@ -27,7 +33,6 @@ issues <-
     issue_stakeholder = localizacao_analista_tarefa,
     issue_status = situacao_tarefa,
     issue_time_spent = horas_trabalhadas_tarefa,
-    issue_relationship_manager = gerente_relacionamento_tarefa,
     issue_priority_number = num_prioridade_tarefa,
     issue_progress = andamento_tarefa,
     issue_priority_scale = prioridade_tarefa,
