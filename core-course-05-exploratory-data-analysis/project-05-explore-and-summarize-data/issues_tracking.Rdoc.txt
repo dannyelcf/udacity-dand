@@ -34,7 +34,8 @@ columns the data are distinct (one for each issue log).
 
 issue_id (integer):
 
-	Internal identifier (in the database) of the issue. Its value uniquely  	identifies an issue. The user of issue tracking system do not see this 
+	Internal identifier (in the database) of the issue. Its value uniquely 
+	identifies an issue. The user of issue tracking system do not see this 
 	identifier.
 
 issue_number (integer):

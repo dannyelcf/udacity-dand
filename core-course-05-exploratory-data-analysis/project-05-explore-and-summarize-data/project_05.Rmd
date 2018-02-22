@@ -93,8 +93,6 @@ The issue data set contains 22,125 rows and 24 variables. Of these 24 variables
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Structure of the Data Set"}
 str(issues, max.level=1, vec.len=1, nchar.max=50)
-min(issues$issue_creation_date)
-max(issues$issue_creation_date)
 ```
 
 The relationship between issue and log is 1-N, that is, one issue can contains

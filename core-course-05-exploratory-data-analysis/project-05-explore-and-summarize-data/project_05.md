@@ -56,10 +56,6 @@ issue.
     ##  $ log_created_by       : chr  "ROSANGELA DIVINA DE SOUSA SANTANA" ...
     ##  $ log_svn_revision     : int  NA NA ...
 
-    ## [1] "2013-05-21 19:10:24 UTC"
-
-    ## [1] "2018-01-26 16:16:06 UTC"
-
 The relationship between issue and log is 1-N, that is, one issue can
 contains zero or more logs. In this project, the data set is
 denormalized. The issue data and log data are joined in the same row.
