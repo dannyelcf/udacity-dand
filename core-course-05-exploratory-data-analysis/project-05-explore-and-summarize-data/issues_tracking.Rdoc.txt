@@ -7,14 +7,8 @@ Issues Tracking Data Set
 Description
 ===========
 
-A data set containing 22,125 observations of issue tracking and their history logs. 
-This data set is a subset of data of a proprietary issue tracking system that was used 
-to manage the activities in a system maintenance and customization project that I was 
-the manager. This data set was exported using data wrangling techniques since I did 
-not have access to the database. In the folder 'data_wrangling' there are 3 scripts 
-which were used to collect (issues_collecting.py), export (issues_export_csv.py) and 
-clean (issues_cleaning.R) the data set. An original issue (in Portuguese) can be seen 
-in 'issue_example.html'
+This data set containing 22,125 observations of issues tracking and their history 
+logs. It represents 5 years of project management which aimed maintenance and customization of many integrated systems. 
 
 
 Usage
@@ -25,28 +19,29 @@ issues <- read.csv("issues_tracking.csv",
                    na.strings = "",
                    colClasses = c(...))
 
-To load the data set with correct column classes see the 'Load Data Set' section in
-'project_05.Rmd' file.
+To load the data set with correct column classes see the 'Load Data Set' section 
+in 'project_05.Rmd' file.
 
 
 Format
 ======
 
-A data.frame with 22,125 rows and 24 variables, 16 being about issues information and 8
-about history logs of a given issue. One issue can have zero or more history logs. Thus,
-an issue with two history logs has two rows with issue_* columns with the data repeated
-in the columns issue_* and the data of each history log in the columns log_*.
+A data.frame containing 22,125 rows and 24 variables. Of these 24 variables 
+16 are about issue data and 8 about history records of a given issue. One issue 
+can have zero or more history logs. Thus, one issue with two history logs has 
+two rows in data set. In issue_* columns the data are repeated and in log_* 
+columns the data are distinct (one for each issue log).
 
 issue_id (integer):
 
-	Internal identifier (in the database) of the issue. Its value uniquely identifies
-        an issue. The user of issue tracking system do not see this identifier.
+	Internal identifier (in the database) of the issue. Its value uniquely  	identifies an issue. The user of issue tracking system do not see this 
+	identifier.
 
 issue_number (integer):
 
 	Identifier (in the database) of the issue. Its value uniquely identifies
-        an issue. The user of issue tracking system see this identifier and use it as 
-        reference.
+        an issue. The user of issue tracking system see this identifier and use 
+	it as reference.
 
 issue_title (character):
 
@@ -55,30 +50,33 @@ issue_title (character):
 
 issue_type (unordered factor):
 
-	A classifier for the issue. Its possible values (levels) are: CUSTOMIZATION, 
-        DATA MIGRATION, MAINTENANCE, OTHERS
+	A classifier for the issue. Its possible values (levels) are: 
+	CUSTOMIZATION, DATA MIGRATION, MAINTENANCE, OTHERS
 
 issue_creation_date (POSIXct):
 
-	The date and time of creation of the issue. Its format is: yyyy-mm-dd h:m:s.
+	The date and time of creation of the issue. Its format is: yyyy-mm-dd 
+	h:m:s.
 	
         Example: 2016-12-15 15:07:32
 
 issue_system (unordered factor):
 
-	The name of the system for which the issue is. There are 10 possible values
-        (levels) for the system name.
+	The name of the system for which the issue is. There are 10 possible 
+	values (levels) for the system name.
 
 issue_start_date (Date):
 
-	The planning date to initiate an action on the issue. Its format is: yyyy-mm-dd. 
+	The planning date to initiate an action on the issue. Its format is: 
+	yyyy-mm-dd. 
         
         Example: 2016-12-20
 
 issue_subsystem (unordered factor):
 
-	The name of the subsystem for which the issue is. One system has one or more 
-        subsystems. There are 77 possible values (levels) for the subsystem name.
+	The name of the subsystem for which the issue is. One system has one or 
+	more subsystems. There are 77 possible values (levels) for the subsystem 
+	name.
 
 issue_deadline_date (Date):
 
@@ -92,17 +90,18 @@ issue_created_by (character):
 
 issue_stakeholder (unordered factor):
 	
-	A classifier for the person who created the issue. Its possible values (levels)
-        are: COMPANY, CUSTOMER.
+	A classifier for the person who created the issue. Its possible values 
+	(levels) are: COMPANY, CUSTOMER.
 
 issue_status (unordered factor):
 	
-	A classifier for the issue which represents its status. There are 10 possible
-        values (levels) for the status.
+	A classifier for the issue which represents its status. There are 10 
+	possible values (levels) for the status.
 
 issue_time_spent (lubridate Period):
 
-	Total time spent solving the issue. Its format is: hH mM sS or mM sS or sS.
+	Total time spent solving the issue. Its format is: hH mM sS or mM sS or 
+	sS.
 	
         Examples: 14H 12M 0S
                       42M 0S
@@ -110,13 +109,13 @@ issue_time_spent (lubridate Period):
 
 issue_priority_number (integer):
 
-	A number that represents the priority of the issue. Its range value is 0 (highest)
-        and 999 (lowest).
+	A number that represents the priority of the issue. Its range value is 0 
+	(highest) and 999 (lowest).
 
 issue_progress (integer):
 
-	A number representing the rate of progress of the completion of the issue. Its
-        range value is 0 (lowest) and 100 (highest).
+	A number representing the rate of progress of the completion of the 
+	issue. Its range value is 0 (lowest) and 100 (highest).
 
 issue_priority_scale (ordered factor):
 
@@ -125,14 +124,16 @@ issue_priority_scale (ordered factor):
 
 log_build_info (character):
 
-	The name of the new system version that will be deployed. It has two formats:
+	The name of the new system version that will be deployed. It has two 
+	formats:
         1) <system name>-<major>.<medium>.<minor>.ufg
         2) <system name>-<ref_major>.<ref_medium>.<ref_minor>.s_<sequence>.ufg
-        For each system there is a reference system (trunk). Each system of a client
-        derivates from the reference system. His system version follows the second format.
-        The first format is an exception. It is used in systems that break compatibility 
-        with version of reference system. Currently, the first format is used only by 
-        SIGAA system. The others systems use the second format.
+        For each system there is a reference system (trunk). Each system of a 
+	client derivates from the reference system. His system version follows 
+	the second format. The first format is an exception. It is used in 
+	systems that break compatibility with version of reference system. 
+	Currently, the first format is used only by SIGAA system. The others 
+	systems use the second format.
         
         Example: SIGAA-4.1.14.ufg
                  SIPAC-4.19.1.s_27.ufg
@@ -146,8 +147,8 @@ log_creation_date (POSIXct):
 
 log_action (unordered factor):
 	
-	An activity/action taken to make progress in solving the issue. There are 14
-        possible values (levels) for the action.
+	An activity/action taken to make progress in solving the issue. There are 
+	14 possible values (levels) for the action.
 
 log_status (unordered factor):
 	
@@ -156,13 +157,13 @@ log_status (unordered factor):
 
 log_progress (integer):
 
-	A number representing the rate of progress of the completion of one activity to
-        the issue. Its range value is 0 (lowest) and 100 (highest).
+	A number representing the rate of progress of the completion of one 
+	activity to the issue. Its range value is 0 (lowest) and 100 (highest).
 
 log_time_spent (lubridate Period):
 
-	Total time spent solving one activity to the issue. Its format is: hH mM sS or 
-        mM sS or sS.
+	Total time spent solving one activity to the issue. Its format is: hH mM 
+	sS or mM sS or sS.
 	
         Examples: 14H 12M 0S
                       42M 0S
@@ -174,6 +175,6 @@ log_created_by (character):
 
 log_svn_revision (integer):
 
-	The number of SVN revision if activity involved changes in the source code of 
-        the subsystem.
+	The number of SVN revision if activity involved changes in the source 
+	code of the subsystem.
 

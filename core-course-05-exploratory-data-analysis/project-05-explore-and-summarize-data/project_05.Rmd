@@ -70,6 +70,47 @@ issues <- read.csv("issues_tracking.csv",
                                   ))
 ```
 
+This project aims to explore a data set containing 22,125 observations of issues 
+tracking and their history logs. The data set represents 5 years of project 
+management which aimed maintenance and customization of many integrated systems.
+
+A proprietary issue tracking system was used to manage activities of teams. I used 
+data wrangling techniques to export data from that and clean them. 
+
+The final data set, used in this project, and its documentation can be accessed, 
+respectively, in these links: 
+
+- [issues_tracking.csv](issues_tracking.csv)
+- [issues_tracking.Rdoc.txt](issues_tracking.Rdoc.txt)
+
+The exported data set, the wrangling process scripts and an example of one issue 
+tracking can be find in [data_wrangling](data_wrangling) folder. 
+
+# Summary of the Data Set
+
+The issue data set contains 22,125 rows and 24 variables. Of these 24 variables 
+16 are about issue data and 8 about history records of a given issue.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Structure of the Data Set"}
+str(issues, max.level=1, vec.len=1, nchar.max=50)
+min(issues$issue_creation_date)
+max(issues$issue_creation_date)
+```
+
+The relationship between issue and log is 1-N, that is, one issue can contains
+zero or more logs. In this project, the data set is denormalized. The issue data 
+and log data are joined in the same row. Thus, one issue with three history logs 
+has three rows in data set. In *issue_\** columns the data are repeated and in 
+*log_\** columns the data are distinct (one for each issue log). The issue 
+*15617* illustrates this case in the table below.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Head of the Data Set"}
+issues %>% 
+  select(issue_id, issue_creation_date, log_creation_date) %>% 
+  arrange(issue_id, log_creation_date) %>%
+  head(5)
+```
+
 # Univariate Plots Section
 
 > **Tip**: In this section, you should perform some preliminary exploration of
