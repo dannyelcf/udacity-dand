@@ -1,7 +1,7 @@
 ---
 output: github_document
 ---
-EDA in Issues Tracking Data Set
+EDA in an Issues Tracking Data Set
 ================================================================================
 *by Dannyel Cardoso da Fonseca* 
 
@@ -9,6 +9,7 @@ EDA in Issues Tracking Data Set
 library(ggplot2)
 library(dplyr)
 library(lubridate)
+library(grid)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Set Up"}
@@ -72,61 +73,226 @@ issues <- read.csv("issues_tracking.csv",
 
 This project aims to explore a data set containing 22,125 observations of issues 
 tracking and their history logs. The data set represents 5 years of project 
-management which aimed maintenance and customization of many integrated systems.
+management which aimed maintenance and customization of many integrated systems
+([SIG](https://docs.info.ufrn.br)) for the academic, administrative and human 
+resources management at the Universidade Federal de Goiás ([UFG](https://www.ufg.br)).
 
-A proprietary issue tracking system was used to manage activities of teams. I used 
-data wrangling techniques to export data from that and clean them. 
+A proprietary issue tracking system ([SIGProject](https://sigproject.esig.com.br)) 
+was used to manage activities of teams.
 
-The final data set, used in this project, and its documentation can be accessed, 
+![Screenshot](project_05_files/screenshot-sigproject.esig.com.br-2018.02.25-11-25-48.png)
+
+I used data wrangling techniques to export data from that and clean them. The 
+final data set, used in this project, and its documentation can be accessed, 
 respectively, in these links: 
 
-- [issues_tracking.csv](issues_tracking.csv)
-- [issues_tracking.Rdoc.txt](issues_tracking.Rdoc.txt)
+- [Issues Data Set](issues_tracking.csv)
+- [Issues Data Set Documentation](issues_tracking.Rdoc.txt)
 
 The exported data set, the wrangling process scripts and an example of one issue 
 tracking can be find in [data_wrangling](data_wrangling) folder. 
 
-# Summary of the Data Set
+# Data Set Summaries
 
-The issue data set contains 22,125 rows and 24 variables. Of these 24 variables 
-16 are about issue data and 8 about history records of a given issue.
+The issues data set contains 22,125 rows and 24 variables. Of these 24 variables 
+16 are about issue data and 8 about issue's logs.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Structure of the Data Set"}
+# Show the issues' dataframe structure
 str(issues, max.level=1, vec.len=1, nchar.max=50)
 ```
 
-The relationship between issue and log is 1-N, that is, one issue can contains
-zero or more logs. In this project, the data set is denormalized. The issue data 
-and log data are joined in the same row. Thus, one issue with three history logs 
-has three rows in data set. In *issue_\** columns the data are repeated and in 
-*log_\** columns the data are distinct (one for each issue log). The issue 
-*15617* illustrates this case in the table below.
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, "Head of the Data Set"}
-issues %>% 
-  select(issue_id, issue_creation_date, log_creation_date) %>% 
-  arrange(issue_id, log_creation_date) %>%
-  head(5)
+```{r echo=FALSE, message=FALSE, warning=FALSE, "df.number_logs_per_issue"}
+# From issues dataframe, it was created another dataframe which counts number of 
+# logs per issue_id
+df.number_logs_per_issue <- 
+  issues %>%
+    select(issue_id, log_creation_date) %>%
+    group_by(issue_id) %>% 
+    summarise(number_logs_per_issue = sum(!is.na(log_creation_date))) %>% 
+    as.data.frame()
 ```
 
-# Univariate Plots Section
+The number of distinct issues rows and issue's logs rows are 4,503 and 21,978
+respectively.
 
-> **Tip**: In this section, you should perform some preliminary exploration of
-your dataset. Run some summaries of the data and create univariate plots to
-understand the structure of the individual variables in your dataset. Don't
-forget to add a comment after each plot or closely-related group of plots!
-There should be multiple code chunks and text sections; the first one below is
-just to help you get started.
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Number of issues and issue's logs"}
+data.frame(number_issues = nrow(df.number_logs_per_issue), 
+           number_logs = sum(df.number_logs_per_issue$number_logs_per_issue))
+```
+We can note that the number of issues represents 20% of the data set and the 
+number of logs represents 99% of it. The 1% of logs remaining (147 rows) represents 
+issues that do not have history logs.
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE, "df.summary_logs_per_issue"}
+df.summary_logs_per_issue <- 
+  data.frame(min = min(df.number_logs_per_issue$number_logs_per_issue), 
+             max = max(df.number_logs_per_issue$number_logs_per_issue),
+             mean = mean(df.number_logs_per_issue$number_logs_per_issue),
+             qu1 = quantile(df.number_logs_per_issue$number_logs_per_issue, 
+                            probs = .25, names = FALSE),
+             median = quantile(df.number_logs_per_issue$number_logs_per_issue, 
+                               probs = .5, names = FALSE),
+             qu3 = quantile(df.number_logs_per_issue$number_logs_per_issue, 
+                            probs = .75, names = FALSE),
+             pc95 = quantile(df.number_logs_per_issue$number_logs_per_issue, 
+                             probs = .95, names = FALSE),
+             iqr = (quantile(df.number_logs_per_issue$number_logs_per_issue, 
+                             probs = .75, names = FALSE) - 
+                    quantile(df.number_logs_per_issue$number_logs_per_issue, 
+                             probs = .25, names = FALSE)))
+```
+
+The distribution of number of logs per issue and their summaries are presented in 
+the barplot below.
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Number of Logs per Issue"}
+#
+y_summary_plot = -35
+
+# Count number of issues for each number of logs per issue
+df.number_logs_per_issue %>%
+  group_by(number_logs_per_issue) %>%
+  summarise(score = n()) %>% 
+  as.data.frame() %>% 
+  # Output a barplot
+  ggplot(aes(x = number_logs_per_issue, y = score)) +
+    geom_bar(stat = "identity", alpha = .6) +
+    scale_x_continuous(breaks = seq(0, 43, 2)) +
+    scale_y_continuous(breaks = seq(0, 800, 50), limits = c(y_summary_plot, 800)) +
+    # 1st quantile
+    annotate("segment", 
+             x = df.summary_logs_per_issue$qu1, 
+             xend = df.summary_logs_per_issue$median, 
+             y = y_summary_plot, yend = y_summary_plot, colour = "black", 
+             size = .5, 
+             arrow = arrow(ends="first", angle=90, length=unit(.15,"cm"))) +
+    # 2nd quantile (median)
+    annotate("segment", 
+             x = df.summary_logs_per_issue$median, 
+             xend = df.summary_logs_per_issue$median, 
+             y = y_summary_plot, yend = y_summary_plot, colour = "black", 
+             size = 1, 
+             arrow = arrow(ends="both", angle=90, length=unit(.15,"cm"))) +
+    # 3rd quantile
+    annotate("segment", 
+             x = df.summary_logs_per_issue$median, 
+             xend = df.summary_logs_per_issue$qu3, 
+             y = y_summary_plot, yend = y_summary_plot, colour = "black", 
+             size = .5, 
+             arrow = arrow(ends="last", angle=90, length=unit(.15,"cm"))) +
+    # Lower outlier limiar (1st qu. - IQR * 1.5)
+    annotate("segment", 
+             x = df.summary_logs_per_issue$min, 
+             xend = df.summary_logs_per_issue$qu1, 
+             y = y_summary_plot, yend = y_summary_plot, colour = "black", 
+             size = .5) +
+    # Upper outlier limiar (3st qu. + IQR * 1.5)
+    annotate("segment", 
+             x = df.summary_logs_per_issue$qu3, 
+             xend = df.summary_logs_per_issue$qu3 + (df.summary_logs_per_issue$iqr * 1.5), 
+             y = y_summary_plot, yend = y_summary_plot, colour = "black", 
+             size = .5) +
+    # Mean
+    annotate("point", 
+             x = df.summary_logs_per_issue$mean, y = y_summary_plot, 
+             colour = "red", size = 1.2) +
+    # Summary labels
+    annotate("text", 
+             label=paste("min:", df.summary_logs_per_issue$min,
+                         "\n    1st qu.:", df.summary_logs_per_issue$qu1,
+                         "\n      median:", df.summary_logs_per_issue$median,
+                         "\n        mean:", round(df.summary_logs_per_issue$mean,2),
+                         "\n     3rd qu.:", df.summary_logs_per_issue$qu3,
+                         "\n    95 %:", df.summary_logs_per_issue$pc95,
+                         "\n  max:", df.summary_logs_per_issue$max), 
+             x = 40, y = 650, size = 3.5) +
+    labs(title = "Distribution of Number of Logs per Issue",
+         x = "Number of logs per issue",
+         y = "Frequency")
+```
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE, "Drop Auxliary Variables 1"}
+rm(df.number_logs_per_issue)
+rm(df.summary_logs_per_issue)
+rm(y_summary_plot)
+```
+
+Analysing the plot above, we can note that 75% of issues have up to 6 history logs 
+and 50% of issues have between 2 and 6 logs. Besides the skewed shape of plot,
+the median (black strong tick) and mean (red point) are very close. This means 
+that the amount of ouliers (greater than 12 logs) is low, approximately 5% of 
+issues.  
+
+This data set comprises issues created in the period between 05/21/2013 and 
+01/26/2018.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Start and End Issue's Creation Date"}
+data.frame(first_issue_creation_date = format(min(issues$issue_creation_date), 
+                                              "%m/%d/%Y %H:%M:%S"), 
+           last_issue_creation_date = format(max(issues$issue_creation_date), 
+                                              "%m/%d/%Y %H:%M:%S"))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, "df.number_issues_per_month"}
+df.issue_creation_date <- 
+  issues %>%
+    select(issue_id, issue_creation_date) %>%
+    group_by(issue_id) %>% 
+    summarise(issue_creation_date = first(issue_creation_date)) %>% 
+    as.data.frame()
+```
+
+The distribution of number of issues created by month and the cumulative mean 
+(red line) are presented in the barplot below. 
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Created per Month"}
+df.issue_creation_date %>%
+  group_by(issue_creation_date = as.Date(floor_date(issue_creation_date, "month"))) %>% 
+  summarise(score = n()) %>% 
+  mutate(cummean = cummean(score)) %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = issue_creation_date, y = score)) +
+    geom_bar(stat = "identity", alpha = .6) +
+    geom_line(aes(x = issue_creation_date, y = cummean), 
+              linetype = 1, color = "red") +
+    scale_x_date(date_breaks = "2 month", date_labels = "%b %Y") +
+    scale_y_continuous(breaks = seq(0, 190, 10)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(title = "Distribution of Number of Issues Created per Month",
+         x = "Issue's creation date (month)",
+         y = "Frequency")
+  
+```
+
+Analysing the plot above, we note that the year 2013 had the lowest demand. The
+mean variates between 10 and 20 issues per month. At the end
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE, "Drop Auxliary Variables 2"}
+rm(df.issue_creation_date)
+```
+
+To continue...
 
 ```{r echo=FALSE, fig.retina=2, Univariate_Plots}
-issues %>% 
-  count(issue_type) %>% 
-  ggplot(aes(x = reorder(issue_type, -n), y = n/sum(n))) + 
-    geom_bar(stat = "identity", alpha = .5) +
-    geom_text(aes(label = n), vjust = -1) +
-    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .1)) +
-    labs(title = "Frequency of Issue Types",
-         x = "issue_type",
-         y = "frequency")
+# issues %>% 
+#   count(issue_type) %>% 
+#   ggplot(aes(x = reorder(issue_type, -n), y = n/sum(n))) + 
+#     geom_bar(stat = "identity") +
+#     geom_text(aes(label = n), vjust = -1) +
+#     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .1)) +
+#     labs(title = "Frequency of Issue Types",
+#          x = "issue_type",
+#          y = "frequency")
 
+```
+
+# Reflections on Data Set Summaries
+
+What is the commom flow of the log states?
+What makes the demand low in 2013?
+What makes the demand grow rapidly in 2014?
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE, "Drop Data Set"}
+rm(issues)
 ```

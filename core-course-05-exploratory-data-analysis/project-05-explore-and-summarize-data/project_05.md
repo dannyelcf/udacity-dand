@@ -1,34 +1,38 @@
 
-EDA in Issues Tracking Data Set
-===============================
+EDA in an Issues Tracking Data Set
+==================================
 
 *by Dannyel Cardoso da Fonseca*
 
 This project aims to explore a data set containing 22,125 observations
 of issues tracking and their history logs. The data set represents 5
 years of project management which aimed maintenance and customization of
-many integrated systems.
+many integrated systems ([SIG](https://docs.info.ufrn.br)) for the
+academic, administrative and human resources management at the
+Universidade Federal de Goiás ([UFG](https://www.ufg.br)).
 
-A proprietary issue tracking system was used to manage activities of
-teams. I used data wrangling techniques to export data from that and
-clean them.
+A proprietary issue tracking system
+([SIGProject](https://sigproject.esig.com.br)) was used to manage
+activities of teams.
 
-The final data set, used in this project, and its documentation can be
-accessed, respectively, in these links:
+![Screenshot](project_05_files/screenshot-sigproject.esig.com.br-2018.02.25-11-25-48.png)
 
--   [issues\_tracking.csv](issues_tracking.csv)
--   [issues\_tracking.Rdoc.txt](issues_tracking.Rdoc.txt)
+I used data wrangling techniques to export data from that and clean
+them. The final data set, used in this project, and its documentation
+can be accessed, respectively, in these links:
+
+-   [Issues Data Set](issues_tracking.csv)
+-   [Issues Data Set Documentation](issues_tracking.Rdoc.txt)
 
 The exported data set, the wrangling process scripts and an example of
 one issue tracking can be find in [data\_wrangling](data_wrangling)
 folder.
 
-Summary of the Data Set
-=======================
+Data Set Summaries
+==================
 
-The issue data set contains 22,125 rows and 24 variables. Of these 24
-variables 16 are about issue data and 8 about history records of a given
-issue.
+The issues data set contains 22,125 rows and 24 variables. Of these 24
+variables 16 are about issue data and 8 about issue’s logs.
 
     ## 'data.frame':    22125 obs. of  24 variables:
     ##  $ issue_id             : int  487247 487247 ...
@@ -56,30 +60,45 @@ issue.
     ##  $ log_created_by       : chr  "ROSANGELA DIVINA DE SOUSA SANTANA" ...
     ##  $ log_svn_revision     : int  NA NA ...
 
-The relationship between issue and log is 1-N, that is, one issue can
-contains zero or more logs. In this project, the data set is
-denormalized. The issue data and log data are joined in the same row.
-Thus, one issue with three history logs has three rows in data set. In
-*issue\_\** columns the data are repeated and in *log\_\** columns the
-data are distinct (one for each issue log). The issue *15617*
-illustrates this case in the table below.
+The number of distinct issues rows and issue’s logs rows are 4,503 and
+21,978 respectively.
 
-    ##   issue_id issue_creation_date   log_creation_date
-    ## 1    14416 2013-05-21 19:10:24 2013-06-13 16:32:00
-    ## 2    15617 2013-06-07 18:01:29 2013-06-10 09:23:00
-    ## 3    15617 2013-06-07 18:01:29 2013-06-13 10:37:00
-    ## 4    15617 2013-06-07 18:01:29 2013-06-17 11:39:00
-    ## 5    16281 2013-06-18 18:28:44 2013-06-20 15:35:00
+    ##   number_issues number_logs
+    ## 1          4503       21978
 
-Univariate Plots Section
-========================
+We can note that the number of issues represents 20% of the data set and
+the number of logs represents 99% of it. The 1% of logs remaining (147
+rows) represents issues that do not have history logs.
 
-> **Tip**: In this section, you should perform some preliminary
-> exploration of your dataset. Run some summaries of the data and create
-> univariate plots to understand the structure of the individual
-> variables in your dataset. Don’t forget to add a comment after each
-> plot or closely-related group of plots! There should be multiple code
-> chunks and text sections; the first one below is just to help you get
-> started.
+The distribution of number of logs per issue and their summaries are
+presented in the barplot below.
 
-<img src="project_05_files/figure-markdown_github-ascii_identifiers/Univariate_Plots-1.png" width="672" />
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Logs per Issue-1.png" width="672" />
+
+Analysing the plot above, we can note that 75% of issues have up to 6
+history logs and 50% of issues have between 2 and 6 logs. Besides the
+skewed shape of plot, the median (black strong tick) and mean (red
+point) are very close. This means that the amount of ouliers (greater
+than 12 logs) is low, approximately 5% of issues.
+
+This data set comprises issues created in the period between 05/21/2013
+and 01/26/2018.
+
+    ##   first_issue_creation_date last_issue_creation_date
+    ## 1       05/21/2013 19:10:24      01/26/2018 16:16:06
+
+The distribution of number of issues created by month and the cumulative
+mean (red line) are presented in the barplot below.
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Issues Created per Month-1.png" width="672" />
+
+Analysing the plot above, we note that the year 2013 had the lowest
+demand. The mean variates between 10 and 20 issues per month. At the end
+
+To continue…
+
+Reflections on Data Set Summaries
+=================================
+
+What is the commom flow of the log states? What makes the demand low in
+2013? What makes the demand grow rapidly in 2014?

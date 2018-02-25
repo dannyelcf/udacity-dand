@@ -7,8 +7,7 @@ Issues Tracking Data Set
 Description
 ===========
 
-This data set containing 22,125 observations of issues tracking and their history 
-logs. It represents 5 years of project management which aimed maintenance and customization of many integrated systems. 
+This data set containing 22,125 observations of issues tracking and their history logs. It represents 5 years of project management which aimed maintenance and customization of many integrated systems. 
 
 
 Usage
@@ -27,10 +26,10 @@ Format
 ======
 
 A data.frame containing 22,125 rows and 24 variables. Of these 24 variables 
-16 are about issue data and 8 about history records of a given issue. One issue 
-can have zero or more history logs. Thus, one issue with two history logs has 
-two rows in data set. In issue_* columns the data are repeated and in log_* 
-columns the data are distinct (one for each issue log).
+16 are about issue data and 8 about issue's logs. One issue can have zero or 
+more history logs. Thus, one issue with two history logs has two rows in data 
+set. In issue_* columns the data are repeated and in log_* columns the data 
+are distinct (one for each issue log).
 
 issue_id (integer):
 
