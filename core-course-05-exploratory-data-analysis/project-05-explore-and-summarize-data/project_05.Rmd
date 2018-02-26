@@ -102,14 +102,42 @@ The issues data set contains 22,125 rows and 24 variables. Of these 24 variables
 str(issues, max.level=1, vec.len=1, nchar.max=50)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, "df.number_logs_per_issue"}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+df.summary <- function(df)
+{
+  data.frame(min = min(df$score), 
+               max = max(df$score),
+               mean = mean(df$score),
+               qu1 = quantile(df$score, probs = .25, names = FALSE),
+               median = quantile(df$score, probs = .5, names = FALSE),
+               qu3 = quantile(df$score, probs = .75, names = FALSE),
+               pc95 = quantile(df$score, probs = .95, names = FALSE),
+               iqr = (quantile(df$score, probs = .75, names = FALSE) - 
+                      quantile(df$score, probs = .25, names = FALSE)))
+}
+
+df.summary.text <- function(df) 
+{
+  df_summary <- df.summary(df)
+  
+  paste0("min: ", df_summary$min,
+        "    1st qu.: ", df_summary$qu1,
+        "    median: ", df_summary$median,
+        "    mean: ", round(df_summary$mean,2),
+        "    3rd qu.: ", df_summary$qu3,
+        "    95 %: ", df_summary$pc95,
+        "    max: ", df_summary$max)
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 # From issues dataframe, it was created another dataframe which counts number of 
 # logs per issue_id
 df.number_logs_per_issue <- 
   issues %>%
     select(issue_id, log_creation_date) %>%
     group_by(issue_id) %>% 
-    summarise(number_logs_per_issue = sum(!is.na(log_creation_date))) %>% 
+    summarise(score = sum(!is.na(log_creation_date))) %>% 
     as.data.frame()
 ```
 
@@ -124,104 +152,51 @@ We can note that the number of issues represents 20% of the data set and the
 number of logs represents 99% of it. The 1% of logs remaining (147 rows) represents 
 issues that do not have history logs.
 
-```{r echo=FALSE,  message=FALSE, warning=FALSE, "df.summary_logs_per_issue"}
-df.summary_logs_per_issue <- 
-  data.frame(min = min(df.number_logs_per_issue$number_logs_per_issue), 
-             max = max(df.number_logs_per_issue$number_logs_per_issue),
-             mean = mean(df.number_logs_per_issue$number_logs_per_issue),
-             qu1 = quantile(df.number_logs_per_issue$number_logs_per_issue, 
-                            probs = .25, names = FALSE),
-             median = quantile(df.number_logs_per_issue$number_logs_per_issue, 
-                               probs = .5, names = FALSE),
-             qu3 = quantile(df.number_logs_per_issue$number_logs_per_issue, 
-                            probs = .75, names = FALSE),
-             pc95 = quantile(df.number_logs_per_issue$number_logs_per_issue, 
-                             probs = .95, names = FALSE),
-             iqr = (quantile(df.number_logs_per_issue$number_logs_per_issue, 
-                             probs = .75, names = FALSE) - 
-                    quantile(df.number_logs_per_issue$number_logs_per_issue, 
-                             probs = .25, names = FALSE)))
-```
-
 The distribution of number of logs per issue and their summaries are presented in 
 the barplot below.
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Logs per Issue"}
-#
-y_summary_plot = -35
-
 # Count number of issues for each number of logs per issue
 df.number_logs_per_issue %>%
-  group_by(number_logs_per_issue) %>%
+  group_by(number_logs_per_issue = score) %>%
   summarise(score = n()) %>% 
   as.data.frame() %>% 
   # Output a barplot
   ggplot(aes(x = number_logs_per_issue, y = score)) +
     geom_bar(stat = "identity", alpha = .6) +
     scale_x_continuous(breaks = seq(0, 43, 2)) +
-    scale_y_continuous(breaks = seq(0, 800, 50), limits = c(y_summary_plot, 800)) +
-    # 1st quantile
-    annotate("segment", 
-             x = df.summary_logs_per_issue$qu1, 
-             xend = df.summary_logs_per_issue$median, 
-             y = y_summary_plot, yend = y_summary_plot, colour = "black", 
-             size = .5, 
-             arrow = arrow(ends="first", angle=90, length=unit(.15,"cm"))) +
-    # 2nd quantile (median)
-    annotate("segment", 
-             x = df.summary_logs_per_issue$median, 
-             xend = df.summary_logs_per_issue$median, 
-             y = y_summary_plot, yend = y_summary_plot, colour = "black", 
-             size = 1, 
-             arrow = arrow(ends="both", angle=90, length=unit(.15,"cm"))) +
-    # 3rd quantile
-    annotate("segment", 
-             x = df.summary_logs_per_issue$median, 
-             xend = df.summary_logs_per_issue$qu3, 
-             y = y_summary_plot, yend = y_summary_plot, colour = "black", 
-             size = .5, 
-             arrow = arrow(ends="last", angle=90, length=unit(.15,"cm"))) +
-    # Lower outlier limiar (1st qu. - IQR * 1.5)
-    annotate("segment", 
-             x = df.summary_logs_per_issue$min, 
-             xend = df.summary_logs_per_issue$qu1, 
-             y = y_summary_plot, yend = y_summary_plot, colour = "black", 
-             size = .5) +
-    # Upper outlier limiar (3st qu. + IQR * 1.5)
-    annotate("segment", 
-             x = df.summary_logs_per_issue$qu3, 
-             xend = df.summary_logs_per_issue$qu3 + (df.summary_logs_per_issue$iqr * 1.5), 
-             y = y_summary_plot, yend = y_summary_plot, colour = "black", 
-             size = .5) +
-    # Mean
-    annotate("point", 
-             x = df.summary_logs_per_issue$mean, y = y_summary_plot, 
-             colour = "red", size = 1.2) +
-    # Summary labels
-    annotate("text", 
-             label=paste("min:", df.summary_logs_per_issue$min,
-                         "\n    1st qu.:", df.summary_logs_per_issue$qu1,
-                         "\n      median:", df.summary_logs_per_issue$median,
-                         "\n        mean:", round(df.summary_logs_per_issue$mean,2),
-                         "\n     3rd qu.:", df.summary_logs_per_issue$qu3,
-                         "\n    95 %:", df.summary_logs_per_issue$pc95,
-                         "\n  max:", df.summary_logs_per_issue$max), 
-             x = 40, y = 650, size = 3.5) +
+    scale_y_continuous(breaks = seq(0, 800, 50)) +
+    geom_vline(data = df.summary(df.number_logs_per_issue),
+               mapping = aes(xintercept = mean),
+               color = "red", linetype = 1) +
+    geom_vline(data = df.summary(df.number_logs_per_issue),
+               mapping = aes(xintercept = qu1),
+               color = "black", linetype = 3) +
+    geom_vline(data = df.summary(df.number_logs_per_issue),
+               mapping = aes(xintercept = median),
+               color = "black", linetype = 2) +
+    geom_vline(data = df.summary(df.number_logs_per_issue),
+               mapping = aes(xintercept = qu3),
+               color = "black", linetype = 3) +
+    geom_vline(data = df.summary(df.number_logs_per_issue),
+               mapping = aes(xintercept = qu3 + (iqr * 1.5)),
+               color = "gray", linetype = 3) +
     labs(title = "Distribution of Number of Logs per Issue",
+         subtitle = df.summary.text(df.number_logs_per_issue),
          x = "Number of logs per issue",
          y = "Frequency")
 ```
 
-```{r echo=FALSE,  message=FALSE, warning=FALSE, "Drop Auxliary Variables 1"}
+```{r echo=FALSE,  message=FALSE, warning=FALSE}
 rm(df.number_logs_per_issue)
 rm(df.summary_logs_per_issue)
-rm(y_summary_plot)
 ```
 
-Analysing the plot above, we can note that 75% of issues have up to 6 history logs 
-and 50% of issues have between 2 and 6 logs. Besides the skewed shape of plot,
-the median (black strong tick) and mean (red point) are very close. This means 
-that the amount of ouliers (greater than 12 logs) is low, approximately 5% of 
+Analysing the plot above, we can note that 75% of issues have up to 6 history logs
+(before second black dotted line) and 50% of issues have between 2 and 6 logs 
+(between black dotted lines). Besides the skewed shape of plot, the median 
+(black dashed line) and mean (red solid line) are very close. This means 
+that the amount of ouliers (after gray dotted line) is low, approximately 5% of 
 issues.  
 
 This data set comprises issues created in the period between 05/21/2013 and 
@@ -234,42 +209,67 @@ data.frame(first_issue_creation_date = format(min(issues$issue_creation_date),
                                               "%m/%d/%Y %H:%M:%S"))
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, "df.number_issues_per_month"}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 df.issue_creation_date <- 
   issues %>%
     select(issue_id, issue_creation_date) %>%
     group_by(issue_id) %>% 
     summarise(issue_creation_date = first(issue_creation_date)) %>% 
     as.data.frame()
+
+df.number_issues_per_month <- 
+  df.issue_creation_date %>%
+    group_by(issue_creation_date = as.Date(floor_date(issue_creation_date, "month"))) %>% 
+    summarise(score = n()) %>% 
+    mutate(cummean = cummean(score)) %>% 
+    as.data.frame()
+
 ```
 
 The distribution of number of issues created by month and the cumulative mean 
 (red line) are presented in the barplot below. 
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Created per Month"}
-df.issue_creation_date %>%
-  group_by(issue_creation_date = as.Date(floor_date(issue_creation_date, "month"))) %>% 
-  summarise(score = n()) %>% 
-  mutate(cummean = cummean(score)) %>%
-  as.data.frame() %>% 
+df.number_issues_per_month %>% 
   ggplot(aes(x = issue_creation_date, y = score)) +
     geom_bar(stat = "identity", alpha = .6) +
     geom_line(aes(x = issue_creation_date, y = cummean), 
               linetype = 1, color = "red") +
+    geom_hline(aes(yintercept = cummean[5]),
+               color = "black", linetype = 3) +
+    geom_hline(aes(yintercept = cummean[11]),
+               color = "black", linetype = 3) +
+    geom_hline(aes(yintercept = cummean[28]),
+               color = "black", linetype = 3) +
+    geom_hline(aes(yintercept = cummean[52]),
+               color = "black", linetype = 3) +
     scale_x_date(date_breaks = "2 month", date_labels = "%b %Y") +
     scale_y_continuous(breaks = seq(0, 190, 10)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     labs(title = "Distribution of Number of Issues Created per Month",
+         subtitle = df.summary.text(df.number_issues_per_month),
          x = "Issue's creation date (month)",
          y = "Frequency")
   
 ```
 
 Analysing the plot above, we note that the year 2013 had the lowest demand. The
-mean variates between 10 and 20 issues per month. At the end
+cumulated mean (red solid line) variates between 10 and 20 issues per month. At 
+the end of 2013 and begin of 2014 there was a drop in activities because of the 
+low administrative and academic activity at the university in this period. From
+April of 2014 until February of 2015 there was significant growth in activities.
+The cumulated mean increase from 10 to 70 issues per month. From August of 2015 
+the pace of growth dropped. There was an average growth of only 10 monthly 
+issues compared to February 2015. Except the significant growth period (April of
+2014 until February of 2015) the months from September to December of each year
+had a decline in activities. The overall mean (79) and overall median (76) are 
+very close. This is because there was a stabilization in the middle of project 
+and because  there was a tradeoff between low demand at the beginning of the 
+project and the high growth thereafter.
 
-```{r echo=FALSE,  message=FALSE, warning=FALSE, "Drop Auxliary Variables 2"}
+```{r echo=FALSE,  message=FALSE, warning=FALSE}
 rm(df.issue_creation_date)
+rm(df.number_issues_per_month)
 ```
 
 To continue...
@@ -293,6 +293,8 @@ What is the commom flow of the log states?
 What makes the demand low in 2013?
 What makes the demand grow rapidly in 2014?
 
-```{r echo=FALSE,  message=FALSE, warning=FALSE, "Drop Data Set"}
+```{r echo=FALSE,  message=FALSE, warning=FALSE}
+rm(df.summary.text)
+rm(df.summary)
 rm(issues)
 ```

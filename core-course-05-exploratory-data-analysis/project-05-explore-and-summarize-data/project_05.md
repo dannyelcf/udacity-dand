@@ -64,7 +64,7 @@ The number of distinct issues rows and issue’s logs rows are 4,503 and
 21,978 respectively.
 
     ##   number_issues number_logs
-    ## 1          4503       21978
+    ## 1          4503           0
 
 We can note that the number of issues represents 20% of the data set and
 the number of logs represents 99% of it. The 1% of logs remaining (147
@@ -76,10 +76,11 @@ presented in the barplot below.
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Logs per Issue-1.png" width="672" />
 
 Analysing the plot above, we can note that 75% of issues have up to 6
-history logs and 50% of issues have between 2 and 6 logs. Besides the
-skewed shape of plot, the median (black strong tick) and mean (red
-point) are very close. This means that the amount of ouliers (greater
-than 12 logs) is low, approximately 5% of issues.
+history logs (before second black dotted line) and 50% of issues have
+between 2 and 6 logs (between black dotted lines). Besides the skewed
+shape of plot, the median (black dashed line) and mean (red solid line)
+are very close. This means that the amount of ouliers (after gray dotted
+line) is low, approximately 5% of issues.
 
 This data set comprises issues created in the period between 05/21/2013
 and 01/26/2018.
@@ -93,7 +94,19 @@ mean (red line) are presented in the barplot below.
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Issues Created per Month-1.png" width="672" />
 
 Analysing the plot above, we note that the year 2013 had the lowest
-demand. The mean variates between 10 and 20 issues per month. At the end
+demand. The cumulated mean (red solid line) variates between 10 and 20
+issues per month. At the end of 2013 and begin of 2014 there was a drop
+in activities because of the low administrative and academic activity at
+the university in this period. From April of 2014 until February of 2015
+there was significant growth in activities. The cumulated mean increase
+from 10 to 70 issues per month. From August of 2015 the pace of growth
+dropped. There was an average growth of only 10 monthly issues compared
+to February 2015. Except the significant growth period (April of 2014
+until February of 2015) the months from September to December of each
+year had a decline in activities. The overall mean (79) and overall
+median (76) are very close. This is because there was a stabilization in
+the middle of project and because there was a tradeoff between low
+demand at the beginning of the project and the high growth thereafter.
 
 To continue…
 
