@@ -7,7 +7,9 @@ Issues Tracking Data Set
 Description
 ===========
 
-This data set containing 22,125 observations of issues tracking and their history logs. It represents 5 years of project management which aimed maintenance and customization of many integrated systems. 
+This data set containing 22,125 observations of issues tracking and their 
+history logs. It represents 5 years of project management which aimed 
+maintenance and customization of many integrated systems. 
 
 
 Usage

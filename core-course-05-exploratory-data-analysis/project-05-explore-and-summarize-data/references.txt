@@ -1,8 +1,51 @@
-In ggplot(issues, aes(x = reorder(issue_type, 
+To learn how to code with lubridate library I used this paper: Dates and Times 
+Made Easy with lubridate (http://vita.had.co.nz/papers/lubridate.pdf)
+
+--------------------------------------------------------------------------------
+
+The code: 
+  setClass('date_ymd_hms')
+  setAs("character","date_ymd_hms", function(from) ymd_hms(from))
+  ...
+  issues <- read.csv("issues_tracking.csv", ... colClasses = c(...))
+
+Load CSV and cast the columns to correct class I adapted the code from post: 
+https://stackoverflow.com/a/31360108/8645131
+
+--------------------------------------------------------------------------------
+
+The code:
+   mutate(cummean = sapply(seq_along(score), function(x){mean(score[1:x])}),
+   ...
+How to use apply and how to implement a cumulative function I learned in this post: https://stackoverflow.com/a/18304702/8645131
+
+--------------------------------------------------------------------------------
+
+The code:
+  # Labels of summary lines
+  geom_text(data = df.summary(df.number_logs_per_issue),
+            mapping = aes(x = mean, y = 820, label = "mean"),
+            size = 3, angle = 90, vjust = -.3, hjust = 0, color = "red") +
+
+Labeling a geom_vline, geom_hline and geom_line was adapted from http://
+sape.inf.usi.ch/quick-reference/ggplot2/geom_vline
+--------------------------------------------------------------------------------
+
+The code:
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+
+Rotating and spacing axis labels in ggplot2 was adapted from https://
+stackoverflow.com/a/1331400/8645131
+
+--------------------------------------------------------------------------------
+
+The code:
+  ggplot(issues, aes(x = reorder(issue_type, 
                                issue_type,
                                function(x) -length(x)), 
                    y = ..count..)) +
   geom_bar() +
   xlab("issue_type")
 
-Reorder categorical variables was adapted from https://stackoverflow.com/a/9231857/8645131
+Reorder categorical variables was adapted from https://stackoverflow.com/a/
+9231857/8645131

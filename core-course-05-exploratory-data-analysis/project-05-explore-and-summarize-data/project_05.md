@@ -94,19 +94,30 @@ mean (red line) are presented in the barplot below.
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Issues Created per Month-1.png" width="672" />
 
 Analysing the plot above, we note that the year 2013 had the lowest
-demand. The cumulated mean (red solid line) variates between 10 and 20
+demand. The accumulated mean (red solid line) variates between 10 and 20
 issues per month. At the end of 2013 and begin of 2014 there was a drop
-in activities because of the low administrative and academic activity at
-the university in this period. From April of 2014 until February of 2015
-there was significant growth in activities. The cumulated mean increase
-from 10 to 70 issues per month. From August of 2015 the pace of growth
-dropped. There was an average growth of only 10 monthly issues compared
-to February 2015. Except the significant growth period (April of 2014
+in activities because of the low administrative and academic activities
+at the university in this period. From April of 2014 until February of
+2015 there was significant growth in activities. The accumulated mean
+increases from 10 to 70 issues per month. The accumulated mean overcame
+the accumulated median and the distance between accumulated 3rd quartile
+and accumulated median became greater than distance between accumulated
+1st quartile and accumulated median. This means that theses months had a
+high number of issues created in relation to the past.
+
+But from August of 2015 the pace of growth dropped. Now, we can note
+that the distance between accumulated 1st quartile and accumulated
+median becomes greater than distance between accumulated 3rd quartile
+and accumulated median. This invertion provocated the overlap between
+accumulated mean and accumulated median. The stabilization of growth
+also contributed to that. The average of growth pass to be only 10
+monthly issues from February 2015.
+
+We also note that except the significant growth period (April of 2014
 until February of 2015) the months from September to December of each
-year had a decline in activities. The overall mean (79) and overall
-median (76) are very close. This is because there was a stabilization in
-the middle of project and because there was a tradeoff between low
-demand at the beginning of the project and the high growth thereafter.
+year had a decline in activities. The reason is the low administrative
+and academic activities at the university in this period. Thus, the
+demand for the systems decreases.
 
 To continue…
 

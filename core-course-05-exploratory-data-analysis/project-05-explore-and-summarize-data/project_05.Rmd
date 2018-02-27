@@ -5,6 +5,17 @@ EDA in an Issues Tracking Data Set
 ================================================================================
 *by Dannyel Cardoso da Fonseca* 
 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# To avoid:
+# Warning message:
+# In as.POSIXlt.POSIXct(x, tz) :
+#   unknown timezone 'zone/tz/2018c.1.0/zoneinfo/America/Sao_Paulo'
+#
+# Evaluation error: (converted from warning) unknown timezone 
+#   'zone/tz/2017c.1.0/zoneinfo/America/Sao_Paulo'.
+Sys.setenv(TZ = "America/Sao_Paulo")
+```
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Load Packages"}
 library(ggplot2)
 library(dplyr)
@@ -14,10 +25,6 @@ library(grid)
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Set Up"}
 # NOTE: To run this notebook set up current work directory to this file location
-
-# To avoid Evaluation error: (converted from warning) unknown timezone 
-# 'zone/tz/2017c.1.0/zoneinfo/America/Sao_Paulo'.
-Sys.setenv(TZ = "America/Sao_Paulo")
 
 # Set up default theme for plots
 theme_set(theme_classic())
@@ -165,7 +172,8 @@ df.number_logs_per_issue %>%
   ggplot(aes(x = number_logs_per_issue, y = score)) +
     geom_bar(stat = "identity", alpha = .6) +
     scale_x_continuous(breaks = seq(0, 43, 2)) +
-    scale_y_continuous(breaks = seq(0, 800, 50)) +
+    scale_y_continuous(breaks = seq(0, 800, 50), limits = c(0, 900)) +
+    # Summary lines
     geom_vline(data = df.summary(df.number_logs_per_issue),
                mapping = aes(xintercept = mean),
                color = "red", linetype = 1) +
@@ -181,6 +189,22 @@ df.number_logs_per_issue %>%
     geom_vline(data = df.summary(df.number_logs_per_issue),
                mapping = aes(xintercept = qu3 + (iqr * 1.5)),
                color = "gray", linetype = 3) +
+    # Labels of summary lines
+    geom_text(data = df.summary(df.number_logs_per_issue),
+              mapping = aes(x = mean, y = 820, label = "mean"), 
+              size = 3, angle = 90, vjust = -.3, hjust = 0, color = "red") +
+    geom_text(data = df.summary(df.number_logs_per_issue),
+              mapping = aes(x = qu1, y = 820, label = "1st qu."), 
+              size = 3, angle = 90, vjust = -.3, hjust = 0) +
+    geom_text(data = df.summary(df.number_logs_per_issue),
+              mapping = aes(x = median, y = 820, label = "median"), 
+              size = 3, angle = 90, vjust = -.3, hjust = 0) +
+    geom_text(data = df.summary(df.number_logs_per_issue),
+              mapping = aes(x = qu3, y = 820, label = "3rd qu."), 
+              size = 3, angle = 90, vjust = -.3, hjust = 0) +
+    geom_text(data = df.summary(df.number_logs_per_issue),
+              mapping = aes(x = qu3 + (iqr * 1.5), y = 620, label = "upper limit of outliers"), 
+              size = 3, angle = 90, vjust = -.3, hjust = 0) +
     labs(title = "Distribution of Number of Logs per Issue",
          subtitle = df.summary.text(df.number_logs_per_issue),
          x = "Number of logs per issue",
@@ -221,9 +245,17 @@ df.number_issues_per_month <-
   df.issue_creation_date %>%
     group_by(issue_creation_date = as.Date(floor_date(issue_creation_date, "month"))) %>% 
     summarise(score = n()) %>% 
-    mutate(cummean = cummean(score)) %>% 
+    mutate(cummean = sapply(seq_along(score), 
+                            function(x){mean(score[1:x])}),
+           cummedian = sapply(seq_along(score), 
+                              function(x){median(score[1:x])}),
+           cum1stqu = sapply(seq_along(score), 
+                             function(x){quantile(score[1:x], probs = .25)}),
+           cum3rdqu = sapply(seq_along(score), 
+                             function(x){quantile(score[1:x], probs = .75)})) %>% 
     as.data.frame()
 
+rm(df.issue_creation_date)
 ```
 
 The distribution of number of issues created by month and the cumulative mean 
@@ -233,18 +265,37 @@ The distribution of number of issues created by month and the cumulative mean
 df.number_issues_per_month %>% 
   ggplot(aes(x = issue_creation_date, y = score)) +
     geom_bar(stat = "identity", alpha = .6) +
+    scale_x_date(date_breaks = "2 month", date_labels = "%b %Y",
+                 limits = c(as.Date("04/01/2013", "%m/%d/%Y"),
+                            as.Date("03/01/2018", "%m/%d/%Y"))) +
+    scale_y_continuous(breaks = seq(0, 190, 10)) +
+    # Summary lines
+    geom_line(aes(x = issue_creation_date, y = cummedian), 
+              linetype = 2, color = "black") +
+    geom_line(aes(x = issue_creation_date, y = cum1stqu), 
+              linetype = 3, color = "black") +
+    geom_line(aes(x = issue_creation_date, y = cum3rdqu), 
+              linetype = 3, color = "black") +
     geom_line(aes(x = issue_creation_date, y = cummean), 
               linetype = 1, color = "red") +
-    geom_hline(aes(yintercept = cummean[5]),
-               color = "black", linetype = 3) +
-    geom_hline(aes(yintercept = cummean[11]),
-               color = "black", linetype = 3) +
-    geom_hline(aes(yintercept = cummean[28]),
-               color = "black", linetype = 3) +
-    geom_hline(aes(yintercept = cummean[52]),
-               color = "black", linetype = 3) +
-    scale_x_date(date_breaks = "2 month", date_labels = "%b %Y") +
-    scale_y_continuous(breaks = seq(0, 190, 10)) +
+    # Labels of summary lines
+    geom_text(data = df.summary(df.number_issues_per_month),
+              mapping = aes(x = as.Date("01/01/2018", "%m/%d/%Y"), 
+                            y = median, label = "median"), 
+              size = 3, vjust = .3, hjust = -.1) +
+    geom_text(data = df.summary(df.number_issues_per_month),
+              mapping = aes(x = as.Date("01/01/2018", "%m/%d/%Y"), 
+                            y = qu1, label = "1st qu."), 
+              size = 3, vjust = .3, hjust = -.1) +
+    geom_text(data = df.summary(df.number_issues_per_month),
+              mapping = aes(x = as.Date("01/01/2018", "%m/%d/%Y"), 
+                            y = qu3, label = "3rd qu."), 
+              size = 3, vjust = .3, hjust = -.1) +
+    geom_text(data = df.summary(df.number_issues_per_month),
+              mapping = aes(x = as.Date("01/01/2018", "%m/%d/%Y"), 
+                            y = mean, label = "mean"), 
+              size = 3, vjust = -.2, hjust = -.1, color = "red") +
+    # Rotate axis x
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     labs(title = "Distribution of Number of Issues Created per Month",
          subtitle = df.summary.text(df.number_issues_per_month),
@@ -254,21 +305,30 @@ df.number_issues_per_month %>%
 ```
 
 Analysing the plot above, we note that the year 2013 had the lowest demand. The
-cumulated mean (red solid line) variates between 10 and 20 issues per month. At 
+accumulated mean (red solid line) variates between 10 and 20 issues per month. At 
 the end of 2013 and begin of 2014 there was a drop in activities because of the 
-low administrative and academic activity at the university in this period. From
+low administrative and academic activities at the university in this period. From
 April of 2014 until February of 2015 there was significant growth in activities.
-The cumulated mean increase from 10 to 70 issues per month. From August of 2015 
-the pace of growth dropped. There was an average growth of only 10 monthly 
-issues compared to February 2015. Except the significant growth period (April of
-2014 until February of 2015) the months from September to December of each year
-had a decline in activities. The overall mean (79) and overall median (76) are 
-very close. This is because there was a stabilization in the middle of project 
-and because  there was a tradeoff between low demand at the beginning of the 
-project and the high growth thereafter.
+The accumulated mean increases from 10 to 70 issues per month. The accumulated mean
+overcame the accumulated median and the distance between accumulated 3rd quartile 
+and accumulated median became greater than distance between accumulated 1st 
+quartile and accumulated median. This means that theses months had a high number 
+of issues created in relation to the past. 
+
+But from August of 2015 the pace of growth dropped. Now, we can note that the 
+distance between accumulated 1st quartile and accumulated median becomes greater 
+than distance between accumulated 3rd quartile and accumulated median. This 
+invertion provocated the overlap between accumulated mean and accumulated median. 
+The stabilization of growth also contributed to that. The average of growth pass 
+to be only 10 monthly issues from February 2015. 
+
+We also note that except the significant growth period (April of 2014 until 
+February of 2015) the months from September to December of each year had a 
+decline in activities. The reason is the low administrative and academic 
+activities at the university in this period. Thus, the demand for the systems 
+decreases.
 
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
-rm(df.issue_creation_date)
 rm(df.number_issues_per_month)
 ```
 
