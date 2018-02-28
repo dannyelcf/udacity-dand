@@ -1,19 +1,14 @@
 ---
 output: github_document
 ---
-EDA in an Issues Tracking Data Set
+EDA in an Issue Tracking Data Set
 ================================================================================
 *by Dannyel Cardoso da Fonseca* 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-# To avoid:
-# Warning message:
-# In as.POSIXlt.POSIXct(x, tz) :
-#   unknown timezone 'zone/tz/2018c.1.0/zoneinfo/America/Sao_Paulo'
-#
-# Evaluation error: (converted from warning) unknown timezone 
-#   'zone/tz/2017c.1.0/zoneinfo/America/Sao_Paulo'.
-Sys.setenv(TZ = "America/Sao_Paulo")
+# Cleaning the environment before start
+# This is useful when execute "Restart R and Run All Chuncks"
+rm(list = ls())
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Load Packages"}
@@ -101,6 +96,11 @@ tracking can be find in [data_wrangling](data_wrangling) folder.
 
 # Data Set Summaries
 
+In this section I perform some preliminary exploration on the data set, analyzing 
+its structure and the distributions of some variables.
+
+### Data Set Structure
+
 The issues data set contains 22,125 rows and 24 variables. Of these 24 variables 
 16 are about issue data and 8 about issue's logs.
 
@@ -137,7 +137,7 @@ df.summary.text <- function(df)
 }
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Support Dataframe to Plot (1)"}
 # From issues dataframe, it was created another dataframe which counts number of 
 # logs per issue_id
 df.number_logs_per_issue <- 
@@ -153,14 +153,12 @@ respectively.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Number of issues and issue's logs"}
 data.frame(number_issues = nrow(df.number_logs_per_issue), 
-           number_logs = sum(df.number_logs_per_issue$number_logs_per_issue))
+           number_logs = sum(df.number_logs_per_issue$score))
 ```
 We can note that the number of issues represents 20% of the data set and the 
 number of logs represents 99% of it. The 1% of logs remaining (147 rows) represents 
-issues that do not have history logs.
-
-The distribution of number of logs per issue and their summaries are presented in 
-the barplot below.
+issues that do not have history logs. The distribution of number of logs per issue 
+and their summaries are presented in the barplot below.
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Logs per Issue"}
 # Count number of issues for each number of logs per issue
@@ -211,17 +209,13 @@ df.number_logs_per_issue %>%
          y = "Frequency")
 ```
 
-```{r echo=FALSE,  message=FALSE, warning=FALSE}
-rm(df.number_logs_per_issue)
-rm(df.summary_logs_per_issue)
-```
-
 Analysing the plot above, we can note that 75% of issues have up to 6 history logs
-(before second black dotted line) and 50% of issues have between 2 and 6 logs 
-(between black dotted lines). Besides the skewed shape of plot, the median 
-(black dashed line) and mean (red solid line) are very close. This means 
-that the amount of ouliers (after gray dotted line) is low, approximately 5% of 
-issues.  
+(before 3rd quartile) and 50% of issues have between 2 and 6 logs (between 1st 
+and 3rd quartile). Besides the skewed shape of plot, the median and mean are very 
+close. This means that the amount of ouliers, after 12 logs per issue, is low, 
+approximately 5% of issues.  
+
+### Issue Creation Date
 
 This data set comprises issues created in the period between 05/21/2013 and 
 01/26/2018.
@@ -233,7 +227,7 @@ data.frame(first_issue_creation_date = format(min(issues$issue_creation_date),
                                               "%m/%d/%Y %H:%M:%S"))
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Support Dataframe to Plot (2)"}
 df.issue_creation_date <- 
   issues %>%
     select(issue_id, issue_creation_date) %>%
@@ -254,12 +248,10 @@ df.number_issues_per_month <-
            cum3rdqu = sapply(seq_along(score), 
                              function(x){quantile(score[1:x], probs = .75)})) %>% 
     as.data.frame()
-
-rm(df.issue_creation_date)
 ```
 
-The distribution of number of issues created by month and the cumulative mean 
-(red line) are presented in the barplot below. 
+The distribution of number of issues created by month and the cumulative summaries 
+are presented in the barplot below. 
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Created per Month"}
 df.number_issues_per_month %>% 
@@ -298,8 +290,9 @@ df.number_issues_per_month %>%
     # Rotate axis x
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     labs(title = "Distribution of Number of Issues Created per Month",
-         subtitle = df.summary.text(df.number_issues_per_month),
-         x = "Issue's creation date (month)",
+         subtitle = paste("(Overall Summaries)    ", 
+                          df.summary.text(df.number_issues_per_month)),
+         x = "Issue creation date (per month)",
          y = "Frequency")
   
 ```
@@ -328,33 +321,32 @@ decline in activities. The reason is the low administrative and academic
 activities at the university in this period. Thus, the demand for the systems 
 decreases.
 
-```{r echo=FALSE,  message=FALSE, warning=FALSE}
-rm(df.number_issues_per_month)
+### Issue Type
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Issue Type Values"}
+levels(issues$issue_type)
 ```
 
-To continue...
-
-```{r echo=FALSE, fig.retina=2, Univariate_Plots}
-# issues %>% 
-#   count(issue_type) %>% 
-#   ggplot(aes(x = reorder(issue_type, -n), y = n/sum(n))) + 
-#     geom_bar(stat = "identity") +
-#     geom_text(aes(label = n), vjust = -1) +
-#     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .1)) +
-#     labs(title = "Frequency of Issue Types",
-#          x = "issue_type",
-#          y = "frequency")
+```{r echo=FALSE, fig.retina=2, "Frequency of Issue Type"}
+issues %>%
+  group_by(issue_type) %>% 
+  summarise(score = n()) %>% 
+  ggplot(aes(x = reorder(issue_type, -score), y = score/sum(score))) +
+    geom_bar(stat = "identity", alpha = .6) +
+    geom_text(aes(label = score), vjust = -1) +
+    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .1)) +
+    labs(title = "Frequency of Issue Type",
+         x = "Issue type",
+         y = "Frequency (relative)")
 
 ```
 
-# Reflections on Data Set Summaries
+### Reflections on Data Set Summaries
 
 What is the commom flow of the log states?
 What makes the demand low in 2013?
 What makes the demand grow rapidly in 2014?
 
-```{r echo=FALSE,  message=FALSE, warning=FALSE}
-rm(df.summary.text)
-rm(df.summary)
-rm(issues)
+```{r echo=FALSE,  message=FALSE, warning=FALSE, "Clean the Environment"}
+# rm(list = ls())
 ```

@@ -1,6 +1,6 @@
 
-EDA in an Issues Tracking Data Set
-==================================
+EDA in an Issue Tracking Data Set
+=================================
 
 *by Dannyel Cardoso da Fonseca*
 
@@ -30,6 +30,11 @@ folder.
 
 Data Set Summaries
 ==================
+
+In this section I perform some preliminary exploration on the data set,
+analyzing its structure and the distributions of some variables.
+
+### Data Set Structure
 
 The issues data set contains 22,125 rows and 24 variables. Of these 24
 variables 16 are about issue data and 8 about issue’s logs.
@@ -64,23 +69,23 @@ The number of distinct issues rows and issue’s logs rows are 4,503 and
 21,978 respectively.
 
     ##   number_issues number_logs
-    ## 1          4503           0
+    ## 1          4503       21978
 
 We can note that the number of issues represents 20% of the data set and
 the number of logs represents 99% of it. The 1% of logs remaining (147
-rows) represents issues that do not have history logs.
-
-The distribution of number of logs per issue and their summaries are
-presented in the barplot below.
+rows) represents issues that do not have history logs. The distribution
+of number of logs per issue and their summaries are presented in the
+barplot below.
 
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Logs per Issue-1.png" width="672" />
 
 Analysing the plot above, we can note that 75% of issues have up to 6
-history logs (before second black dotted line) and 50% of issues have
-between 2 and 6 logs (between black dotted lines). Besides the skewed
-shape of plot, the median (black dashed line) and mean (red solid line)
-are very close. This means that the amount of ouliers (after gray dotted
-line) is low, approximately 5% of issues.
+history logs (before 3rd quartile) and 50% of issues have between 2 and
+6 logs (between 1st and 3rd quartile). Besides the skewed shape of plot,
+the median and mean are very close. This means that the amount of
+ouliers, after 12 logs per issue, is low, approximately 5% of issues.
+
+### Issue Creation Date
 
 This data set comprises issues created in the period between 05/21/2013
 and 01/26/2018.
@@ -89,7 +94,7 @@ and 01/26/2018.
     ## 1       05/21/2013 19:10:24      01/26/2018 16:16:06
 
 The distribution of number of issues created by month and the cumulative
-mean (red line) are presented in the barplot below.
+summaries are presented in the barplot below.
 
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Issues Created per Month-1.png" width="672" />
 
@@ -119,10 +124,13 @@ year had a decline in activities. The reason is the low administrative
 and academic activities at the university in this period. Thus, the
 demand for the systems decreases.
 
-To continue…
+### Issue Type
 
-Reflections on Data Set Summaries
-=================================
+    ## [1] "CUSTOMIZATION"  "DATA MIGRATION" "MAINTENANCE"    "OTHERS"
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Type-1.png" width="672" />
+
+### Reflections on Data Set Summaries
 
 What is the commom flow of the log states? What makes the demand low in
 2013? What makes the demand grow rapidly in 2014?

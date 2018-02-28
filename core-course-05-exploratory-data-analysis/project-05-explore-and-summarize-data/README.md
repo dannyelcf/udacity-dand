@@ -1,1 +1,1 @@
-# EDA in Issues Tracking Data Set
+# EDA in an Issue Tracking Data Set
