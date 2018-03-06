@@ -124,13 +124,64 @@ year had a decline in activities. The reason is the low administrative
 and academic activities at the university in this period. Thus, the
 demand for the systems decreases.
 
+### Issue Start Date
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Issues Started per Month-1.png" width="672" />
+
+### Issue Deadline Date
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Issues Deadline per Month-1.png" width="672" />
+
 ### Issue Type
+
+In the issue tracking system, 4 types of issues were used to classify
+the purpose of a issue. They are:
 
     ## [1] "CUSTOMIZATION"  "DATA MIGRATION" "MAINTENANCE"    "OTHERS"
 
+The frequency of issues created by each issue type is shown in the graph
+below.
+
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Type-1.png" width="672" />
+
+Analysing the plot above, we note that most of the issues are of the
+MAINTENANCE type (around 75%). Next comes the issues of the
+CUSTOMIZATION type (around 20%). And, with less than 0.05% comes the
+issues of the types DATA MIGRATION and OTHERS. Thus, we can summarize
+that project management was characterized by corrective maintenance
+activities of existing systems and subsystems.
+
+The demand for adaptation and evolution of the systems was not
+insignificant. Although the amount of CUSTOMIZATION and DATA MIGRATION
+issues are less than MAINTENANCE, they may have indirectly influenced in
+the creation of large volume of MAINTENANCE issues. Maybe, CUSTOMIZATION
+issues had provocated related creation of MAINTENANCE issues. The same
+is true for DATA MIGRATION. An analysis of issues creation timeline by
+system/subsystem may answer that assumption.
+
+### Issue System
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue System-1.png" width="672" />
+
+### Issue Subsystem
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Subsystem-1.png" width="672" />
+
+### Issue Created By
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Created By-1.png" width="672" />
+
+### Issue Stakeholder
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Stakeholder-1.png" width="672" />
+
+### Issue Status
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Status-1.png" width="672" />
 
 ### Reflections on Data Set Summaries
 
-What is the commom flow of the log states? What makes the demand low in
-2013? What makes the demand grow rapidly in 2014?
+What is the commom flow of the log states? (Data Set Structure)
+
+What makes the demand low in 2013? What makes the demand grow rapidly in
+2014?

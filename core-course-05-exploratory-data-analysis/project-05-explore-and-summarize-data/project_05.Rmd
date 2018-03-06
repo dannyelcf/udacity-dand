@@ -16,61 +16,20 @@ library(ggplot2)
 library(dplyr)
 library(lubridate)
 library(grid)
+
+source("project_05.R")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Set Up"}
 # NOTE: To run this notebook set up current work directory to this file location
 
 # Set up default theme for plots
-theme_set(theme_classic())
+theme_set(theme_classic() %+replace%
+            theme(panel.grid.major.y = element_line(size=.05, color="gray")))
 ```
 
 ```{r echo=FALSE, "Load Data Set"}
-# Load the Issues Tracking Data Set
-setClass('date_ymd_hms')
-setAs("character","date_ymd_hms", function(from) ymd_hms(from))
-setClass('date_ymd')
-setAs("character", "date_ymd", function(from) ymd(from))
-setClass('time_period')
-setAs("character", "time_period", function(from) seconds_to_period(from))
-setClass('factor_issue_priority_scale')
-setAs("character", "factor_issue_priority_scale", 
-      function(from) {
-        factor(from, levels = c("SUSPENDED",
-                                "LOW",
-                                "MEDIUM",
-                                "HIGH",
-                                "URGENT",
-                                "BLOCKING"))
-      })
-issues <- read.csv("issues_tracking.csv", 
-                   stringsAsFactors=FALSE, 
-                   na.strings = "",
-                   colClasses = c("integer", # issue_id
-                                  "integer", # issue_number
-                                  "character", # issue_title
-                                  "factor", # issue_type
-                                  "date_ymd_hms", # issue_creation_date
-                                  "factor", # issue_system
-                                  "date_ymd", # issue_start_date
-                                  "factor", # issue_subsystem
-                                  "date_ymd", # issue_deadline_date
-                                  "character", # issue_created_by
-                                  "factor", # issue_stakeholder
-                                  "factor", # issue_status
-                                  "time_period", # issue_time_spent
-                                  "integer", # issue_priority_number
-                                  "integer", # issue_progress
-                                  "factor_issue_priority_scale",  # issue_priority_scale
-                                  "character", # log_build_info
-                                  "date_ymd_hms",  # log_creation_date
-                                  "factor", # log_action
-                                  "factor", # log_status
-                                  "integer", # log_progress
-                                  "time_period", # log_time_spent
-                                  "character", # log_created_by 
-                                  "integer" # log_svn_revision 
-                                  ))
+issues <- load_dataset("issues_tracking.csv")
 ```
 
 This project aims to explore a data set containing 22,125 observations of issues 
@@ -109,34 +68,6 @@ The issues data set contains 22,125 rows and 24 variables. Of these 24 variables
 str(issues, max.level=1, vec.len=1, nchar.max=50)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-df.summary <- function(df)
-{
-  data.frame(min = min(df$score), 
-               max = max(df$score),
-               mean = mean(df$score),
-               qu1 = quantile(df$score, probs = .25, names = FALSE),
-               median = quantile(df$score, probs = .5, names = FALSE),
-               qu3 = quantile(df$score, probs = .75, names = FALSE),
-               pc95 = quantile(df$score, probs = .95, names = FALSE),
-               iqr = (quantile(df$score, probs = .75, names = FALSE) - 
-                      quantile(df$score, probs = .25, names = FALSE)))
-}
-
-df.summary.text <- function(df) 
-{
-  df_summary <- df.summary(df)
-  
-  paste0("min: ", df_summary$min,
-        "    1st qu.: ", df_summary$qu1,
-        "    median: ", df_summary$median,
-        "    mean: ", round(df_summary$mean,2),
-        "    3rd qu.: ", df_summary$qu3,
-        "    95 %: ", df_summary$pc95,
-        "    max: ", df_summary$max)
-}
-```
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Support Dataframe to Plot (1)"}
 # From issues dataframe, it was created another dataframe which counts number of 
 # logs per issue_id
@@ -165,48 +96,12 @@ and their summaries are presented in the barplot below.
 df.number_logs_per_issue %>%
   group_by(number_logs_per_issue = score) %>%
   summarise(score = n()) %>% 
-  as.data.frame() %>% 
-  # Output a barplot
-  ggplot(aes(x = number_logs_per_issue, y = score)) +
-    geom_bar(stat = "identity", alpha = .6) +
-    scale_x_continuous(breaks = seq(0, 43, 2)) +
-    scale_y_continuous(breaks = seq(0, 800, 50), limits = c(0, 900)) +
-    # Summary lines
-    geom_vline(data = df.summary(df.number_logs_per_issue),
-               mapping = aes(xintercept = mean),
-               color = "red", linetype = 1) +
-    geom_vline(data = df.summary(df.number_logs_per_issue),
-               mapping = aes(xintercept = qu1),
-               color = "black", linetype = 3) +
-    geom_vline(data = df.summary(df.number_logs_per_issue),
-               mapping = aes(xintercept = median),
-               color = "black", linetype = 2) +
-    geom_vline(data = df.summary(df.number_logs_per_issue),
-               mapping = aes(xintercept = qu3),
-               color = "black", linetype = 3) +
-    geom_vline(data = df.summary(df.number_logs_per_issue),
-               mapping = aes(xintercept = qu3 + (iqr * 1.5)),
-               color = "gray", linetype = 3) +
-    # Labels of summary lines
-    geom_text(data = df.summary(df.number_logs_per_issue),
-              mapping = aes(x = mean, y = 820, label = "mean"), 
-              size = 3, angle = 90, vjust = -.3, hjust = 0, color = "red") +
-    geom_text(data = df.summary(df.number_logs_per_issue),
-              mapping = aes(x = qu1, y = 820, label = "1st qu."), 
-              size = 3, angle = 90, vjust = -.3, hjust = 0) +
-    geom_text(data = df.summary(df.number_logs_per_issue),
-              mapping = aes(x = median, y = 820, label = "median"), 
-              size = 3, angle = 90, vjust = -.3, hjust = 0) +
-    geom_text(data = df.summary(df.number_logs_per_issue),
-              mapping = aes(x = qu3, y = 820, label = "3rd qu."), 
-              size = 3, angle = 90, vjust = -.3, hjust = 0) +
-    geom_text(data = df.summary(df.number_logs_per_issue),
-              mapping = aes(x = qu3 + (iqr * 1.5), y = 620, label = "upper limit of outliers"), 
-              size = 3, angle = 90, vjust = -.3, hjust = 0) +
-    labs(title = "Distribution of Number of Logs per Issue",
-         subtitle = df.summary.text(df.number_logs_per_issue),
-         x = "Number of logs per issue",
-         y = "Frequency")
+  plot_frequency.numeric(x = number_logs_per_issue, y = score,
+                         summary = df_summary(df.number_logs_per_issue),
+                         x.breaks = seq(0, 43, 2), y.breaks = seq(0, 800, 50),
+                         y.limits = c(0, 800), 
+                         labs.title = "Distribution of Number of Logs per Issue", 
+                         labs.x = "Number of logs per issue")
 ```
 
 Analysing the plot above, we can note that 75% of issues have up to 6 history logs
@@ -227,73 +122,18 @@ data.frame(first_issue_creation_date = format(min(issues$issue_creation_date),
                                               "%m/%d/%Y %H:%M:%S"))
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, "Support Dataframe to Plot (2)"}
-df.issue_creation_date <- 
-  issues %>%
-    select(issue_id, issue_creation_date) %>%
-    group_by(issue_id) %>% 
-    summarise(issue_creation_date = first(issue_creation_date)) %>% 
-    as.data.frame()
-
-df.number_issues_per_month <- 
-  df.issue_creation_date %>%
-    group_by(issue_creation_date = as.Date(floor_date(issue_creation_date, "month"))) %>% 
-    summarise(score = n()) %>% 
-    mutate(cummean = sapply(seq_along(score), 
-                            function(x){mean(score[1:x])}),
-           cummedian = sapply(seq_along(score), 
-                              function(x){median(score[1:x])}),
-           cum1stqu = sapply(seq_along(score), 
-                             function(x){quantile(score[1:x], probs = .25)}),
-           cum3rdqu = sapply(seq_along(score), 
-                             function(x){quantile(score[1:x], probs = .75)})) %>% 
-    as.data.frame()
-```
-
 The distribution of number of issues created by month and the cumulative summaries 
 are presented in the barplot below. 
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Created per Month"}
-df.number_issues_per_month %>% 
-  ggplot(aes(x = issue_creation_date, y = score)) +
-    geom_bar(stat = "identity", alpha = .6) +
-    scale_x_date(date_breaks = "2 month", date_labels = "%b %Y",
-                 limits = c(as.Date("04/01/2013", "%m/%d/%Y"),
-                            as.Date("03/01/2018", "%m/%d/%Y"))) +
-    scale_y_continuous(breaks = seq(0, 190, 10)) +
-    # Summary lines
-    geom_line(aes(x = issue_creation_date, y = cummedian), 
-              linetype = 2, color = "black") +
-    geom_line(aes(x = issue_creation_date, y = cum1stqu), 
-              linetype = 3, color = "black") +
-    geom_line(aes(x = issue_creation_date, y = cum3rdqu), 
-              linetype = 3, color = "black") +
-    geom_line(aes(x = issue_creation_date, y = cummean), 
-              linetype = 1, color = "red") +
-    # Labels of summary lines
-    geom_text(data = df.summary(df.number_issues_per_month),
-              mapping = aes(x = as.Date("01/01/2018", "%m/%d/%Y"), 
-                            y = median, label = "median"), 
-              size = 3, vjust = .3, hjust = -.1) +
-    geom_text(data = df.summary(df.number_issues_per_month),
-              mapping = aes(x = as.Date("01/01/2018", "%m/%d/%Y"), 
-                            y = qu1, label = "1st qu."), 
-              size = 3, vjust = .3, hjust = -.1) +
-    geom_text(data = df.summary(df.number_issues_per_month),
-              mapping = aes(x = as.Date("01/01/2018", "%m/%d/%Y"), 
-                            y = qu3, label = "3rd qu."), 
-              size = 3, vjust = .3, hjust = -.1) +
-    geom_text(data = df.summary(df.number_issues_per_month),
-              mapping = aes(x = as.Date("01/01/2018", "%m/%d/%Y"), 
-                            y = mean, label = "mean"), 
-              size = 3, vjust = -.2, hjust = -.1, color = "red") +
-    # Rotate axis x
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-    labs(title = "Distribution of Number of Issues Created per Month",
-         subtitle = paste("(Overall Summaries)    ", 
-                          df.summary.text(df.number_issues_per_month)),
-         x = "Issue creation date (per month)",
-         y = "Frequency")
+issues %>% 
+  distinct(issue_id, issue_creation_date) %>% 
+  group_by(issue_creation_date = as.Date(floor_date(issue_creation_date, "month"))) %>% 
+  summarise(score = n()) %>% 
+  plot_frequency.month(x = issue_creation_date, y = score,
+                      y.breaks = seq(0, 190, 10),
+                      labs.title = "Distribution of Number of Issues Created per Month", 
+                      labs.x = "Issue creation date (per month)")
   
 ```
 
@@ -321,31 +161,149 @@ decline in activities. The reason is the low administrative and academic
 activities at the university in this period. Thus, the demand for the systems 
 decreases.
 
+### Issue Start Date
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Started per Month"}
+subset(issues, !is.na(issue_start_date)) %>% 
+  distinct(issue_id, issue_start_date) %>% 
+  group_by(issue_start_date = as.Date(floor_date(issue_start_date, "month"))) %>% 
+  summarise(score = n()) %>% 
+  plot_frequency.month(x = issue_start_date, y = score,
+                       y.breaks = seq(0, 185, 10),
+                       labs.title = "Distribution of Number of Issues Started per Month", 
+                       labs.x = "Issue start date (per month)")
+  
+```
+
+### Issue Deadline Date
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Deadline per Month"}
+subset(issues, !is.na(issue_deadline_date)) %>% 
+  distinct(issue_id, issue_deadline_date) %>% 
+  group_by(issue_deadline_date = as.Date(floor_date(issue_deadline_date, "month"))) %>% 
+  summarise(score = n()) %>% 
+  plot_frequency.month(x = issue_deadline_date, y = score,
+                       y.breaks = seq(0, 80, 5),
+                       labs.title = "Distribution of Number of Issues Deadline per Month", 
+                       labs.x = "Issue deadline date (per month)")
+  
+```
+
 ### Issue Type
+
+In the issue tracking system, 4 types of issues were used to classify the 
+purpose of a issue. They are:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Issue Type Values"}
 levels(issues$issue_type)
 ```
 
+The frequency of issues created by each issue type is shown in the graph below.
+
 ```{r echo=FALSE, fig.retina=2, "Frequency of Issue Type"}
 issues %>%
+  distinct(issue_id, issue_type) %>% 
   group_by(issue_type) %>% 
   summarise(score = n()) %>% 
-  ggplot(aes(x = reorder(issue_type, -score), y = score/sum(score))) +
-    geom_bar(stat = "identity", alpha = .6) +
-    geom_text(aes(label = score), vjust = -1) +
-    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .1)) +
-    labs(title = "Frequency of Issue Type",
-         x = "Issue type",
-         y = "Frequency (relative)")
+  plot_frequency.factor(x = issue_type, y = score,
+                        y.limits = c(0, .85),
+                        labs.title = "Frequency of Issue Type",
+                        labs.x = "Issue type")
+```
 
+Analysing the plot above, we note that most of the issues are of the MAINTENANCE 
+type (around 75%). Next comes the issues of the CUSTOMIZATION type (around 20%). 
+And, with less than 0.05% comes the issues of the types DATA MIGRATION and OTHERS.
+Thus, we can summarize that project management was characterized by corrective 
+maintenance activities of existing systems and subsystems.
+
+The demand for adaptation and evolution of the systems was not insignificant. 
+Although the amount of CUSTOMIZATION and DATA MIGRATION issues are less than 
+MAINTENANCE, they may have indirectly influenced in the creation of large volume 
+of MAINTENANCE issues. Maybe, CUSTOMIZATION issues had provocated related creation 
+of MAINTENANCE issues. The same is true for DATA MIGRATION. An analysis of 
+issues creation timeline by system/subsystem may answer that assumption.
+
+### Issue System
+
+```{r echo=FALSE, fig.retina=2, "Frequency of Issue System"}
+issues %>%
+  distinct(issue_id, issue_system) %>% 
+  group_by(issue_system) %>% 
+  summarise(score = n()) %>% 
+  plot_frequency.factor(x = issue_system, y = score,
+                        x.rotate = 20, y.limits = c(0, .85),
+                        labs.title = "Frequency of Issue System",
+                        labs.x = "Issue system")
+```
+
+### Issue Subsystem
+
+```{r echo=FALSE, fig.retina=2, "Frequency of Issue Subsystem"}
+issues %>%
+  distinct(issue_id, issue_subsystem) %>% 
+  group_by(issue_subsystem) %>% 
+  summarise(score = n()) %>% 
+  arrange(desc(score)) %>% 
+  filter(row_number() <= 15) %>% 
+  plot_frequency.factor(x = issue_subsystem, y = score,
+                        x.rotate = 18, y.limits = c(0, .45),
+                        labs.title = "Frequency (Top 15) of Issue Subsystem",
+                        labs.x = "Issue subsytem")
+```
+
+### Issue Created By
+
+```{r echo=FALSE, fig.retina=2, "Frequency of Issue Created By"}
+issues %>%
+  distinct(issue_id, issue_created_by) %>% 
+  group_by(issue_created_by) %>% 
+  summarise(score = n()) %>% 
+  arrange(desc(score)) %>% 
+  filter(row_number() <= 15) %>% 
+  mutate(issue_created_by = substr(issue_created_by, 0, 12)) %>% 
+  plot_frequency.factor(x = issue_created_by, y = score,
+                        x.rotate = 18, y.limits = c(0, .25),
+                        labs.title = "Frequency (Top 15) of Issue Created By",
+                        labs.x = "Issue created by")
+```
+
+### Issue Stakeholder
+
+```{r echo=FALSE, fig.retina=2, "Frequency of Issue Stakeholder"}
+issues %>%
+  distinct(issue_id, issue_stakeholder) %>% 
+  group_by(issue_stakeholder) %>% 
+  summarise(score = n()) %>% 
+  plot_frequency.factor(x = issue_stakeholder, y = score,
+                        y.limits = c(0, .75),
+                        labs.title = "Frequency of Issue Stakeholder",
+                        labs.x = "Issue stakeholder")
+```
+
+### Issue Status
+
+```{r echo=FALSE, fig.retina=2, "Frequency of Issue Status"}
+issues %>%
+  distinct(issue_id, issue_status) %>% 
+  group_by(issue_status) %>% 
+  summarise(score = n()) %>% 
+  arrange(desc(score)) %>% 
+  plot_frequency.factor(x = issue_status, y = score,
+                        x.breaks = seq(0, 1, .1),
+                        x.rotate = 13, y.limits = c(0, 1),
+                        labs.title = "Frequency (Top 15) of Issue Status",
+                        labs.x = "Issue status")
 ```
 
 ### Reflections on Data Set Summaries
 
-What is the commom flow of the log states?
+What is the commom flow of the log states? (Data Set Structure)
+
 What makes the demand low in 2013?
 What makes the demand grow rapidly in 2014?
+
+
 
 ```{r echo=FALSE,  message=FALSE, warning=FALSE, "Clean the Environment"}
 # rm(list = ls())
