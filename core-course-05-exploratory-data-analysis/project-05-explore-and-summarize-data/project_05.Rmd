@@ -261,7 +261,7 @@ issues %>%
   summarise(score = n()) %>% 
   arrange(desc(score)) %>% 
   filter(row_number() <= 15) %>% 
-  mutate(issue_created_by = substr(issue_created_by, 0, 12)) %>% 
+  mutate(issue_created_by = name_abbreviation(issue_created_by)) %>% 
   plot_frequency.factor(x = issue_created_by, y = score,
                         x.rotate = 18, y.limits = c(0, .25),
                         labs.title = "Frequency (Top 15) of Issue Created By",

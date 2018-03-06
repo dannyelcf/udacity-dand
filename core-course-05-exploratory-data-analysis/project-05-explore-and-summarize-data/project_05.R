@@ -269,3 +269,10 @@ plot_frequency.factor <- function(df, x = NULL, y = NULL,
            x = labs.x,
            y = "Frequency (relative)")
 }
+
+name_abbreviation <- function(names) {
+  sapply(names, function(name) {
+    name_splited <- unlist(strsplit(name, " "))
+    paste0(name_splited[1], " ", substr(name_splited[2], 1, 1), ".")
+  })
+}
