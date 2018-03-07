@@ -46,19 +46,28 @@ load_dataset <- function(path) {
                      ))
 }
 
-
-df_summary <- function(df) {
-  data.frame(min = min(df$score), 
-             max = max(df$score),
-             mean = mean(df$score),
-             qu1 = quantile(df$score, probs = .25, names = FALSE),
-             median = quantile(df$score, probs = .5, names = FALSE),
-             qu3 = quantile(df$score, probs = .75, names = FALSE),
-             pc95 = quantile(df$score, probs = .95, names = FALSE),
-             iqr = (quantile(df$score, probs = .75, names = FALSE) - 
-                      quantile(df$score, probs = .25, names = FALSE)))
+df_summary <- function(df, variable = NULL) {
+  df_summary_q(df, substitute(variable))
 }
 
+df_summary_q <- function(df, variable = NULL) {
+  variable <- eval(variable, df)
+  
+  if(is.null(variable)) {
+    stop("variable argument can't be NULL")
+  }
+  
+  data.frame(min = min(variable), 
+             max = max(variable),
+             mean = mean(variable),
+             qu1 = quantile(variable, probs = .25, names = FALSE),
+             median = quantile(variable, probs = .5, names = FALSE),
+             qu3 = quantile(variable, probs = .75, names = FALSE),
+             pc95 = quantile(variable, probs = .95, names = FALSE),
+             iqr = (quantile(variable, probs = .75, names = FALSE) - 
+                      quantile(variable, probs = .25, names = FALSE)))
+  
+}
 
 df_summary_text <- function(df_summary) {
   paste0("min: ", df_summary$min,
@@ -70,6 +79,85 @@ df_summary_text <- function(df_summary) {
          "    max: ", df_summary$max)
 }
 
+plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
+                           x.breaks = waiver(), y.breaks = waiver(),
+                           x.limits = NULL, y.limits = NULL, 
+                           labs.title = "", labs.x = "") {
+  if(is.null(df)) {
+    stop("df argument can't be NULL")
+  }
+  
+  x_q <- substitute(x)
+  x <- eval(x_q, df)
+  
+  if(is.null(x)) {
+    stop("x argument can't be NULL")
+  }
+  
+  if(is.null(summary)) {
+    summary <- df_summary_q(df, x_q)
+  }
+  
+  summary.y <- 0
+  
+  df %>% 
+    ggplot(aes(x = x)) +
+    geom_histogram(alpha = .6, binwidth = binwidth) +
+    scale_x_continuous(breaks = x.breaks, limits = x.limits) +
+    scale_y_continuous(breaks = y.breaks, limits = y.limits) +
+    labs(title = labs.title,
+         subtitle = df_summary_text(summary),
+         x = labs.x,
+         y = "Frequency") +
+    
+    # Summaries....
+    # 1st quantile
+    annotate("segment", 
+             x = summary$qu1, 
+             xend = summary$median, 
+             y = summary.y, yend = summary.y, colour = "black", 
+             size = .5, 
+             arrow = arrow(ends="first", angle=90, length=unit(.15,"cm"))) +
+    # 2nd quantile (median)
+    annotate("segment", 
+             x = summary$median, 
+             xend = summary$median, 
+             y = summary.y, yend = summary.y, colour = "black", 
+             size = 1, 
+             arrow = arrow(ends="both", angle=90, length=unit(.15,"cm"))) +
+    # 3rd quantile
+    annotate("segment", 
+             x = summary$median, 
+             xend = summary$qu3, 
+             y = summary.y, yend = summary.y, colour = "black", 
+             size = .5, 
+             arrow = arrow(ends="last", angle=90, length=unit(.15,"cm"))) +
+    # Lower outlier limiar (1st qu. - IQR * 1.5)
+    annotate("segment", 
+             x = if(summary$qu1 - (summary$iqr * 1.5) < summary$min) {
+               summary$min
+             } else {
+               summary$qu1 - (summary$iqr * 1.5)
+             }, 
+             xend = summary$qu1, 
+             y = summary.y, yend = summary.y, colour = "black", 
+             size = .5) +
+    # Upper outlier limiar (3st qu. + IQR * 1.5)
+    annotate("segment", 
+             x = summary$qu3, 
+             xend = if(summary$qu3 + (summary$iqr * 1.5) > summary$max) {
+               summary$max
+             } else {
+               summary$qu3 + (summary$iqr * 1.5)
+             }, 
+             y = summary.y, yend = summary.y, colour = "black", 
+             size = .5) +
+    # Mean
+    annotate("point", 
+             x = summary$mean, y = summary.y, 
+             colour = "red", size = 1.2) 
+}
+
 plot_frequency.numeric <- function(df, x = NULL, y = NULL, summary = NULL,
                                    x.breaks = waiver(), y.breaks = waiver(),
                                    x.limits = NULL, y.limits = NULL, 
@@ -78,8 +166,10 @@ plot_frequency.numeric <- function(df, x = NULL, y = NULL, summary = NULL,
     stop("df argument can't be NULL")
   }
   
-  x <- eval(substitute(x), df)
-  y <- eval(substitute(y), df)
+  x_q <- substitute(x)
+  x <- eval(x_q, df)
+  y_q <- substitute(y)
+  y <- eval(y_q, df)
   
   if(is.null(x)) {
     stop("x argument can't be NULL")
@@ -89,25 +179,17 @@ plot_frequency.numeric <- function(df, x = NULL, y = NULL, summary = NULL,
     stop("y argument can't be NULL")
   }
   
-  if(is.null(y)) {
-    stop("y argument can't be NULL")
-  }
-  
   if(is.null(summary)) {
-    summary <- df_summary(df)
+    summary <- df_summary_q(df, y_q)
   }
   
-  if (is.null(y.limits)) {
-    y.limits <- c(min(y), max(y))
-  }
-  
-  summary.y <- y.limits[1] - 35
+  summary.y <- 0
   
   df %>% 
     ggplot(aes(x = x, y = y)) +
     geom_bar(stat = "identity", alpha = .6) +
     scale_x_continuous(breaks = x.breaks, limits = x.limits) +
-    scale_y_continuous(breaks = y.breaks, limits = c(summary.y, y.limits[2])) +
+    scale_y_continuous(breaks = y.breaks, limits = y.limits) +
     labs(title = labs.title,
          subtitle = df_summary_text(summary),
          x = labs.x,
@@ -163,14 +245,15 @@ plot_frequency.numeric <- function(df, x = NULL, y = NULL, summary = NULL,
 
 plot_frequency.month <- function(df, x = NULL, y = NULL, summary = NULL,
                                  y.breaks = waiver(),
-                                 labs.title = "", labs.x = "") 
-{
+                                 labs.title = "", labs.x = "") {
   if(is.null(df)) {
     stop("df argument can't be NULL")
   }
   
-  x <- eval(substitute(x), df)
-  y <- eval(substitute(y), df)
+  x_q <- substitute(x)
+  x <- eval(x_q, df)
+  y_q <- substitute(y)
+  y <- eval(y_q, df)
   
   if(is.null(x)) {
     stop("x argument can't be NULL")
@@ -181,7 +264,7 @@ plot_frequency.month <- function(df, x = NULL, y = NULL, summary = NULL,
   }
   
   if(is.null(summary)) {
-    summary <- df_summary(df)
+    summary <- df_summary_q(df, y_q)
   }
   
   df %>%
@@ -232,8 +315,7 @@ plot_frequency.month <- function(df, x = NULL, y = NULL, summary = NULL,
 plot_frequency.factor <- function(df, x = NULL, y = NULL,
                                   x.breaks = seq(0, 1, .05),
                                   x.rotate = NULL, y.limits = c(0, 1), 
-                                  labs.title = "", labs.x = "") 
-{
+                                  labs.title = "", labs.x = "") {
   if(is.null(df)) {
     stop("df argument can't be NULL")
   }
@@ -243,10 +325,6 @@ plot_frequency.factor <- function(df, x = NULL, y = NULL,
   
   if(is.null(x)) {
     stop("x argument can't be NULL")
-  }
-  
-  if(is.null(y)) {
-    stop("y argument can't be NULL")
   }
   
   if(is.null(y)) {
@@ -270,9 +348,13 @@ plot_frequency.factor <- function(df, x = NULL, y = NULL,
            y = "Frequency (relative)")
 }
 
-name_abbreviation <- function(names) {
+first_last_names <- function(names) {
   sapply(names, function(name) {
     name_splited <- unlist(strsplit(name, " "))
-    paste0(name_splited[1], " ", substr(name_splited[2], 1, 1), ".")
+    if (length(name_splited) > 1) {
+      paste(name_splited[1], name_splited[length(name_splited)])
+    } else {
+      name_splited[1]
+    }
   })
 }

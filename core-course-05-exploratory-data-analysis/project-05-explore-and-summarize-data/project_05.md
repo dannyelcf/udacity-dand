@@ -132,6 +132,10 @@ demand for the systems decreases.
 
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Issues Deadline per Month-1.png" width="672" />
 
+### Issue Time Spent
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Time Spent per Issue-1.png" width="672" />
+
 ### Issue Type
 
 In the issue tracking system, 4 types of issues were used to classify
@@ -167,13 +171,13 @@ system/subsystem may answer that assumption.
 
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Subsystem-1.png" width="672" />
 
-### Issue Created By
-
-<img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Created By-1.png" width="672" />
-
 ### Issue Stakeholder
 
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Stakeholder-1.png" width="672" />
+
+### Issue Created By
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Created By-1.png" width="672" />
 
 ### Issue Status
 

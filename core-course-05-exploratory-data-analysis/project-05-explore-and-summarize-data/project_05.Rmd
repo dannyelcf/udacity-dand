@@ -25,7 +25,8 @@ source("project_05.R")
 
 # Set up default theme for plots
 theme_set(theme_classic() %+replace%
-            theme(panel.grid.major.y = element_line(size=.05, color="gray")))
+            theme(panel.grid.major.y = element_line(size=.05, color="gray"),
+                  plot.margin = unit(c(1, .5, 1, 2), "cm")))
 ```
 
 ```{r echo=FALSE, "Load Data Set"}
@@ -97,9 +98,8 @@ df.number_logs_per_issue %>%
   group_by(number_logs_per_issue = score) %>%
   summarise(score = n()) %>% 
   plot_frequency.numeric(x = number_logs_per_issue, y = score,
-                         summary = df_summary(df.number_logs_per_issue),
+                         summary = df_summary(df.number_logs_per_issue, score),
                          x.breaks = seq(0, 43, 2), y.breaks = seq(0, 800, 50),
-                         y.limits = c(0, 800), 
                          labs.title = "Distribution of Number of Logs per Issue", 
                          labs.x = "Number of logs per issue")
 ```
@@ -127,8 +127,9 @@ are presented in the barplot below.
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Created per Month"}
 issues %>% 
-  distinct(issue_id, issue_creation_date) %>% 
-  group_by(issue_creation_date = as.Date(floor_date(issue_creation_date, "month"))) %>% 
+  distinct(issue_id, issue_creation_date = as.Date(floor_date(issue_creation_date, 
+                                                              "month"))) %>% 
+  group_by(issue_creation_date) %>% 
   summarise(score = n()) %>% 
   plot_frequency.month(x = issue_creation_date, y = score,
                       y.breaks = seq(0, 190, 10),
@@ -165,8 +166,9 @@ decreases.
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Started per Month"}
 subset(issues, !is.na(issue_start_date)) %>% 
-  distinct(issue_id, issue_start_date) %>% 
-  group_by(issue_start_date = as.Date(floor_date(issue_start_date, "month"))) %>% 
+  distinct(issue_id, issue_start_date = as.Date(floor_date(issue_start_date, 
+                                                           "month"))) %>% 
+  group_by(issue_start_date) %>% 
   summarise(score = n()) %>% 
   plot_frequency.month(x = issue_start_date, y = score,
                        y.breaks = seq(0, 185, 10),
@@ -179,13 +181,27 @@ subset(issues, !is.na(issue_start_date)) %>%
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Deadline per Month"}
 subset(issues, !is.na(issue_deadline_date)) %>% 
-  distinct(issue_id, issue_deadline_date) %>% 
-  group_by(issue_deadline_date = as.Date(floor_date(issue_deadline_date, "month"))) %>% 
+  distinct(issue_id, issue_deadline_date = as.Date(floor_date(issue_deadline_date, 
+                                                              "month"))) %>% 
+  group_by(issue_deadline_date) %>% 
   summarise(score = n()) %>% 
   plot_frequency.month(x = issue_deadline_date, y = score,
                        y.breaks = seq(0, 80, 5),
                        labs.title = "Distribution of Number of Issues Deadline per Month", 
                        labs.x = "Issue deadline date (per month)")
+  
+```
+
+### Issue Time Spent
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Time Spent per Issue"}
+issues %>% 
+  distinct(issue_id, issue_time_spent = period_to_seconds(issue_time_spent) / 3600) %>% 
+  plot_histogram(x = issue_time_spent, binwidth = 1,
+                 x.breaks = seq(0, 24, 1), y.breaks = seq(0, 3000, 150),
+                 labs.title = "Distribution of Time Spent per Issue", 
+                 labs.x = "Issue time spent (hours)") +
+    coord_cartesian(xlim = c(0, 24))
   
 ```
 
@@ -241,31 +257,16 @@ issues %>%
 
 ```{r echo=FALSE, fig.retina=2, "Frequency of Issue Subsystem"}
 issues %>%
-  distinct(issue_id, issue_subsystem) %>% 
-  group_by(issue_subsystem) %>% 
+  distinct(issue_id, issue_system, issue_subsystem) %>% 
+  group_by(issue_system, issue_subsystem) %>% 
   summarise(score = n()) %>% 
   arrange(desc(score)) %>% 
+  ungroup() %>% 
   filter(row_number() <= 15) %>% 
-  plot_frequency.factor(x = issue_subsystem, y = score,
-                        x.rotate = 18, y.limits = c(0, .45),
+  plot_frequency.factor(x = paste0("(", issue_system, ") ", issue_subsystem), 
+                        y = score, x.rotate = 25, y.limits = c(0, .45),
                         labs.title = "Frequency (Top 15) of Issue Subsystem",
                         labs.x = "Issue subsytem")
-```
-
-### Issue Created By
-
-```{r echo=FALSE, fig.retina=2, "Frequency of Issue Created By"}
-issues %>%
-  distinct(issue_id, issue_created_by) %>% 
-  group_by(issue_created_by) %>% 
-  summarise(score = n()) %>% 
-  arrange(desc(score)) %>% 
-  filter(row_number() <= 15) %>% 
-  mutate(issue_created_by = name_abbreviation(issue_created_by)) %>% 
-  plot_frequency.factor(x = issue_created_by, y = score,
-                        x.rotate = 18, y.limits = c(0, .25),
-                        labs.title = "Frequency (Top 15) of Issue Created By",
-                        labs.x = "Issue created by")
 ```
 
 ### Issue Stakeholder
@@ -281,6 +282,23 @@ issues %>%
                         labs.x = "Issue stakeholder")
 ```
 
+### Issue Created By
+
+```{r echo=FALSE, fig.retina=2, "Frequency of Issue Created By"}
+issues %>%
+  distinct(issue_id, issue_stakeholder, issue_created_by) %>% 
+  group_by(issue_stakeholder, issue_created_by) %>% 
+  summarise(score = n()) %>% 
+  arrange(desc(score)) %>% 
+  ungroup() %>% 
+  filter(row_number() <= 15) %>% 
+  mutate(issue_created_by = first_last_names(issue_created_by)) %>% 
+  plot_frequency.factor(x = paste0("(", issue_stakeholder, ") ", issue_created_by), 
+                        y = score, x.rotate = 25, y.limits = c(0, .25),
+                        labs.title = "Frequency (Top 15) of Issue Created By",
+                        labs.x = "Issue created by")
+```
+
 ### Issue Status
 
 ```{r echo=FALSE, fig.retina=2, "Frequency of Issue Status"}
@@ -291,8 +309,8 @@ issues %>%
   arrange(desc(score)) %>% 
   plot_frequency.factor(x = issue_status, y = score,
                         x.breaks = seq(0, 1, .1),
-                        x.rotate = 13, y.limits = c(0, 1),
-                        labs.title = "Frequency (Top 15) of Issue Status",
+                        x.rotate = 20, y.limits = c(0, 1.1),
+                        labs.title = "Frequency of Issue Status",
                         labs.x = "Issue status")
 ```
 
