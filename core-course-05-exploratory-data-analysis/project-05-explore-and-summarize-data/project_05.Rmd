@@ -5,6 +5,24 @@ EDA in an Issue Tracking Data Set
 ================================================================================
 *by Dannyel Cardoso da Fonseca* 
 
+<style>
+body {
+  text-align: justify
+}
+pre code, pre, code {
+  white-space: pre !important;
+  overflow-x: auto !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
+</style>
+
+```{r setup, include=FALSE}
+# https://stackoverflow.com/a/38579910/8645131
+knitr::opts_chunk$set(echo = TRUE)
+options(width=200)
+```
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Cleaning the environment before start
 # This is useful when execute "Restart R and Run All Chuncks"
@@ -90,18 +108,18 @@ data.frame(number_issues = nrow(df.number_logs_per_issue),
 We can note that the number of issues represents 20% of the data set and the 
 number of logs represents 99% of it. The 1% of logs remaining (147 rows) represents 
 issues that do not have history logs. The distribution of number of logs per issue 
-and their summaries are presented in the barplot below.
+and their summaries are presented in the histogram below.
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Logs per Issue"}
 # Count number of issues for each number of logs per issue
-df.number_logs_per_issue %>%
-  group_by(number_logs_per_issue = score) %>%
-  summarise(score = n()) %>% 
-  plot_frequency.numeric(x = number_logs_per_issue, y = score,
-                         summary = df_summary(df.number_logs_per_issue, score),
-                         x.breaks = seq(0, 43, 2), y.breaks = seq(0, 800, 50),
+df.number_logs_per_issue %>% 
+  #distinct(issue_id, issue_time_spent = period_to_seconds(issue_time_spent) / 3600) %>% 
+  plot_histogram(x = score, binwidth = 1,
+                 x.breaks = seq(0, 43, 2), y.breaks = seq(0, 800, 50),
                          labs.title = "Distribution of Number of Logs per Issue", 
-                         labs.x = "Number of logs per issue")
+                         labs.x = "Number of logs per issue",
+                         labs.caption = paste0("\nNumber of observations: ",
+                                               nrow(df.number_logs_per_issue)))
 ```
 
 Analysing the plot above, we can note that 75% of issues have up to 6 history logs
@@ -126,15 +144,20 @@ The distribution of number of issues created by month and the cumulative summari
 are presented in the barplot below. 
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Created per Month"}
-issues %>% 
-  distinct(issue_id, issue_creation_date = as.Date(floor_date(issue_creation_date, 
-                                                              "month"))) %>% 
+df_issue_created_by_month <- 
+  issues %>% 
+    distinct(issue_id, issue_creation_date = as.Date(floor_date(issue_creation_date, 
+                                                                "month"))) 
+
+df_issue_created_by_month %>% 
   group_by(issue_creation_date) %>% 
   summarise(score = n()) %>% 
   plot_frequency.month(x = issue_creation_date, y = score,
                       y.breaks = seq(0, 190, 10),
                       labs.title = "Distribution of Number of Issues Created per Month", 
-                      labs.x = "Issue creation date (per month)")
+                      labs.x = "Issue creation date (per month)",
+                      labs.caption = paste0("\nNumber of observations: ",
+                                            nrow(df_issue_created_by_month)))
   
 ```
 
@@ -165,43 +188,104 @@ decreases.
 ### Issue Start Date
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Started per Month"}
-subset(issues, !is.na(issue_start_date)) %>% 
-  distinct(issue_id, issue_start_date = as.Date(floor_date(issue_start_date, 
-                                                           "month"))) %>% 
+df_issue_start_date <-
+  subset(issues, !is.na(issue_start_date)) %>% 
+    distinct(issue_id, issue_start_date = as.Date(floor_date(issue_start_date, 
+                                                           "month")))
+df_issue_start_date %>% 
   group_by(issue_start_date) %>% 
   summarise(score = n()) %>% 
   plot_frequency.month(x = issue_start_date, y = score,
                        y.breaks = seq(0, 185, 10),
                        labs.title = "Distribution of Number of Issues Started per Month", 
-                       labs.x = "Issue start date (per month)")
+                       labs.x = "Issue start date (per month)",
+                       labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_issue_start_date)))
   
 ```
 
 ### Issue Deadline Date
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Deadline per Month"}
-subset(issues, !is.na(issue_deadline_date)) %>% 
-  distinct(issue_id, issue_deadline_date = as.Date(floor_date(issue_deadline_date, 
-                                                              "month"))) %>% 
+df_issue_deadline_date <- 
+  subset(issues, !is.na(issue_deadline_date)) %>% 
+    distinct(issue_id, issue_deadline_date = as.Date(floor_date(issue_deadline_date, 
+                                                                "month"))) 
+df_issue_deadline_date %>% 
   group_by(issue_deadline_date) %>% 
   summarise(score = n()) %>% 
   plot_frequency.month(x = issue_deadline_date, y = score,
                        y.breaks = seq(0, 80, 5),
                        labs.title = "Distribution of Number of Issues Deadline per Month", 
-                       labs.x = "Issue deadline date (per month)")
-  
+                       labs.x = "Issue deadline date (per month)",
+                       labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_issue_deadline_date)))
 ```
 
 ### Issue Time Spent
 
 ```{r echo=FALSE, fig.retina=2, "Distribution of Time Spent per Issue"}
-issues %>% 
-  distinct(issue_id, issue_time_spent = period_to_seconds(issue_time_spent) / 3600) %>% 
+df_issue_time_spent_hours <- 
+  issues %>% 
+    distinct(issue_id, issue_time_spent = period_to_seconds(issue_time_spent) / 3600)
+
+df_issue_time_spent_hours %>% 
   plot_histogram(x = issue_time_spent, binwidth = 1,
-                 x.breaks = seq(0, 24, 1), y.breaks = seq(0, 3000, 150),
+                 x.breaks = seq(0, 24, 1), y.breaks = seq(0, 2700, 150),
+                 xlim = c(0, 24),
                  labs.title = "Distribution of Time Spent per Issue", 
-                 labs.x = "Issue time spent (hours)") +
-    coord_cartesian(xlim = c(0, 24))
+                 labs.x = "Issue time spent (hours)",
+                 labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_issue_time_spent_hours)))
+```
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Time Spent per Issue (Less than 1 Hour)"}
+df_issue_time_spent_min <- 
+  issues %>% 
+    distinct(issue_id, issue_time_spent = period_to_seconds(issue_time_spent) / 60) %>% 
+    filter(issue_time_spent < 60)
+
+df_issue_time_spent_min %>%
+  plot_histogram(x = issue_time_spent, binwidth = 10,
+                 x.breaks = seq(0, 60, 10), y.breaks = seq(0, 1700, 100),
+                 labs.title = "Distribution of Time Spent per Issue", 
+                 labs.x = "Issue time spent (minutes)",
+                 labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_issue_time_spent_min)))
+
+```
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Time Spent per Issue (Less than 1 Hour and Dropped 0 Seconds)"}
+df_issue_time_spent_min <- 
+  issues %>% 
+    distinct(issue_id, issue_time_spent = period_to_seconds(issue_time_spent) / 60) %>% 
+    filter(issue_time_spent != 0 & issue_time_spent < 60)
+
+df_issue_time_spent_min %>%
+  plot_histogram(x = issue_time_spent, binwidth = 10,
+                 x.breaks = seq(6, 60, 10), y.breaks = seq(0, 500, 50),
+                 labs.title = "Distribution of Time Spent per Issue", 
+                 labs.x = "Issue time spent (minutes)",
+                 labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_issue_time_spent_min)))
+
+```
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Time Spent per Issue (Dropped 0 Seconds)"}
+df_issue_time_spent_hours <- 
+  issues %>% 
+    distinct(issue_id, 
+             issue_time_spent = period_to_seconds(issue_time_spent) / 3600) %>% 
+    filter(issue_time_spent != 0)
+
+df_issue_time_spent_hours %>% 
+  plot_histogram(x = issue_time_spent, binwidth = 1,
+                 x.breaks = seq(0, 24, 1), y.breaks = seq(0, 2700, 150),
+                 xlim = c(0, 24),
+                 labs.title = "Distribution of Time Spent per Issue", 
+                 labs.x = "Issue time spent (hours)",
+                 labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_issue_time_spent_hours)))
   
 ```
 
@@ -217,14 +301,20 @@ levels(issues$issue_type)
 The frequency of issues created by each issue type is shown in the graph below.
 
 ```{r echo=FALSE, fig.retina=2, "Frequency of Issue Type"}
-issues %>%
+df_issue_type <-
+  issues %>%
+    distinct(issue_id, issue_type)
+
+df_issue_type %>%
   distinct(issue_id, issue_type) %>% 
   group_by(issue_type) %>% 
   summarise(score = n()) %>% 
   plot_frequency.factor(x = issue_type, y = score,
                         y.limits = c(0, .85),
                         labs.title = "Frequency of Issue Type",
-                        labs.x = "Issue type")
+                        labs.x = "Issue type",
+                        labs.caption = paste0("\nNumber of observations: ",
+                                              nrow(df_issue_type)))
 ```
 
 Analysing the plot above, we note that most of the issues are of the MAINTENANCE 
@@ -243,20 +333,29 @@ issues creation timeline by system/subsystem may answer that assumption.
 ### Issue System
 
 ```{r echo=FALSE, fig.retina=2, "Frequency of Issue System"}
-issues %>%
-  distinct(issue_id, issue_system) %>% 
+df_issue_system <-
+  issues %>%
+    distinct(issue_id, issue_system)
+
+df_issue_system %>%
   group_by(issue_system) %>% 
   summarise(score = n()) %>% 
   plot_frequency.factor(x = issue_system, y = score,
                         x.rotate = 20, y.limits = c(0, .85),
                         labs.title = "Frequency of Issue System",
-                        labs.x = "Issue system")
+                        labs.x = "Issue system",
+                        labs.caption = paste0("\nNumber of observations: ",
+                                              nrow(df_issue_system)))
 ```
 
 ### Issue Subsystem
 
 ```{r echo=FALSE, fig.retina=2, "Frequency of Issue Subsystem"}
-issues %>%
+df_issue_subsystem <-
+  issues %>%
+    distinct(issue_id, issue_system, issue_subsystem)
+
+df_issue_subsystem %>%
   distinct(issue_id, issue_system, issue_subsystem) %>% 
   group_by(issue_system, issue_subsystem) %>% 
   summarise(score = n()) %>% 
@@ -266,27 +365,37 @@ issues %>%
   plot_frequency.factor(x = paste0("(", issue_system, ") ", issue_subsystem), 
                         y = score, x.rotate = 25, y.limits = c(0, .45),
                         labs.title = "Frequency (Top 15) of Issue Subsystem",
-                        labs.x = "Issue subsytem")
+                        labs.x = "Issue subsytem",
+                        labs.caption = paste0("\nNumber of observations: ",
+                                              nrow(df_issue_subsystem)))
 ```
 
 ### Issue Stakeholder
 
 ```{r echo=FALSE, fig.retina=2, "Frequency of Issue Stakeholder"}
-issues %>%
-  distinct(issue_id, issue_stakeholder) %>% 
+df_issue_stakeholder <-
+  issues %>%
+    distinct(issue_id, issue_stakeholder)
+
+df_issue_stakeholder %>%
   group_by(issue_stakeholder) %>% 
   summarise(score = n()) %>% 
   plot_frequency.factor(x = issue_stakeholder, y = score,
                         y.limits = c(0, .75),
                         labs.title = "Frequency of Issue Stakeholder",
-                        labs.x = "Issue stakeholder")
+                        labs.x = "Issue stakeholder",
+                        labs.caption = paste0("\nNumber of observations: ",
+                                              nrow(df_issue_stakeholder)))
 ```
 
 ### Issue Created By
 
 ```{r echo=FALSE, fig.retina=2, "Frequency of Issue Created By"}
-issues %>%
-  distinct(issue_id, issue_stakeholder, issue_created_by) %>% 
+df_issue_created_by <-
+  issues %>%
+    distinct(issue_id, issue_stakeholder, issue_created_by)
+
+df_issue_created_by %>% 
   group_by(issue_stakeholder, issue_created_by) %>% 
   summarise(score = n()) %>% 
   arrange(desc(score)) %>% 
@@ -296,14 +405,19 @@ issues %>%
   plot_frequency.factor(x = paste0("(", issue_stakeholder, ") ", issue_created_by), 
                         y = score, x.rotate = 25, y.limits = c(0, .25),
                         labs.title = "Frequency (Top 15) of Issue Created By",
-                        labs.x = "Issue created by")
+                        labs.x = "Issue created by",
+                        labs.caption = paste0("\nNumber of observations: ",
+                                              nrow(df_issue_created_by)))
 ```
 
 ### Issue Status
 
 ```{r echo=FALSE, fig.retina=2, "Frequency of Issue Status"}
-issues %>%
-  distinct(issue_id, issue_status) %>% 
+df_issue_status <-
+  issues %>%
+    distinct(issue_id, issue_status)
+
+df_issue_status %>% 
   group_by(issue_status) %>% 
   summarise(score = n()) %>% 
   arrange(desc(score)) %>% 
@@ -311,7 +425,130 @@ issues %>%
                         x.breaks = seq(0, 1, .1),
                         x.rotate = 20, y.limits = c(0, 1.1),
                         labs.title = "Frequency of Issue Status",
-                        labs.x = "Issue status")
+                        labs.x = "Issue status",
+                        labs.caption = paste0("\nNumber of observations: ",
+                                              nrow(df_issue_status)))
+```
+
+### Issue Priority Number
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Priority Number per Issue"}
+df_issue_priority_number <- 
+  issues %>% 
+    distinct(issue_id, issue_priority_number)
+
+df_issue_priority_number %>% 
+  plot_histogram(x = issue_priority_number, binwidth = 50,
+                 x.breaks = seq(0, 999, 50), y.breaks = seq(0, 2700, 150),
+                 labs.title = "Distribution of Priority Number per Issue", 
+                 labs.x = "Issue priority number",
+                 labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_issue_priority_number)))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Head Issue Priority Number"}
+df_issue_priority_number %>% 
+  group_by(issue_priority_number) %>% 
+  summarise(score = sum(!is.na(issue_priority_number))) %>% 
+  arrange(desc(score)) %>% 
+  head() %>% 
+  as.data.frame()
+```
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Priority Number per Issue (Dropped 999 and Zoomed In to 100)"}
+df_issue_priority_number <- 
+  issues %>% 
+    distinct(issue_id, issue_priority_number) %>% 
+    filter(issue_priority_number != 999)
+
+df_issue_priority_number %>% 
+  plot_histogram(x = issue_priority_number, binwidth = 10,
+                 x.breaks = seq(0, 280, 10), y.breaks = seq(0, 1600, 150),
+                 xlim = c(0, 100),
+                 labs.title = "Distribution of Priority Number per Issue", 
+                 labs.x = "Issue priority number",
+                 labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_issue_priority_number)))
+```
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Priority Number per Issue (Less than or Equal to 20)"}
+df_issue_priority_number <- 
+  issues %>% 
+    distinct(issue_id, issue_priority_number) %>% 
+    filter(issue_priority_number <= 20)
+
+df_issue_priority_number %>% 
+  plot_histogram(x = issue_priority_number, binwidth = 1,
+                 x.breaks = seq(0, 20, 1), y.breaks = seq(0, 450, 50),
+                 labs.title = "Distribution of Priority Number per Issue", 
+                 labs.x = "Issue priority number",
+                 labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_issue_priority_number)))
+```
+
+### Issue Priority Scale
+
+```{r echo=FALSE, fig.retina=2, "Frequency of Issue Priority Scale"}
+df_issue_priority_scale <-
+  issues %>%
+    distinct(issue_id, issue_priority_scale)
+
+df_issue_priority_scale %>% 
+  group_by(issue_priority_scale) %>% 
+  summarise(score = n()) %>% 
+  arrange(desc(score)) %>% 
+  plot_frequency.factor(x = issue_priority_scale, y = score,
+                        x.breaks = seq(0, 1, .1),
+                        y.limits = c(0, .7),
+                        labs.title = "Frequency of Issue Priority Scale",
+                        labs.x = "Issue priority scale",
+                        labs.caption = paste0("\nNumber of observations: ",
+                                              nrow(df_issue_priority_scale)))
+```
+
+### Issue Progress
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Priority Number per Issue"}
+df_issue_progress <- 
+  issues %>% 
+    distinct(issue_id, issue_progress)
+
+df_issue_progress %>% 
+  plot_histogram(x = issue_progress, binwidth = 10,
+                 x.breaks = seq(0, 100, 10), y.breaks = seq(0, 4600, 500),
+                 labs.title = "Distribution of Priority Number per Issue", 
+                 labs.x = "Issue priority number",
+                 labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_issue_progress)))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Head Issue Progress"}
+df_issue_progress %>% 
+  group_by(issue_progress) %>% 
+  summarise(score = sum(!is.na(issue_progress))) %>% 
+  arrange(desc(score)) %>% 
+  head() %>% 
+  as.data.frame()
+```
+
+### Log Build Info
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Log Build Info"}
+df_log_build_info <- 
+  subset(issues, !is.na(log_build_info)) %>% 
+    distinct(issue_id, log_build_info) %>% 
+    arrange(log_build_info)
+
+df_log_build_info %>% 
+  group_by(log_build_info) %>% 
+  summarise(score = n()) %>% 
+  arrange(desc(score)) %>%
+  plot_histogram(x = score, binwidth = 10,
+                 x.breaks = seq(0, 200, 10), y.breaks = seq(0, 4600, 500),
+                 labs.title = "Distribution of Priority Number per Issue", 
+                 labs.x = "Issue priority number",
+                 labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_log_build_info)))
 ```
 
 ### Reflections on Data Set Summaries
