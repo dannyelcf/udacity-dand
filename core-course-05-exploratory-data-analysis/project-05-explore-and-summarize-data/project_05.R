@@ -109,7 +109,7 @@ plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
   
   df %>% 
     ggplot(aes(x = x)) +
-    geom_histogram(alpha = .3, binwidth = binwidth, 
+    geom_histogram(alpha = .3, binwidth = binwidth, color = "gray",
                    boundary = summary$min, closed = "left") +
     scale_x_continuous(breaks = x.breaks, limits = x.limits) +
     scale_y_continuous(breaks = y.breaks, limits = y.limits) +
@@ -152,7 +152,8 @@ plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
              }, 
              xend = summary$qu1, 
              y = summary.y, yend = summary.y, colour = "black", 
-             size = .5) +
+             size = .15, linetype = 1,
+             arrow = arrow(ends="first", angle=90, length=unit(.1,"cm"))) +
     # Upper outlier limiar (3st qu. + IQR * 1.5)
     annotate("segment", 
              x = summary$qu3, 
@@ -162,96 +163,8 @@ plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
                summary$qu3 + (summary$iqr * 1.5)
              }, 
              y = summary.y, yend = summary.y, colour = "black", 
-             size = .5) +
-    # Mean
-    annotate("point", 
-             x = summary$mean, y = summary.y, 
-             colour = "red", size = 1.2) 
-}
-
-plot_frequency.numeric <- function(df, x = NULL, y = NULL, summary = NULL,
-                                   x.breaks = waiver(), y.breaks = waiver(),
-                                   x.limits = NULL, y.limits = NULL, 
-                                   xlim = NULL, ylim = NULL,
-                                   labs.title = "", labs.x = "", 
-                                   labs.caption = "") {
-  if(is.null(df)) {
-    stop("df argument can't be NULL")
-  }
-  
-  x_q <- substitute(x)
-  x <- eval(x_q, df)
-  y_q <- substitute(y)
-  y <- eval(y_q, df)
-  
-  if(is.null(x)) {
-    stop("x argument can't be NULL")
-  }
-  
-  if(is.null(y)) {
-    stop("y argument can't be NULL")
-  }
-  
-  if(is.null(summary)) {
-    summary <- df_summary_q(df, y_q)
-  }
-  
-  summary.y <- 0
-  
-  df %>% 
-    ggplot(aes(x = x, y = y)) +
-    geom_bar(stat = "identity", alpha = .3) +
-    scale_x_continuous(breaks = x.breaks, limits = x.limits) +
-    scale_y_continuous(breaks = y.breaks, limits = y.limits) +
-    coord_cartesian(xlim = xlim, ylim = ylim) +
-    labs(title = labs.title,
-         subtitle = df_summary_text(summary),
-         x = labs.x,
-         y = "Frequency",
-         caption = labs.caption) +
-    
-    # Summaries....
-    # 1st quantile
-    annotate("segment", 
-             x = summary$qu1, 
-             xend = summary$median, 
-             y = summary.y, yend = summary.y, colour = "black", 
-             size = .5, 
-             arrow = arrow(ends="first", angle=90, length=unit(.15,"cm"))) +
-    # 2nd quantile (median)
-    annotate("segment", 
-             x = summary$median, 
-             xend = summary$median, 
-             y = summary.y, yend = summary.y, colour = "black", 
-             size = 1, 
-             arrow = arrow(ends="both", angle=90, length=unit(.15,"cm"))) +
-    # 3rd quantile
-    annotate("segment", 
-             x = summary$median, 
-             xend = summary$qu3, 
-             y = summary.y, yend = summary.y, colour = "black", 
-             size = .5, 
-             arrow = arrow(ends="last", angle=90, length=unit(.15,"cm"))) +
-    # Lower outlier limiar (1st qu. - IQR * 1.5)
-    annotate("segment", 
-             x = if(summary$qu1 - (summary$iqr * 1.5) < summary$min) {
-                   summary$min
-                 } else {
-                   summary$qu1 - (summary$iqr * 1.5)
-                 }, 
-             xend = summary$qu1, 
-             y = summary.y, yend = summary.y, colour = "black", 
-             size = .5) +
-    # Upper outlier limiar (3st qu. + IQR * 1.5)
-    annotate("segment", 
-             x = summary$qu3, 
-             xend = if(summary$qu3 + (summary$iqr * 1.5) > summary$max) {
-                      summary$max
-                    } else {
-                      summary$qu3 + (summary$iqr * 1.5)
-                    }, 
-             y = summary.y, yend = summary.y, colour = "black", 
-             size = .5) +
+             size = .15, linetype = 1,
+             arrow = arrow(ends="last", angle=90, length=unit(.1,"cm"))) +
     # Mean
     annotate("point", 
              x = summary$mean, y = summary.y, 
@@ -295,7 +208,7 @@ plot_frequency.month <- function(df, x = NULL, y = NULL, summary = NULL,
            cum3rdqu = sapply(seq_along(y), 
                              function(n){quantile(score[1:n], probs = .75)})) %>%
     ggplot(aes(x = x, y = y)) +
-      geom_bar(stat = "identity", alpha = .3) +
+      geom_col(alpha = .3, color = "grey", width = 28) +
       scale_x_date(date_breaks = "2 month", date_labels = "%b %Y",
                    limits = c(min(x), max(x) + months(2))) +
       scale_y_continuous(breaks = y.breaks) +

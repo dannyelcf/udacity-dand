@@ -158,6 +158,7 @@ df_issue_created_by_month %>%
                       labs.x = "Issue creation date (per month)",
                       labs.caption = paste0("\nNumber of observations: ",
                                             nrow(df_issue_created_by_month)))
+
   
 ```
 
@@ -508,7 +509,7 @@ df_issue_priority_scale %>%
 
 ### Issue Progress
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Priority Number per Issue"}
+```{r echo=FALSE, fig.retina=2, "Distribution of Progress per Issue"}
 df_issue_progress <- 
   issues %>% 
     distinct(issue_id, issue_progress)
@@ -533,20 +534,37 @@ df_issue_progress %>%
 
 ### Log Build Info
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Log Build Info"}
+```{r echo=FALSE, fig.retina=2, "Distribution of Number of the Issues per System's Version"}
 df_log_build_info <- 
   subset(issues, !is.na(log_build_info)) %>% 
     distinct(issue_id, log_build_info) %>% 
-    arrange(log_build_info)
+    group_by(log_build_info) %>% 
+    summarise(score = n()) %>% 
+    arrange(desc(score))  
 
 df_log_build_info %>% 
-  group_by(log_build_info) %>% 
-  summarise(score = n()) %>% 
-  arrange(desc(score)) %>%
-  plot_histogram(x = score, binwidth = 10,
-                 x.breaks = seq(0, 200, 10), y.breaks = seq(0, 4600, 500),
-                 labs.title = "Distribution of Priority Number per Issue", 
-                 labs.x = "Issue priority number",
+  plot_histogram(x = score, binwidth = 5,
+                 x.breaks = seq(1, 125, 5), y.breaks = seq(0, 320, 20),
+                 labs.title = "Distribution of Number of the Issues per System's Version", 
+                 labs.x = "Number of issues",
+                 labs.caption = paste0("\nNumber of observations: ",
+                                       nrow(df_log_build_info)))
+```
+
+```{r echo=FALSE, fig.retina=2, "Distribution of Number of the Issues per System's Version (Less Than 6 Issues)"}
+df_log_build_info <- 
+  subset(issues, !is.na(log_build_info)) %>% 
+    distinct(issue_id, log_build_info) %>% 
+    group_by(log_build_info) %>% 
+    summarise(score = n()) %>% 
+    arrange(desc(score)) %>% 
+    filter(score < 6)
+
+df_log_build_info %>% 
+  plot_histogram(x = score, binwidth = 1,
+                 x.breaks = seq(1, 5, 1), y.breaks = seq(0, 90, 10),
+                 labs.title = "Distribution of Number of the Issues per System's Version", 
+                 labs.x = "Number of issues",
                  labs.caption = paste0("\nNumber of observations: ",
                                        nrow(df_log_build_info)))
 ```
