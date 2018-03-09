@@ -90,7 +90,7 @@ str(issues, max.level=1, vec.len=1, nchar.max=50)
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Support Dataframe to Plot (1)"}
 # From issues dataframe, it was created another dataframe which counts number of 
 # logs per issue_id
-df.number_logs_per_issue <- 
+df_number_logs_per_issue <- 
   issues %>%
     select(issue_id, log_creation_date) %>%
     group_by(issue_id) %>% 
@@ -102,32 +102,36 @@ The number of distinct issues rows and issue's logs rows are 4,503 and 21,978
 respectively.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Number of issues and issue's logs"}
-data.frame(number_issues = nrow(df.number_logs_per_issue), 
-           number_logs = sum(df.number_logs_per_issue$score))
+data.frame(number_issues = nrow(df_number_logs_per_issue), 
+           number_logs = sum(df_number_logs_per_issue$score))
 ```
 We can note that the number of issues represents 20% of the data set and the 
 number of logs represents 99% of it. The 1% of logs remaining (147 rows) represents 
 issues that do not have history logs. The distribution of number of logs per issue 
 and their summaries are presented in the histogram below.
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Number of Logs per Issue"}
-summ.number_logs_per_issue <- df_summary(df.number_logs_per_issue, score)
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of Logs per Issue"}
+summ_number_logs_per_issue <- df_summary(df_number_logs_per_issue, score)
 # Count number of issues for each number of logs per issue
-df.number_logs_per_issue %>% 
-  ggplot(aes(x = score)) +
-    geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
-                   boundary = summ.number_logs_per_issue$min, 
-                   closed = "left") +
-    plot_summary(df.number_logs_per_issue, score) +
-    scale_x_continuous(breaks = seq(0, 43, 2)) +
-    scale_y_continuous(breaks = seq(0, 800, 50)) +
-    labs(title = "Distribution of Number of Logs per Issue",
-         subtitle = text_df_summary(summ.number_logs_per_issue),
-         x = "Number of logs per issue",
-         y = "Frequency", 
-         caption = paste0("\nNumber of observations: ",
-                          nrow(df.number_logs_per_issue))) +
-    theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_number_logs_per_issue <-
+  df_number_logs_per_issue %>% 
+    ggplot(aes(x = score)) +
+      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+                     boundary = summ_number_logs_per_issue$min, 
+                     closed = "left") +
+      plot_summary(df_number_logs_per_issue, score) +
+      scale_x_continuous(breaks = seq(0, 43, 2)) +
+      scale_y_continuous(breaks = seq(0, 800, 50)) +
+      labs(title = "Distribution of Number of Logs per Issue",
+           subtitle = text_df_summary(summ_number_logs_per_issue),
+           x = "Number of logs per issue",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_number_logs_per_issue))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_number_logs_per_issue
 ```
 
 Analysing the plot above, we can note that 75% of issues have up to 6 history logs
@@ -151,7 +155,7 @@ data.frame(first_issue_creation_date = format(min(issues$issue_creation_date),
 The distribution of number of issues created by month and the cumulative summaries 
 are presented in the barplot below. 
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Created per Month"}
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Created per Month"}
 df_issue_created_by_month <- 
   issues %>% 
     distinct(issue_id, 
@@ -163,26 +167,29 @@ df_score_issue_created_by_month <-
     group_by(issue_creation_date) %>% 
     summarise(score = n())
 
-summ.issue_created_by_month <- df_summary(df_score_issue_created_by_month, score)
+summ_issue_created_by_month <- df_summary(df_score_issue_created_by_month, score)
   
-df_score_issue_created_by_month %>% 
-  ggplot(aes(x = issue_creation_date, y = score)) +
-    geom_col(alpha = .3, color = "grey", width = 28) +
-    plot_cumsummary(df_score_issue_created_by_month, 
-                    x = issue_creation_date,
-                    y = score) +
-    scale_x_date(date_breaks = "2 month", date_labels = "%b %Y",
-                 limits = c(min(df_score_issue_created_by_month$issue_creation_date), 
-                            max(df_score_issue_created_by_month$issue_creation_date) + 
-                                months(2))) +
-    scale_y_continuous(breaks = seq(0, 190, 10)) +
-    labs(title = "Distribution of Number of Issues Created per Month",
-         subtitle = paste("", text_df_summary(summ.issue_created_by_month)),
-         x = "Issue creation date (per month)",
-         y = "Frequency",
-         caption = paste0("\nNumber of observations: ", 
-                          nrow(df_issue_created_by_month))) +
-    theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+plot_score_issue_created_by_month <-
+  df_score_issue_created_by_month %>% 
+    ggplot(aes(x = issue_creation_date, y = score)) +
+      geom_col(alpha = .3, color = "grey", width = 28) +
+      plot_cumsummary(df_score_issue_created_by_month, 
+                      x = issue_creation_date,
+                      y = score) +
+      scale_x_date(date_breaks = "2 month", date_labels = "%b %Y",
+                   limits = c(min(df_score_issue_created_by_month$issue_creation_date), 
+                              max(df_score_issue_created_by_month$issue_creation_date) + 
+                                  months(2))) +
+      scale_y_continuous(breaks = seq(0, 190, 15)) +
+      labs(title = "Distribution of Number of Issues Created per Month",
+           subtitle = paste("", text_df_summary(summ_issue_created_by_month)),
+           x = "Issue creation date (per month)",
+           y = "Frequency",
+           caption = paste0("\nNumber of observations: ", 
+                            nrow(df_issue_created_by_month))) +
+      theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+
+plot_score_issue_created_by_month
 ```
 
 Analysing the plot above, we note that the year 2013 had the lowest demand. The
@@ -209,7 +216,7 @@ decline in activities. The reason is the low administrative and academic
 activities at the university in this period. Thus, the demand for the systems 
 decreases.
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Created per Weekday"}
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Created per Weekday"}
 df_issue_created_by_wday <- 
   issues %>% 
     distinct(issue_id, 
@@ -220,148 +227,267 @@ df_score_issue_created_by_wday <-
     group_by(issue_creation_wday) %>% 
     summarise(score = n())
 
-df_score_issue_created_by_wday %>% 
-  ggplot(aes(x = issue_creation_wday, y = score/sum(score))) +
-    geom_col(color = "grey", alpha = .3) +
-    add_label(df_score_issue_created_by_wday$score) +
-    scale_y_continuous(limits = c(0, .25), breaks = seq(0, 1, .03), 
-                       labels = scales::percent) + 
-    labs(title = "Frequency of Issues Created per Weekday",
-         x = "Weekday",
-         y = "Frequency (relative)", 
-         caption = paste0("\nNumber of observations: ",
-                          nrow(df_issue_created_by_wday))) +
-    theme(axis.text.x = element_text(size = 8.5)) 
+plot_score_issue_created_by_wday <- 
+  df_score_issue_created_by_wday %>% 
+    ggplot(aes(x = issue_creation_wday, y = score/sum(score))) +
+      geom_col(color = "grey", alpha = .3) +
+      add_label(df_score_issue_created_by_wday$score) +
+      scale_y_continuous(limits = c(0, .25), breaks = seq(0, 1, .03), 
+                         labels = scales::percent) + 
+      labs(title = "Frequency of Issues Created per Weekday",
+           x = "Weekday",
+           y = "Frequency (relative)", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_created_by_wday))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_score_issue_created_by_wday
 ```
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Created per Hour of the Day"}
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Created per Hour of the Day"}
 df_issue_created_by_hour <- 
   issues %>% 
     distinct(issue_id, 
              issue_creation_hour = hour(issue_creation_date))
 
-summ.number_issue_created_by_hour <- df_summary(df_issue_created_by_hour, 
+summ_number_issue_created_by_hour <- df_summary(df_issue_created_by_hour, 
                                                 issue_creation_hour)
 
-df_issue_created_by_hour %>% 
-  ggplot(aes(x = issue_creation_hour)) +
-    geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
-                   boundary = summ.number_issue_created_by_hour$min, 
-                   closed = "left") +
-    plot_summary(df_issue_created_by_hour, issue_creation_hour) +
-    scale_x_continuous(breaks = seq(0, 23, 1)) +
-    scale_y_continuous(limits = c(0, 700), breaks = seq(0, 700, 50)) +
-    labs(title = "Frequency of Issues Created per Hour of the Day",
-         subtitle = text_df_summary(summ.number_issue_created_by_hour),
-         x = "Hour",
-         y = "Frequency", 
-         caption = paste0("\nNumber of observations: ",
-                          nrow(df_issue_created_by_hour))) +
-    theme(axis.text.x = element_text(size = 8.5)) 
+plot_issue_created_by_hour <-
+  df_issue_created_by_hour %>% 
+    ggplot(aes(x = issue_creation_hour)) +
+      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+                     boundary = summ_number_issue_created_by_hour$min, 
+                     closed = "left") +
+      plot_summary(df_issue_created_by_hour, issue_creation_hour) +
+      scale_x_continuous(breaks = seq(0, 23, 1)) +
+      scale_y_continuous(limits = c(0, 700), breaks = seq(0, 700, 50)) +
+      labs(title = "Distribution of Number of Issues Created per Hour of the Day",
+           subtitle = text_df_summary(summ_number_issue_created_by_hour),
+           x = "Hour of the day",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_created_by_hour))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_issue_created_by_hour
 ```
 
 ### Issue Start Date
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Started per Month"}
-df_issue_start_date <-
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Started per Month"}
+df_issue_start_date_month <- 
   subset(issues, !is.na(issue_start_date)) %>% 
-    distinct(issue_id, issue_start_date = as.Date(floor_date(issue_start_date, 
-                                                           "month")))
-df_issue_start_date %>% 
-  group_by(issue_start_date) %>% 
-  summarise(score = n()) %>% 
-  plot_frequency.month(x = issue_start_date, y = score,
-                       y.breaks = seq(0, 185, 10),
-                       labs.title = "Distribution of Number of Issues Started per Month", 
-                       labs.x = "Issue start date (per month)",
-                       labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_issue_start_date)))
+    distinct(issue_id, 
+             issue_start_date = as.Date(floor_date(issue_start_date,
+                                                   "month")))
+
+df_score_issue_start_date_month <- 
+  df_issue_start_date_month %>% 
+    group_by(issue_start_date) %>% 
+    summarise(score = n())
+
+summ_issue_start_date_month <- df_summary(df_score_issue_start_date_month, score)
+
+plot_score_issue_start_date_month <-   
+  df_score_issue_start_date_month %>% 
+    ggplot(aes(x = issue_start_date, y = score)) +
+      geom_col(alpha = .3, color = "grey", width = 28) +
+      plot_cumsummary(df_score_issue_start_date_month, 
+                      x = issue_start_date,
+                      y = score) +
+      scale_x_date(date_breaks = "2 month", date_labels = "%b %Y",
+                   limits = c(min(df_score_issue_start_date_month$issue_start_date), 
+                              max(df_score_issue_start_date_month$issue_start_date) + 
+                                  months(2))) +
+      scale_y_continuous(breaks = seq(0, 185, 15)) +
+      labs(title = "Distribution of Number of Issues Started per Month",
+           subtitle = paste("", text_df_summary(summ_issue_start_date_month)),
+           x = "Issue start date (per month)",
+           y = "Frequency",
+           caption = paste0("\nNumber of observations: ", 
+                            nrow(df_issue_start_date_month))) +
+      theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+
+plot_score_issue_start_date_month
   
 ```
 
 ### Issue Deadline Date
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Number of Issues Deadline per Month"}
-df_issue_deadline_date <- 
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Deadline per Month"}
+df_issue_deadline_date_month <- 
   subset(issues, !is.na(issue_deadline_date)) %>% 
-    distinct(issue_id, issue_deadline_date = as.Date(floor_date(issue_deadline_date, 
-                                                                "month"))) 
-df_issue_deadline_date %>% 
-  group_by(issue_deadline_date) %>% 
-  summarise(score = n()) %>% 
-  plot_frequency.month(x = issue_deadline_date, y = score,
-                       y.breaks = seq(0, 80, 5),
-                       labs.title = "Distribution of Number of Issues Deadline per Month", 
-                       labs.x = "Issue deadline date (per month)",
-                       labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_issue_deadline_date)))
+    distinct(issue_id, 
+             issue_deadline_date = as.Date(floor_date(issue_deadline_date,
+                                                   "month")))
+
+df_score_issue_deadline_date_month <- 
+  df_issue_deadline_date_month %>% 
+    group_by(issue_deadline_date) %>% 
+    summarise(score = n())
+
+summ_issue_deadline_date_month <- df_summary(df_score_issue_deadline_date_month, 
+                                             score)
+  
+plot_score_issue_deadline_date_month <- 
+  df_score_issue_deadline_date_month %>% 
+    ggplot(aes(x = issue_deadline_date, y = score)) +
+      geom_col(alpha = .3, color = "grey", width = 28) +
+      plot_cumsummary(df_score_issue_deadline_date_month, 
+                      x = issue_deadline_date,
+                      y = score) +
+      scale_x_date(date_breaks = "2 month", date_labels = "%b %Y",
+                   limits = c(min(df_score_issue_deadline_date_month$issue_deadline_date), 
+                              max(df_score_issue_deadline_date_month$issue_deadline_date) + 
+                                  months(2))) +
+      scale_y_continuous(breaks = seq(0, 80, 5)) +
+      labs(title = "Distribution of Number of Issues Deadline per Month",
+           subtitle = paste("", text_df_summary(summ_issue_deadline_date_month)),
+           x = "Issue deadline date (per month)",
+           y = "Frequency",
+           caption = paste0("\nNumber of observations: ", 
+                            nrow(df_issue_deadline_date_month))) +
+      theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+
+plot_score_issue_deadline_date_month
 ```
 
 ### Issue Time Spent
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Time Spent per Issue"}
-df_issue_time_spent_hours <- 
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of Time Spent in a Issue per Hour"}
+df_issue_time_spent_hour <- 
   issues %>% 
-    distinct(issue_id, issue_time_spent = period_to_seconds(issue_time_spent) / 3600)
+    distinct(issue_id, 
+             issue_time_spent = period_to_seconds(issue_time_spent) / 3600)
 
-df_issue_time_spent_hours %>% 
-  plot_histogram(x = issue_time_spent, binwidth = 1,
-                 x.breaks = seq(0, 24, 1), y.breaks = seq(0, 2700, 150),
-                 xlim = c(0, 24),
-                 labs.title = "Distribution of Time Spent per Issue", 
-                 labs.x = "Issue time spent (hours)",
-                 labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_issue_time_spent_hours)))
+summ_issue_time_spent_hour <- df_summary(df_issue_time_spent_hour, 
+                                         issue_time_spent)
+
+plot_issue_time_spent_hour <- 
+  df_issue_time_spent_hour %>% 
+    ggplot(aes(x = issue_time_spent)) +
+      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+                     boundary = summ_issue_time_spent_hour$min, 
+                     closed = "left") +
+      plot_summary(df_issue_time_spent_hour, issue_time_spent) +
+      scale_x_continuous(breaks = seq(0, 110, 5)) +
+      scale_y_continuous(breaks = seq(0, 3000, 250)) +
+      labs(title = "Distribution of Number of Time Spent in a Issue per Hour",
+           subtitle = text_df_summary(summ_issue_time_spent_hour),
+           x = "Hours spent",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_time_spent_hour))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_issue_time_spent_hour
 ```
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Time Spent per Issue (Less than 1 Hour)"}
+```{r echo=FALSE, fig.retina=3, message=FALSE, "Distribution of Number of Time Spent in a Issue per Hour (Zoomed In)"}
+plot_issue_time_spent_hour + 
+    scale_x_continuous(breaks = seq(0, 24, 1)) +
+    scale_y_continuous(breaks = seq(0, 2700, 175)) +
+    coord_cartesian(xlim = c(0, 24)) +
+    labs(title = "Distribution of Number of Time Spent in a Issue per Hour (Zoomed In)")
+```
+
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of Time Spent in a Issue (Less Than 1 Hour)"}
 df_issue_time_spent_min <- 
   issues %>% 
     distinct(issue_id, issue_time_spent = period_to_seconds(issue_time_spent) / 60) %>% 
     filter(issue_time_spent < 60)
 
-df_issue_time_spent_min %>%
-  plot_histogram(x = issue_time_spent, binwidth = 10,
-                 x.breaks = seq(0, 60, 10), y.breaks = seq(0, 1700, 100),
-                 labs.title = "Distribution of Time Spent per Issue", 
-                 labs.x = "Issue time spent (minutes)",
-                 labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_issue_time_spent_min)))
+summ_issue_time_spent_min <- df_summary(df_issue_time_spent_min, 
+                                         issue_time_spent)
 
+plot_issue_time_spent_min <- 
+  df_issue_time_spent_min %>% 
+    ggplot(aes(x = issue_time_spent)) +
+      geom_histogram(binwidth = 5, color = "gray", alpha = .3, 
+                     boundary = summ_issue_time_spent_min$min, 
+                     closed = "left") +
+      plot_summary(df_issue_time_spent_min, issue_time_spent) +
+      scale_x_continuous(breaks = seq(0, 60, 5)) +
+      scale_y_continuous(breaks = seq(0, 1700, 150)) +
+      labs(title = "Distribution of Number of Time Spent in a Issue (Less Than 1 Hour)",
+           subtitle = text_df_summary(summ_issue_time_spent_min),
+           x = "Minutes spent",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_time_spent_min))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_issue_time_spent_min
 ```
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Time Spent per Issue (Less than 1 Hour and Dropped 0 Seconds)"}
+```{r echo=FALSE, message=FALSE, warning=FALSE, "Head Issue Time Spent"}
+df_issue_time_spent_min %>% 
+  group_by(issue_time_spent) %>% 
+  summarise(score = sum(!is.na(issue_time_spent))) %>% 
+  arrange(desc(score)) %>% 
+  head() %>% 
+  as.data.frame()
+```
+
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of Time Spent in a Issue (Greater Than 0)"}
 df_issue_time_spent_min <- 
   issues %>% 
     distinct(issue_id, issue_time_spent = period_to_seconds(issue_time_spent) / 60) %>% 
     filter(issue_time_spent != 0 & issue_time_spent < 60)
 
-df_issue_time_spent_min %>%
-  plot_histogram(x = issue_time_spent, binwidth = 10,
-                 x.breaks = seq(6, 60, 10), y.breaks = seq(0, 500, 50),
-                 labs.title = "Distribution of Time Spent per Issue", 
-                 labs.x = "Issue time spent (minutes)",
-                 labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_issue_time_spent_min)))
+summ_issue_time_spent_min <- df_summary(df_issue_time_spent_min, 
+                                         issue_time_spent)
 
+plot_issue_time_spent_min <- 
+  df_issue_time_spent_min %>% 
+    ggplot(aes(x = issue_time_spent)) +
+      geom_histogram(binwidth = 10, color = "gray", alpha = .3, 
+                     boundary = summ_issue_time_spent_min$min, 
+                     closed = "left") +
+      plot_summary(df_issue_time_spent_min, issue_time_spent) +
+      scale_x_continuous(breaks = seq(6, 60, 10)) +
+      scale_y_continuous(breaks = seq(0, 500, 50)) +
+      labs(title = "Distribution of Number of Time Spent in a Issue (Less Than 1 Hour)",
+           subtitle = text_df_summary(summ_issue_time_spent_min),
+           x = "Minutes spent",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_time_spent_min))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_issue_time_spent_min
 ```
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Time Spent per Issue (Dropped 0 Seconds)"}
-df_issue_time_spent_hours <- 
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of Time Spent in a Issue (Greater Than 0)"}
+df_issue_time_spent_hour <- 
   issues %>% 
     distinct(issue_id, 
              issue_time_spent = period_to_seconds(issue_time_spent) / 3600) %>% 
     filter(issue_time_spent != 0)
 
-df_issue_time_spent_hours %>% 
-  plot_histogram(x = issue_time_spent, binwidth = 1,
-                 x.breaks = seq(0, 24, 1), y.breaks = seq(0, 2700, 150),
-                 xlim = c(0, 24),
-                 labs.title = "Distribution of Time Spent per Issue", 
-                 labs.x = "Issue time spent (hours)",
-                 labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_issue_time_spent_hours)))
-  
+summ_issue_time_spent_hour <- df_summary(df_issue_time_spent_hour, 
+                                         issue_time_spent)
+
+plot_issue_time_spent_hour <- 
+  df_issue_time_spent_hour %>% 
+    ggplot(aes(x = issue_time_spent)) +
+      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+                     boundary = summ_issue_time_spent_hour$min, 
+                     closed = "left") +
+      plot_summary(df_issue_time_spent_hour, issue_time_spent) +
+      scale_x_continuous(breaks = seq(0, 24, 1)) +
+      scale_y_continuous(breaks = seq(0, 2700, 150)) +
+      coord_cartesian(xlim = c(0, 24)) +
+      labs(title = "Distribution of Number of Time Spent in a Issue (Greater Than 0)",
+           subtitle = text_df_summary(summ_issue_time_spent_hour),
+           x = "Hours spent",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_time_spent_hour))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_issue_time_spent_hour
 ```
 
 ### Issue Type
@@ -375,21 +501,31 @@ levels(issues$issue_type)
 
 The frequency of issues created by each issue type is shown in the graph below.
 
-```{r echo=FALSE, fig.retina=2, "Frequency of Issue Type"}
-df_issue_type <-
-  issues %>%
+```{r echo=FALSE, fig.retina=3, "Frequency of Issue Type"}
+df_issue_type <- 
+  issues %>% 
     distinct(issue_id, issue_type)
 
-df_issue_type %>%
-  distinct(issue_id, issue_type) %>% 
-  group_by(issue_type) %>% 
-  summarise(score = n()) %>% 
-  plot_frequency.factor(x = issue_type, y = score,
-                        y.limits = c(0, .85),
-                        labs.title = "Frequency of Issue Type",
-                        labs.x = "Issue type",
-                        labs.caption = paste0("\nNumber of observations: ",
-                                              nrow(df_issue_type)))
+df_score_issue_type <- 
+  df_issue_type %>% 
+    group_by(issue_type) %>% 
+    summarise(score = n())
+
+plot_score_issue_type <- 
+  df_score_issue_type %>% 
+    ggplot(aes(x = reorder(issue_type, -score), y = score/sum(score))) +
+      geom_col(color = "grey", alpha = .3) +
+      add_label(df_score_issue_type$score) +
+      scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
+                         labels = scales::percent) + 
+      labs(title = "Frequency of Issue Type",
+           x = "Issue type",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_type))) +
+      theme(axis.text.x = element_text(size = 7)) 
+
+plot_score_issue_type
 ```
 
 Analysing the plot above, we note that most of the issues are of the MAINTENANCE 
@@ -407,118 +543,188 @@ issues creation timeline by system/subsystem may answer that assumption.
 
 ### Issue System
 
-```{r echo=FALSE, fig.retina=2, "Frequency of Issue System"}
+```{r echo=FALSE, fig.retina=3, "Frequency of Issue System"}
 df_issue_system <-
   issues %>%
     distinct(issue_id, issue_system)
 
-df_issue_system %>%
-  group_by(issue_system) %>% 
-  summarise(score = n()) %>% 
-  plot_frequency.factor(x = issue_system, y = score,
-                        x.rotate = 20, y.limits = c(0, .85),
-                        labs.title = "Frequency of Issue System",
-                        labs.x = "Issue system",
-                        labs.caption = paste0("\nNumber of observations: ",
-                                              nrow(df_issue_system)))
+df_score_issue_system <- 
+  df_issue_system %>% 
+    group_by(issue_system) %>% 
+    summarise(score = n())
+
+plot_score_issue_system <- 
+  df_score_issue_system %>% 
+    ggplot(aes(x = reorder(issue_system, -score), y = score/sum(score))) +
+      geom_col(color = "grey", alpha = .3) +
+      add_label(df_score_issue_system$score) +
+      scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
+                         labels = scales::percent) + 
+      labs(title = "Frequency of Issue System",
+           x = "Issue system",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_system))) +
+      theme(axis.text.x = element_text(angle = 20, hjust = 1, size = 7)) 
+
+plot_score_issue_system
 ```
 
 ### Issue Subsystem
 
-```{r echo=FALSE, fig.retina=2, "Frequency of Issue Subsystem"}
+```{r echo=FALSE, fig.retina=3, "Frequency of Issue Subsystem"}
 df_issue_subsystem <-
   issues %>%
     distinct(issue_id, issue_system, issue_subsystem)
 
-df_issue_subsystem %>%
-  distinct(issue_id, issue_system, issue_subsystem) %>% 
-  group_by(issue_system, issue_subsystem) %>% 
-  summarise(score = n()) %>% 
-  arrange(desc(score)) %>% 
-  ungroup() %>% 
-  filter(row_number() <= 15) %>% 
-  plot_frequency.factor(x = paste0("(", issue_system, ") ", issue_subsystem), 
-                        y = score, x.rotate = 25, y.limits = c(0, .45),
-                        labs.title = "Frequency (Top 15) of Issue Subsystem",
-                        labs.x = "Issue subsytem",
-                        labs.caption = paste0("\nNumber of observations: ",
-                                              nrow(df_issue_subsystem)))
+df_score_top15_issue_subsystem <- 
+  df_issue_subsystem %>%
+    group_by(issue_system, issue_subsystem) %>% 
+    summarise(score = n()) %>% 
+    arrange(desc(score)) %>% 
+    ungroup() %>% 
+    filter(row_number() <= 15)
+
+plot_score_top15_issue_subsystem <- 
+  df_score_top15_issue_subsystem %>% 
+    ggplot(aes(x = reorder(paste0("(", issue_system, ") ", issue_subsystem), 
+                           -score), 
+               y = score/sum(score))) +
+      geom_col(color = "grey", alpha = .3) +
+      add_label(df_score_top15_issue_subsystem$score) +
+      scale_y_continuous(limits = c(0, .45), breaks = seq(0, 1, .1), 
+                         labels = scales::percent) + 
+      labs(title = "Frequency (Top 15) of Issue Subsystem",
+           x = "Issue subsystem",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_subsystem))) +
+      theme(axis.text.x = element_text(angle = 25, hjust = 1, size = 7)) 
+
+plot_score_top15_issue_subsystem
 ```
 
 ### Issue Stakeholder
 
-```{r echo=FALSE, fig.retina=2, "Frequency of Issue Stakeholder"}
+```{r echo=FALSE, fig.retina=3, "Frequency of Issue Stakeholder"}
 df_issue_stakeholder <-
   issues %>%
     distinct(issue_id, issue_stakeholder)
 
-df_issue_stakeholder %>%
-  group_by(issue_stakeholder) %>% 
-  summarise(score = n()) %>% 
-  plot_frequency.factor(x = issue_stakeholder, y = score,
-                        y.limits = c(0, .75),
-                        labs.title = "Frequency of Issue Stakeholder",
-                        labs.x = "Issue stakeholder",
-                        labs.caption = paste0("\nNumber of observations: ",
-                                              nrow(df_issue_stakeholder)))
+df_score_issue_stakeholder <- 
+  df_issue_stakeholder %>% 
+    group_by(issue_stakeholder) %>% 
+    summarise(score = n())
+
+plot_score_issue_stakeholder <- 
+  df_score_issue_stakeholder %>% 
+    ggplot(aes(x = reorder(issue_stakeholder, -score), y = score/sum(score))) +
+      geom_col(color = "grey", alpha = .3) +
+      add_label(df_score_issue_stakeholder$score) +
+      scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
+                         labels = scales::percent) + 
+      labs(title = "Frequency of Issue Stakeholder",
+           x = "Issue stakeholder",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_stakeholder))) +
+      theme(axis.text.x = element_text(size = 7)) 
+
+plot_score_issue_stakeholder
 ```
 
 ### Issue Created By
 
-```{r echo=FALSE, fig.retina=2, "Frequency of Issue Created By"}
+```{r echo=FALSE, fig.retina=3, "Frequency of Issue Created By"}
 df_issue_created_by <-
   issues %>%
     distinct(issue_id, issue_stakeholder, issue_created_by)
 
-df_issue_created_by %>% 
-  group_by(issue_stakeholder, issue_created_by) %>% 
-  summarise(score = n()) %>% 
-  arrange(desc(score)) %>% 
-  ungroup() %>% 
-  filter(row_number() <= 15) %>% 
-  mutate(issue_created_by = first_last_names(issue_created_by)) %>% 
-  plot_frequency.factor(x = paste0("(", issue_stakeholder, ") ", issue_created_by), 
-                        y = score, x.rotate = 25, y.limits = c(0, .25),
-                        labs.title = "Frequency (Top 15) of Issue Created By",
-                        labs.x = "Issue created by",
-                        labs.caption = paste0("\nNumber of observations: ",
-                                              nrow(df_issue_created_by)))
+df_score_top15_issue_created_by <- 
+  df_issue_created_by %>%
+    group_by(issue_stakeholder, issue_created_by) %>% 
+    summarise(score = n()) %>% 
+    arrange(desc(score)) %>% 
+    ungroup() %>% 
+    filter(row_number() <= 15) %>% 
+    mutate(issue_created_by = first_last_names(issue_created_by))
+
+plot_score_top15_issue_created_by <- 
+  df_score_top15_issue_created_by %>% 
+    ggplot(aes(x = reorder(paste0("(", issue_stakeholder, ") ", issue_created_by), 
+                           -score), 
+               y = score/sum(score))) +
+      geom_col(color = "grey", alpha = .3) +
+      add_label(df_score_top15_issue_created_by$score) +
+      scale_y_continuous(limits = c(0, .25), breaks = seq(0, 1, .05), 
+                         labels = scales::percent) + 
+      labs(title = "Frequency (Top 15) of Issue Created By",
+           x = "Issue created by",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_created_by))) +
+      theme(axis.text.x = element_text(angle = 25, hjust = 1, size = 7)) 
+
+plot_score_top15_issue_created_by
 ```
 
 ### Issue Status
 
-```{r echo=FALSE, fig.retina=2, "Frequency of Issue Status"}
+```{r echo=FALSE, fig.retina=3, "Frequency of Issue Status"}
 df_issue_status <-
   issues %>%
     distinct(issue_id, issue_status)
 
-df_issue_status %>% 
-  group_by(issue_status) %>% 
-  summarise(score = n()) %>% 
-  arrange(desc(score)) %>% 
-  plot_frequency.factor(x = issue_status, y = score,
-                        x.breaks = seq(0, 1, .1),
-                        x.rotate = 20, y.limits = c(0, 1.1),
-                        labs.title = "Frequency of Issue Status",
-                        labs.x = "Issue status",
-                        labs.caption = paste0("\nNumber of observations: ",
-                                              nrow(df_issue_status)))
+df_score_issue_status <- 
+  df_issue_status %>% 
+    group_by(issue_status) %>% 
+    summarise(score = n())
+
+plot_score_issue_status <- 
+  df_score_issue_status %>% 
+    ggplot(aes(x = reorder(issue_status, -score), y = score/sum(score))) +
+      geom_col(color = "grey", alpha = .3) +
+      add_label(df_score_issue_status$score) +
+      scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, .15), 
+                         labels = scales::percent) + 
+      labs(title = "Frequency of Issue Stakeholder",
+           x = "Issue stakeholder",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_status))) +
+      theme(axis.text.x = element_text(angle = 20, hjust = 1, size = 7)) 
+
+plot_score_issue_status
 ```
 
 ### Issue Priority Number
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Priority Number per Issue"}
+```{r echo=FALSE, fig.retina=3, "Distribution of Priority Number per Issue"}
 df_issue_priority_number <- 
   issues %>% 
     distinct(issue_id, issue_priority_number)
 
-df_issue_priority_number %>% 
-  plot_histogram(x = issue_priority_number, binwidth = 50,
-                 x.breaks = seq(0, 999, 50), y.breaks = seq(0, 2700, 150),
-                 labs.title = "Distribution of Priority Number per Issue", 
-                 labs.x = "Issue priority number",
-                 labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_issue_priority_number)))
+summ_issue_priority_number <- df_summary(df_issue_priority_number, 
+                                         issue_priority_number)
+
+plot_issue_priority_number <- 
+  df_issue_priority_number %>% 
+    ggplot(aes(x = issue_priority_number)) +
+      geom_histogram(binwidth = 50, color = "gray", alpha = .3, 
+                     boundary = summ_issue_priority_number$min, 
+                     closed = "left") +
+      plot_summary(df_issue_priority_number, issue_priority_number) +
+      scale_x_continuous(breaks = seq(0, 999, 50)) +
+      scale_y_continuous(breaks = seq(0, 2700, 150)) +
+      labs(title = "Distribution of Priority Number per Issue",
+           subtitle = text_df_summary(summ_issue_priority_number),
+           x = "Issue priority number",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_priority_number))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_issue_priority_number
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Head Issue Priority Number"}
@@ -530,75 +736,123 @@ df_issue_priority_number %>%
   as.data.frame()
 ```
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Priority Number per Issue (Dropped 999 and Zoomed In to 100)"}
+```{r echo=FALSE, fig.retina=3, "Distribution of Priority Number per Issue (Dropped 999 and Zoomed In to 100)"}
 df_issue_priority_number <- 
   issues %>% 
     distinct(issue_id, issue_priority_number) %>% 
     filter(issue_priority_number != 999)
 
-df_issue_priority_number %>% 
-  plot_histogram(x = issue_priority_number, binwidth = 10,
-                 x.breaks = seq(0, 280, 10), y.breaks = seq(0, 1600, 150),
-                 xlim = c(0, 100),
-                 labs.title = "Distribution of Priority Number per Issue", 
-                 labs.x = "Issue priority number",
-                 labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_issue_priority_number)))
+summ_issue_priority_number <- df_summary(df_issue_priority_number, 
+                                         issue_priority_number)
+
+plot_issue_priority_number <- 
+  df_issue_priority_number %>% 
+    ggplot(aes(x = issue_priority_number)) +
+      geom_histogram(binwidth = 10, color = "gray", alpha = .3, 
+                     boundary = summ_issue_priority_number$min, 
+                     closed = "left") +
+      plot_summary(df_issue_priority_number, issue_priority_number) +
+      scale_x_continuous(breaks = seq(0, 280, 10)) +
+      scale_y_continuous(breaks = seq(0, 1600, 150)) +
+      coord_cartesian(xlim = c(0, 100)) +
+      labs(title = "Distribution of Priority Number per Issue (Dropped 999)",
+           subtitle = text_df_summary(summ_issue_priority_number),
+           x = "Issue priority number",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_priority_number))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_issue_priority_number
 ```
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Priority Number per Issue (Less than or Equal to 20)"}
+```{r echo=FALSE, fig.retina=3, "Distribution of Priority Number per Issue (Less than or Equal to 20)"}
 df_issue_priority_number <- 
   issues %>% 
     distinct(issue_id, issue_priority_number) %>% 
     filter(issue_priority_number <= 20)
 
-df_issue_priority_number %>% 
-  plot_histogram(x = issue_priority_number, binwidth = 1,
-                 x.breaks = seq(0, 20, 1), y.breaks = seq(0, 450, 50),
-                 labs.title = "Distribution of Priority Number per Issue", 
-                 labs.x = "Issue priority number",
-                 labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_issue_priority_number)))
+summ_issue_priority_number <- df_summary(df_issue_priority_number, 
+                                         issue_priority_number)
+
+plot_issue_priority_number <- 
+  df_issue_priority_number %>% 
+    ggplot(aes(x = issue_priority_number)) +
+      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+                     boundary = summ_issue_priority_number$min, 
+                     closed = "left") +
+      plot_summary(df_issue_priority_number, issue_priority_number) +
+      scale_x_continuous(breaks = seq(0, 20, 1)) +
+      scale_y_continuous(breaks = seq(0, 450, 50)) +
+      labs(title = "Distribution of Priority Number per Issue (Less Than or Equal to 20)",
+           subtitle = text_df_summary(summ_issue_priority_number),
+           x = "Issue priority number",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_priority_number))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_issue_priority_number
 ```
 
 ### Issue Priority Scale
 
-```{r echo=FALSE, fig.retina=2, "Frequency of Issue Priority Scale"}
+```{r echo=FALSE, fig.retina=3, "Frequency of Issue Priority Scale"}
 df_issue_priority_scale <-
   issues %>%
     distinct(issue_id, issue_priority_scale)
 
+df_score_issue_priority_scale <- 
+  df_issue_priority_scale %>% 
+    group_by(issue_priority_scale) %>% 
+    summarise(score = n()) %>% 
+    arrange(desc(score))
 
-### Ordenar pelo fator e não pelo valor
+plot_score_issue_priority_scale <- 
+  df_score_issue_priority_scale %>% 
+    ggplot(aes(x = issue_priority_scale, y = score/sum(score))) +
+      geom_col(color = "grey", alpha = .3) +
+      add_label(df_score_issue_priority_scale$score) +
+      scale_y_continuous(limits = c(0, .7), breaks = seq(0, 1, .1), 
+                         labels = scales::percent) + 
+      labs(title = "Frequency of Issue Priority Scale",
+           x = "Issue priority scale",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_priority_scale))) +
+      theme(axis.text.x = element_text(angle = 20, hjust = 1, size = 7)) 
 
-
-df_issue_priority_scale %>% 
-  group_by(issue_priority_scale) %>% 
-  summarise(score = n()) %>% 
-  arrange(desc(score)) %>% 
-  plot_frequency.factor(x = issue_priority_scale, y = score,
-                        x.breaks = seq(0, 1, .1),
-                        y.limits = c(0, .7),
-                        labs.title = "Frequency of Issue Priority Scale",
-                        labs.x = "Issue priority scale",
-                        labs.caption = paste0("\nNumber of observations: ",
-                                              nrow(df_issue_priority_scale)))
+plot_score_issue_priority_scale
 ```
 
 ### Issue Progress
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Progress per Issue"}
+```{r echo=FALSE, fig.retina=3, "Distribution of Progress per Issue"}
 df_issue_progress <- 
   issues %>% 
     distinct(issue_id, issue_progress)
 
-df_issue_progress %>% 
-  plot_histogram(x = issue_progress, binwidth = 10,
-                 x.breaks = seq(0, 100, 10), y.breaks = seq(0, 4600, 500),
-                 labs.title = "Distribution of Priority Number per Issue", 
-                 labs.x = "Issue priority number",
-                 labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_issue_progress)))
+summ_issue_progress <- df_summary(df_issue_progress, 
+                                         issue_progress)
+
+plot_issue_progress <- 
+  df_issue_progress %>% 
+    ggplot(aes(x = issue_progress)) +
+      geom_histogram(binwidth = 10, color = "gray", alpha = .3, 
+                     boundary = summ_issue_progress$min, 
+                     closed = "left") +
+      plot_summary(df_issue_progress, issue_progress) +
+      scale_x_continuous(breaks = seq(0, 100, 10)) +
+      scale_y_continuous(breaks = seq(0, 4600, 500)) +
+      labs(title = "Distribution of Progress per Issue",
+           subtitle = text_df_summary(summ_issue_progress),
+           x = "Issue progress",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_issue_progress))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_issue_progress
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Head Issue Progress"}
@@ -612,24 +866,37 @@ df_issue_progress %>%
 
 ### Log Build Info
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Number of the Issues per System's Version"}
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of the Issues per System's Version"}
 df_log_build_info <- 
   subset(issues, !is.na(log_build_info)) %>% 
     distinct(issue_id, log_build_info) %>% 
     group_by(log_build_info) %>% 
     summarise(score = n()) %>% 
-    arrange(desc(score))  
+    arrange(desc(score)) 
 
-df_log_build_info %>% 
-  plot_histogram(x = score, binwidth = 5,
-                 x.breaks = seq(1, 125, 5), y.breaks = seq(0, 320, 20),
-                 labs.title = "Distribution of Number of the Issues per System's Version", 
-                 labs.x = "Number of issues",
-                 labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_log_build_info)))
+summ_log_build_info <- df_summary(df_log_build_info, score)
+
+plot_log_build_info <- 
+  df_log_build_info %>% 
+    ggplot(aes(x = score)) +
+      geom_histogram(binwidth = 5, color = "gray", alpha = .3, 
+                     boundary = summ_log_build_info$min, 
+                     closed = "left") +
+      plot_summary(df_log_build_info, score) +
+      scale_x_continuous(breaks = seq(1, 125, 5)) +
+      scale_y_continuous(breaks = seq(0, 320, 20)) +
+      labs(title = "Distribution of Number of the Issues per System's Version",
+           subtitle = text_df_summary(summ_log_build_info),
+           x = "Number of issues",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_log_build_info))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_log_build_info
 ```
 
-```{r echo=FALSE, fig.retina=2, "Distribution of Number of the Issues per System's Version (Less Than 6 Issues)"}
+```{r echo=FALSE, fig.retina=3, "Distribution of Number of the Issues per System's Version (Less Than 6 Issues)"}
 df_log_build_info <- 
   subset(issues, !is.na(log_build_info)) %>% 
     distinct(issue_id, log_build_info) %>% 
@@ -638,13 +905,26 @@ df_log_build_info <-
     arrange(desc(score)) %>% 
     filter(score < 6)
 
-df_log_build_info %>% 
-  plot_histogram(x = score, binwidth = 1,
-                 x.breaks = seq(1, 5, 1), y.breaks = seq(0, 90, 10),
-                 labs.title = "Distribution of Number of the Issues per System's Version", 
-                 labs.x = "Number of issues",
-                 labs.caption = paste0("\nNumber of observations: ",
-                                       nrow(df_log_build_info)))
+summ_log_build_info <- df_summary(df_log_build_info, score)
+
+plot_log_build_info <- 
+  df_log_build_info %>% 
+    ggplot(aes(x = score)) +
+      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+                     boundary = summ_log_build_info$min, 
+                     closed = "left") +
+      plot_summary(df_log_build_info, score) +
+      scale_x_continuous(breaks = seq(1, 5, 1)) +
+      scale_y_continuous(breaks = seq(0, 90, 10)) +
+      labs(title = "Distribution of Number of the Issues per System's Version",
+           subtitle = text_df_summary(summ_log_build_info),
+           x = "Number of issues",
+           y = "Frequency", 
+           caption = paste0("\nNumber of observations: ",
+                            nrow(df_log_build_info))) +
+      theme(axis.text.x = element_text(size = 8.5)) 
+
+plot_log_build_info
 ```
 
 ### Reflections on Data Set Summaries

@@ -75,9 +75,9 @@ text_df_summary <- function(df_summary) {
          "    max: ", df_summary$max)
 }
 
-plot_summary <- function(df, x, y = 0) {
+plot_summary <- function(data, x, y = 0) {
   x_q <- substitute(x)
-  df_summary <- .df_summary(df, x_q)
+  df_summary <- .df_summary(data, x_q)
   
   list(
     # Summaries....
@@ -131,22 +131,22 @@ plot_summary <- function(df, x, y = 0) {
   )
 }
 
-plot_cumsummary <- function(df, x, y) {
+plot_cumsummary <- function(data, x, y) {
   x_q <- substitute(x)
-  x <- eval(x_q, df)
+  x <- eval(x_q, data)
   
   if(is.null(x)) {
     stop("'x' argument can't be NULL")
   }
   
   y_q <- substitute(y)
-  y <- eval(y_q, df)
+  y <- eval(y_q, data)
   
   if(is.null(y)) {
     stop("'y' argument can't be NULL")
   }
   
-  df_cumsummary <- df %>%
+  df_cumsummary <- data %>%
                     # Create cumulative summaries variables
                      mutate(cummean = sapply(seq_along(y), 
                                              function(n) {
@@ -164,7 +164,7 @@ plot_cumsummary <- function(df, x, y) {
                                               function(n) {
                                                 quantile(score[1:n], probs = .75)
                                               }))
-  df_summary <- .df_summary(df, y_q)
+  df_summary <- .df_summary(data, y_q)
   df_summary$max.x <- max(x)
   
   list <- list(
@@ -199,210 +199,6 @@ plot_cumsummary <- function(df, x, y) {
                                    label = deparse("mean")),
               size = 3, vjust = .3, hjust = -.1, color = "red")
   )
-}
-
-plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
-                           x.breaks = waiver(), y.breaks = waiver(),
-                           x.limits = NULL, y.limits = NULL, 
-                           xlim = NULL, ylim = NULL, x.rotate = NULL,
-                           labs.title = "", labs.x = "", labs.caption = "") {
-  if(is.null(df)) {
-    stop("df argument can't be NULL")
-  }
-  
-  x_q <- substitute(x)
-  x <- eval(x_q, df)
-  
-  if(is.null(x)) {
-    stop("x argument can't be NULL")
-  }
-  
-  if(is.null(summary)) {
-    summary <- .df_summary(df, x_q)
-  }
-  
-  axis.text.x <- if (is.null(x.rotate)) {
-    element_text(size = 8.5)
-  } else {
-    element_text(angle = x.rotate, hjust = 1, size = 8.5)
-  }
-  
-  summary.y <- 0
-  
-  df %>% 
-    ggplot(aes(x = x)) +
-    geom_histogram(alpha = .3, binwidth = binwidth, color = "gray",
-                   boundary = summary$min, closed = "left") +
-    scale_x_continuous(breaks = x.breaks, limits = x.limits) +
-    scale_y_continuous(breaks = y.breaks, limits = y.limits) +
-    coord_cartesian(xlim = xlim, ylim = ylim) +
-    theme(axis.text.x = axis.text.x) + 
-    labs(title = labs.title,
-         subtitle = text_df_summary(summary),
-         x = labs.x,
-         y = "Frequency", 
-         caption = labs.caption) +
-    
-    # Summaries....
-    # 1st quantile
-    annotate("segment", 
-             x = summary$qu1, 
-             xend = summary$median, 
-             y = summary.y, yend = summary.y, colour = "black", 
-             size = .6, 
-             arrow = arrow(ends="first", angle=90, length=unit(.15,"cm"))) +
-    # 2nd quantile (median)
-    annotate("segment", 
-             x = summary$median, 
-             xend = summary$median, 
-             y = summary.y, yend = summary.y, colour = "black", 
-             size = 1.1, 
-             arrow = arrow(ends="both", angle=90, length=unit(.15,"cm"))) +
-    # 3rd quantile
-    annotate("segment", 
-             x = summary$median, 
-             xend = summary$qu3, 
-             y = summary.y, yend = summary.y, colour = "black", 
-             size = .6, 
-             arrow = arrow(ends="last", angle=90, length=unit(.15,"cm"))) +
-    # Lower outlier limiar (1st qu. - IQR * 1.5)
-    annotate("segment", 
-             x = if(summary$qu1 - (summary$iqr * 1.5) < summary$min) {
-               summary$min
-             } else {
-               summary$qu1 - (summary$iqr * 1.5)
-             }, 
-             xend = summary$qu1, 
-             y = summary.y, yend = summary.y, colour = "black", 
-             size = .2, linetype = 1,
-             arrow = arrow(ends="first", angle=90, length=unit(.1,"cm"))) +
-    # Upper outlier limiar (3st qu. + IQR * 1.5)
-    annotate("segment", 
-             x = summary$qu3, 
-             xend = if(summary$qu3 + (summary$iqr * 1.5) > summary$max) {
-               summary$max
-             } else {
-               summary$qu3 + (summary$iqr * 1.5)
-             }, 
-             y = summary.y, yend = summary.y, colour = "black", 
-             size = .2, linetype = 1,
-             arrow = arrow(ends="last", angle=90, length=unit(.1,"cm"))) +
-    # Mean
-    annotate("point", 
-             x = summary$mean, y = summary.y, 
-             colour = "red", size = 1.2) 
-}
-
-plot_frequency.month <- function(df, x = NULL, y = NULL, summary = NULL,
-                                 y.breaks = waiver(),
-                                 xlim = NULL, ylim = NULL,
-                                 labs.title = "", labs.x = "", 
-                                 labs.caption = "") {
-  if(is.null(df)) {
-    stop("df argument can't be NULL")
-  }
-  
-  x_q <- substitute(x)
-  x <- eval(x_q, df)
-  y_q <- substitute(y)
-  y <- eval(y_q, df)
-  
-  if(is.null(x)) {
-    stop("x argument can't be NULL")
-  }
-  
-  if(is.null(y)) {
-    stop("y argument can't be NULL")
-  }
-  
-  if(is.null(summary)) {
-    summary <- .df_summary(df, y_q)
-  }
-  
-  df %>%
-    # Create cumulative summaries variables
-    mutate(cummean = sapply(seq_along(y), 
-                            function(n){mean(y[1:n])}),
-           cummedian = sapply(seq_along(y), 
-                              function(n){median(y[1:n])}),
-           cum1stqu = sapply(seq_along(y), 
-                             function(n){quantile(y[1:n], probs = .25)}),
-           cum3rdqu = sapply(seq_along(y), 
-                             function(n){quantile(score[1:n], probs = .75)})) %>%
-    ggplot(aes(x = x, y = y)) +
-      geom_col(alpha = .3, color = "grey", width = 28) +
-      scale_x_date(date_breaks = "2 month", date_labels = "%b %Y",
-                   limits = c(min(x), max(x) + months(2))) +
-      scale_y_continuous(breaks = y.breaks) +
-      coord_cartesian(xlim = xlim, ylim = ylim) +
-      # Rotate axis x
-      theme(axis.text.x = element_text(angle = 40, hjust = 1)) +
-      labs(title = labs.title,
-           subtitle = paste("", text_df_summary(summary)),
-           x = labs.x,
-           y = "Frequency",
-           caption = labs.caption) +
-      # Summary lines
-      geom_line(aes(x = x, y = cummedian), 
-                linetype = 2, color = "black") +
-      geom_line(aes(x = x, y = cum1stqu), 
-                linetype = 3, color = "black") +
-      geom_line(aes(x = x, y = cum3rdqu), 
-                linetype = 3, color = "black") +
-      geom_line(aes(x = x, y = cummean), 
-                linetype = 1, color = "red") +
-      # Labels of summary lines
-      geom_text(data = summary, mapping = aes(x = max(x), 
-                                              y = median, label = "median"), 
-                size = 3, vjust = .3, hjust = -.1) +
-      geom_text(data = summary, mapping = aes(x = max(x),
-                                              y = qu1, label = "1st qu."), 
-                size = 3, vjust = .3, hjust = -.1) +
-      geom_text(data = summary, mapping = aes(x = max(x), 
-                                              y = qu3, label = "3rd qu."), 
-                size = 3, vjust = .3, hjust = -.1) +
-      geom_text(data = summary, mapping = aes(x = max(x), 
-                                              y = mean, label = "mean"), 
-                size = 3, vjust = .3, hjust = -.1, color = "red") 
-}
-
-plot_frequency.factor <- function(df, x = NULL, y = NULL,
-                                  x.breaks = seq(0, 1, .05),
-                                  x.rotate = NULL, y.limits = c(0, 1), 
-                                  labs.title = "", labs.x = "", 
-                                  labs.caption = "") {
-  if(is.null(df)) {
-    stop("df argument can't be NULL")
-  }
-  
-  x <- eval(substitute(x), df)
-  y <- eval(substitute(y), df)
-  
-  if(is.null(x)) {
-    stop("x argument can't be NULL")
-  }
-  
-  if(is.null(y)) {
-    stop("y argument can't be NULL")
-  }
-  
-  axis.text.x <- if (is.null(x.rotate)) {
-    element_text(size = 7)
-  } else {
-    element_text(angle = x.rotate, hjust = 1, size = 7)
-  }
-  
-  df %>% 
-    ggplot(aes(x = reorder(x, -score), y = y/sum(y))) +
-      geom_bar(stat = "identity", alpha = .3) +
-      geom_text(aes(label = y), vjust = -1, size = 3) +
-      scale_y_continuous(limits = y.limits, breaks = x.breaks, 
-                         labels = scales::percent) +
-      theme(axis.text.x = axis.text.x) + 
-      labs(title = labs.title,
-           x = labs.x,
-           y = "Frequency", 
-           caption = labs.caption)
 }
 
 add_label <- function(y) {
