@@ -4,6 +4,17 @@ EDA in an Issue Tracking Data Set
 
 *by Dannyel Cardoso da Fonseca*
 
+<style>
+body {
+  text-align: justify
+}
+pre code, pre, code {
+  white-space: pre !important;
+  overflow-x: auto !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
+</style>
 This project aims to explore a data set containing 22,125 observations
 of issues tracking and their history logs. The data set represents 5
 years of project management which aimed maintenance and customization of
@@ -75,7 +86,7 @@ We can note that the number of issues represents 20% of the data set and
 the number of logs represents 99% of it. The 1% of logs remaining (147
 rows) represents issues that do not have history logs. The distribution
 of number of logs per issue and their summaries are presented in the
-barplot below.
+histogram below.
 
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Logs per Issue-1.png" width="672" />
 
@@ -124,6 +135,10 @@ year had a decline in activities. The reason is the low administrative
 and academic activities at the university in this period. Thus, the
 demand for the systems decreases.
 
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Issues Created per Weekday-1.png" width="672" />
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Issues Created per Hour of the Day-1.png" width="672" />
+
 ### Issue Start Date
 
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of Issues Started per Month-1.png" width="672" />
@@ -135,6 +150,12 @@ demand for the systems decreases.
 ### Issue Time Spent
 
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Time Spent per Issue-1.png" width="672" />
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Time Spent per Issue (Less than 1 Hour)-1.png" width="672" />
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Time Spent per Issue (Less than 1 Hour and Dropped 0 Seconds)-1.png" width="672" />
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Time Spent per Issue (Dropped 0 Seconds)-1.png" width="672" />
 
 ### Issue Type
 
@@ -182,6 +203,43 @@ system/subsystem may answer that assumption.
 ### Issue Status
 
 <img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Status-1.png" width="672" />
+
+### Issue Priority Number
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Priority Number per Issue-1.png" width="672" />
+
+    ##   issue_priority_number score
+    ## 1                   999  2272
+    ## 2                     0   427
+    ## 3                     1   243
+    ## 4                     2   192
+    ## 5                     3   148
+    ## 6                     4   142
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Priority Number per Issue (Dropped 999 and Zoomed In to 100)-1.png" width="672" />
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Priority Number per Issue (Less than or Equal to 20)-1.png" width="672" />
+
+### Issue Priority Scale
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Frequency of Issue Priority Scale-1.png" width="672" />
+
+### Issue Progress
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Progress per Issue-1.png" width="672" />
+
+    ##   issue_progress score
+    ## 1            100  4492
+    ## 2              0     8
+    ## 3             50     1
+    ## 4             60     1
+    ## 5             90     1
+
+### Log Build Info
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of the Issues per System's Version-1.png" width="672" />
+
+<img src="project_05_files/figure-markdown_github-ascii_identifiers/Distribution of Number of the Issues per System's Version (Less Than 6 Issues)-1.png" width="672" />
 
 ### Reflections on Data Set Summaries
 

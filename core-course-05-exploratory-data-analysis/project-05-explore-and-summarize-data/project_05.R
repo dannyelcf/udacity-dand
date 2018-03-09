@@ -46,16 +46,12 @@ load_dataset <- function(path) {
                      ))
 }
 
-df_summary <- function(df, variable = NULL) {
-  df_summary_q(df, substitute(variable))
+df_summary <- function(df, variable) {
+  .df_summary(df, substitute(variable))
 }
 
-df_summary_q <- function(df, variable = NULL) {
+.df_summary <- function(df, variable) {
   variable <- eval(variable, df)
-  
-  if(is.null(variable)) {
-    stop("variable argument can't be NULL")
-  }
   
   data.frame(min = min(variable), 
              max = max(variable),
@@ -69,7 +65,7 @@ df_summary_q <- function(df, variable = NULL) {
   
 }
 
-df_summary_text <- function(df_summary) {
+text_df_summary <- function(df_summary) {
   paste0("min: ", df_summary$min,
          "    1st qu.: ", df_summary$qu1,
          "    median: ", df_summary$median,
@@ -77,6 +73,132 @@ df_summary_text <- function(df_summary) {
          "    3rd qu.: ", df_summary$qu3,
          "    95 %: ", df_summary$pc95,
          "    max: ", df_summary$max)
+}
+
+plot_summary <- function(df, x, y = 0) {
+  x_q <- substitute(x)
+  df_summary <- .df_summary(df, x_q)
+  
+  list(
+    # Summaries....
+    # 1st quantile
+    annotate("segment", 
+             x = df_summary$qu1, 
+             xend = df_summary$median, 
+             y = y, yend = y, colour = "black", 
+             size = .6, 
+             arrow = arrow(ends="first", angle=90, length=unit(.15,"cm"))),
+    # 2nd quantile (median)
+    annotate("segment", 
+             x = df_summary$median, 
+             xend = df_summary$median, 
+             y = y, yend = y, colour = "black", 
+             size = 1.1, 
+             arrow = arrow(ends="both", angle=90, length=unit(.15,"cm"))),
+    # 3rd quantile
+    annotate("segment", 
+             x = df_summary$median, 
+             xend = df_summary$qu3, 
+             y = y, yend = y, colour = "black", 
+             size = .6, 
+             arrow = arrow(ends="last", angle=90, length=unit(.15,"cm"))),
+    # Lower outlier limiar (1st qu. - IQR * 1.5)
+    annotate("segment", 
+             x = if(df_summary$qu1 - (df_summary$iqr * 1.5) < df_summary$min) {
+               df_summary$min
+             } else {
+               df_summary$qu1 - (df_summary$iqr * 1.5)
+             }, 
+             xend = df_summary$qu1, 
+             y = y, yend = y, colour = "black", 
+             size = .2, linetype = 1,
+             arrow = arrow(ends="first", angle=90, length=unit(.1,"cm"))),
+    # Upper outlier limiar (3st qu. + IQR * 1.5)
+    annotate("segment", 
+             x = df_summary$qu3, 
+             xend = if(df_summary$qu3 + (df_summary$iqr * 1.5) > df_summary$max) {
+               df_summary$max
+             } else {
+               df_summary$qu3 + (df_summary$iqr * 1.5)
+             }, 
+             y = y, yend = y, colour = "black", 
+             size = .2, linetype = 1,
+             arrow = arrow(ends="last", angle=90, length=unit(.1,"cm"))),
+    # Mean
+    annotate("point", 
+             x = df_summary$mean, y = y, 
+             colour = "red", size = 1.2)
+  )
+}
+
+plot_cumsummary <- function(df, x, y) {
+  x_q <- substitute(x)
+  x <- eval(x_q, df)
+  
+  if(is.null(x)) {
+    stop("'x' argument can't be NULL")
+  }
+  
+  y_q <- substitute(y)
+  y <- eval(y_q, df)
+  
+  if(is.null(y)) {
+    stop("'y' argument can't be NULL")
+  }
+  
+  df_cumsummary <- df %>%
+                    # Create cumulative summaries variables
+                     mutate(cummean = sapply(seq_along(y), 
+                                             function(n) {
+                                               mean(y[1:n])
+                                             }),
+                            cummedian = sapply(seq_along(y),
+                                               function(n) {
+                                                 median(y[1:n])
+                                               }),
+                            cum1stqu = sapply(seq_along(y), 
+                                              function(n) {
+                                                quantile(y[1:n], probs = .25)
+                                              }),
+                            cum3rdqu = sapply(seq_along(y), 
+                                              function(n) {
+                                                quantile(score[1:n], probs = .75)
+                                              }))
+  df_summary <- .df_summary(df, y_q)
+  df_summary$max.x <- max(x)
+  
+  list <- list(
+    # Summary lines
+    geom_line(data = df_cumsummary,
+              mapping = aes_string(x = deparse(x_q), y = "cummedian"), 
+              linetype = 2, color = "black"),
+    geom_line(data = df_cumsummary,
+              mapping = aes_string(x = deparse(x_q), y = "cum1stqu"), 
+              linetype = 3, color = "black"),
+    geom_line(data = df_cumsummary,
+              mapping = aes_string(x = deparse(x_q), y = "cum3rdqu"), 
+              linetype = 3, color = "black"),
+    geom_line(data = df_cumsummary,
+              mapping = aes_string(x = deparse(x_q), y = "cummean"), 
+              linetype = 1, color = "red"),
+    # Labels of summary lines
+    geom_text(data = df_summary,
+              mapping = aes_string(x = "max.x", y = "median", 
+                                   label = deparse("median")),
+              size = 3, vjust = .3, hjust = -.1),
+    geom_text(data = df_summary,
+              mapping = aes_string(x = "max.x", y = "qu1", 
+                                   label = deparse("1st qu.")),
+              size = 3, vjust = .3, hjust = -.1),
+    geom_text(data = df_summary,
+              mapping = aes_string(x = "max.x", y = "qu3", 
+                                   label = deparse("3rd qu.")),
+              size = 3, vjust = .3, hjust = -.1),
+    geom_text(data = df_summary,
+              mapping = aes_string(x = "max.x", y = "mean", 
+                                   label = deparse("mean")),
+              size = 3, vjust = .3, hjust = -.1, color = "red")
+  )
 }
 
 plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
@@ -96,7 +218,7 @@ plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
   }
   
   if(is.null(summary)) {
-    summary <- df_summary_q(df, x_q)
+    summary <- .df_summary(df, x_q)
   }
   
   axis.text.x <- if (is.null(x.rotate)) {
@@ -116,7 +238,7 @@ plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
     coord_cartesian(xlim = xlim, ylim = ylim) +
     theme(axis.text.x = axis.text.x) + 
     labs(title = labs.title,
-         subtitle = df_summary_text(summary),
+         subtitle = text_df_summary(summary),
          x = labs.x,
          y = "Frequency", 
          caption = labs.caption) +
@@ -127,21 +249,21 @@ plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
              x = summary$qu1, 
              xend = summary$median, 
              y = summary.y, yend = summary.y, colour = "black", 
-             size = .5, 
+             size = .6, 
              arrow = arrow(ends="first", angle=90, length=unit(.15,"cm"))) +
     # 2nd quantile (median)
     annotate("segment", 
              x = summary$median, 
              xend = summary$median, 
              y = summary.y, yend = summary.y, colour = "black", 
-             size = 1, 
+             size = 1.1, 
              arrow = arrow(ends="both", angle=90, length=unit(.15,"cm"))) +
     # 3rd quantile
     annotate("segment", 
              x = summary$median, 
              xend = summary$qu3, 
              y = summary.y, yend = summary.y, colour = "black", 
-             size = .5, 
+             size = .6, 
              arrow = arrow(ends="last", angle=90, length=unit(.15,"cm"))) +
     # Lower outlier limiar (1st qu. - IQR * 1.5)
     annotate("segment", 
@@ -152,7 +274,7 @@ plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
              }, 
              xend = summary$qu1, 
              y = summary.y, yend = summary.y, colour = "black", 
-             size = .15, linetype = 1,
+             size = .2, linetype = 1,
              arrow = arrow(ends="first", angle=90, length=unit(.1,"cm"))) +
     # Upper outlier limiar (3st qu. + IQR * 1.5)
     annotate("segment", 
@@ -163,7 +285,7 @@ plot_histogram <- function(df, x = NULL, binwidth = 1, summary = NULL,
                summary$qu3 + (summary$iqr * 1.5)
              }, 
              y = summary.y, yend = summary.y, colour = "black", 
-             size = .15, linetype = 1,
+             size = .2, linetype = 1,
              arrow = arrow(ends="last", angle=90, length=unit(.1,"cm"))) +
     # Mean
     annotate("point", 
@@ -194,7 +316,7 @@ plot_frequency.month <- function(df, x = NULL, y = NULL, summary = NULL,
   }
   
   if(is.null(summary)) {
-    summary <- df_summary_q(df, y_q)
+    summary <- .df_summary(df, y_q)
   }
   
   df %>%
@@ -216,7 +338,7 @@ plot_frequency.month <- function(df, x = NULL, y = NULL, summary = NULL,
       # Rotate axis x
       theme(axis.text.x = element_text(angle = 40, hjust = 1)) +
       labs(title = labs.title,
-           subtitle = paste("", df_summary_text(summary)),
+           subtitle = paste("", text_df_summary(summary)),
            x = labs.x,
            y = "Frequency",
            caption = labs.caption) +
@@ -274,12 +396,18 @@ plot_frequency.factor <- function(df, x = NULL, y = NULL,
     ggplot(aes(x = reorder(x, -score), y = y/sum(y))) +
       geom_bar(stat = "identity", alpha = .3) +
       geom_text(aes(label = y), vjust = -1, size = 3) +
-      scale_y_continuous(limits = y.limits, breaks = x.breaks) +
+      scale_y_continuous(limits = y.limits, breaks = x.breaks, 
+                         labels = scales::percent) +
       theme(axis.text.x = axis.text.x) + 
       labs(title = labs.title,
            x = labs.x,
-           y = "Frequency (relative)", 
+           y = "Frequency", 
            caption = labs.caption)
+}
+
+add_label <- function(y) {
+  geom_text(aes_string(label = deparse(y)), 
+            vjust = -1, size = 3)
 }
 
 first_last_names <- function(names) {
