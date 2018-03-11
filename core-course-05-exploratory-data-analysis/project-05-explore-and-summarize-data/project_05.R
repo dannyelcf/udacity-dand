@@ -4,8 +4,8 @@ load_dataset <- function(path) {
   setAs("character","date_ymd_hms", function(from) ymd_hms(from))
   setClass('date_ymd')
   setAs("character", "date_ymd", function(from) ymd(from))
-  setClass('time_period')
-  setAs("character", "time_period", function(from) seconds_to_period(from))
+  # setClass('time_period')
+  # setAs("character", "time_period", function(from) seconds_to_period(from))
   setClass('factor_issue_priority_scale')
   setAs("character", "factor_issue_priority_scale", 
         function(from) {
@@ -31,7 +31,8 @@ load_dataset <- function(path) {
                                     "character", # issue_created_by
                                     "factor", # issue_stakeholder
                                     "factor", # issue_status
-                                    "time_period", # issue_time_spent
+                                    # "time_period", # issue_time_spent
+                                    "integer", # issue_time_spent
                                     "integer", # issue_priority_number
                                     "integer", # issue_progress
                                     "factor_issue_priority_scale",  # issue_priority_scale
@@ -40,7 +41,8 @@ load_dataset <- function(path) {
                                     "factor", # log_action
                                     "factor", # log_status
                                     "integer", # log_progress
-                                    "time_period", # log_time_spent
+                                    # "time_period", # log_time_spent
+                                    "integer", # log_time_spent
                                     "character", # log_created_by 
                                     "integer" # log_svn_revision 
                      ))
@@ -54,80 +56,101 @@ df_summary <- function(df, variable) {
   variable <- eval(variable, df)
   
   data.frame(min = min(variable), 
-             max = max(variable),
-             mean = mean(variable),
              qu1 = quantile(variable, probs = .25, names = FALSE),
              median = quantile(variable, probs = .5, names = FALSE),
+             mean = mean(variable),
              qu3 = quantile(variable, probs = .75, names = FALSE),
-             pc95 = quantile(variable, probs = .95, names = FALSE),
              iqr = (quantile(variable, probs = .75, names = FALSE) - 
-                      quantile(variable, probs = .25, names = FALSE)))
+                      quantile(variable, probs = .25, names = FALSE)),
+             pc90 = quantile(variable, probs = .90, names = FALSE),
+             max = max(variable))
   
 }
 
 text_df_summary <- function(df_summary) {
-  paste0("min: ", df_summary$min,
-         "    1st qu.: ", df_summary$qu1,
-         "    median: ", df_summary$median,
-         "    mean: ", round(df_summary$mean,2),
-         "    3rd qu.: ", df_summary$qu3,
-         "    95 %: ", df_summary$pc95,
-         "    max: ", df_summary$max)
+  paste0("min: ", round(df_summary$min, 1),
+         "    1st qu.: ", round(df_summary$qu1, 1),
+         "    median: ", round(df_summary$median, 1),
+         "    mean: ", round(df_summary$mean, 1),
+         "    3rd qu.: ", round(df_summary$qu3, 1),
+         "    1.5 IQR: ", round(df_summary$iqr * 1.5, 1),
+         "    90%: ", round(df_summary$pc90, 1),
+         "    max: ", round(df_summary$max), 1)
 }
 
-plot_summary <- function(data, x, y = 0) {
+subtitle <- function(observations, complement = NULL, df_summary = NULL) {
+  paste0(observations, 
+         " observations ", 
+         complement,
+         if(!is.null(df_summary)) {
+           paste0("\n", text_df_summary(df_summary))
+         } else {
+           NULL
+         })
+}
+
+plot_x_summary <- function(data, x) {
   x_q <- substitute(x)
   df_summary <- .df_summary(data, x_q)
   
   list(
     # Summaries....
     # 1st quantile
-    annotate("segment", 
-             x = df_summary$qu1, 
-             xend = df_summary$median, 
-             y = y, yend = y, colour = "black", 
-             size = .6, 
-             arrow = arrow(ends="first", angle=90, length=unit(.15,"cm"))),
+    geom_vline(xintercept = df_summary$qu1, linetype = 2, color = "black"),
     # 2nd quantile (median)
-    annotate("segment", 
-             x = df_summary$median, 
-             xend = df_summary$median, 
-             y = y, yend = y, colour = "black", 
-             size = 1.1, 
-             arrow = arrow(ends="both", angle=90, length=unit(.15,"cm"))),
+    geom_vline(xintercept = df_summary$median, linetype = 1, color = "black"),
     # 3rd quantile
-    annotate("segment", 
-             x = df_summary$median, 
-             xend = df_summary$qu3, 
-             y = y, yend = y, colour = "black", 
-             size = .6, 
-             arrow = arrow(ends="last", angle=90, length=unit(.15,"cm"))),
+    geom_vline(xintercept = df_summary$qu3, linetype = 2, color = "black"),
     # Lower outlier limiar (1st qu. - IQR * 1.5)
-    annotate("segment", 
-             x = if(df_summary$qu1 - (df_summary$iqr * 1.5) < df_summary$min) {
-               df_summary$min
-             } else {
-               df_summary$qu1 - (df_summary$iqr * 1.5)
-             }, 
-             xend = df_summary$qu1, 
-             y = y, yend = y, colour = "black", 
-             size = .2, linetype = 1,
-             arrow = arrow(ends="first", angle=90, length=unit(.1,"cm"))),
+    if(df_summary$qu1 - (df_summary$iqr * 1.5) > df_summary$min) {
+      geom_vline(xintercept = df_summary$qu1 - (df_summary$iqr * 1.5), 
+                 linetype = 3, color = "black")
+    } else {
+      geom_blank()
+    },
     # Upper outlier limiar (3st qu. + IQR * 1.5)
-    annotate("segment", 
-             x = df_summary$qu3, 
-             xend = if(df_summary$qu3 + (df_summary$iqr * 1.5) > df_summary$max) {
-               df_summary$max
-             } else {
-               df_summary$qu3 + (df_summary$iqr * 1.5)
-             }, 
-             y = y, yend = y, colour = "black", 
-             size = .2, linetype = 1,
-             arrow = arrow(ends="last", angle=90, length=unit(.1,"cm"))),
+    if(df_summary$qu3 + (df_summary$iqr * 1.5) < df_summary$max) {
+      geom_vline(xintercept = df_summary$qu3 + (df_summary$iqr * 1.5), 
+                 linetype = 3, color = "black")
+    } else {
+      geom_blank()
+    },
     # Mean
-    annotate("point", 
-             x = df_summary$mean, y = y, 
-             colour = "red", size = 1.2)
+    geom_vline(xintercept = df_summary$mean, linetype = 1, color = "red")
+  )
+}
+
+plot_y_summary <- function(data, y) {
+  y_q <- substitute(y)
+  df_summary <- data %>% 
+                  group_by_(y_q) %>% 
+                  summarise(frequency = n()) %>% 
+                  df_summary(frequency)
+  
+  list(
+    # Summaries....
+    # 1st quantile
+    geom_hline(yintercept = df_summary$qu1, linetype = 2, color = "black"),
+    # 2nd quantile (median)
+    geom_hline(yintercept = df_summary$median, linetype = 1, color = "black"),
+    # 3rd quantile
+    geom_hline(yintercept = df_summary$qu3, linetype = 2, color = "black"),
+    # Lower outlier limiar (1st qu. - IQR * 1.5)
+    if(df_summary$qu1 - (df_summary$iqr * 1.5) > df_summary$min) {
+      geom_hline(yintercept = df_summary$qu1 - (df_summary$iqr * 1.5), 
+                 linetype = 3, color = "black")
+    } else {
+      geom_blank()
+    },
+    # Upper outlier limiar (3st qu. + IQR * 1.5)
+    if(df_summary$qu3 + (df_summary$iqr * 1.5) < df_summary$max) {
+      geom_hline(yintercept = df_summary$qu3 + (df_summary$iqr * 1.5), 
+                 linetype = 3, color = "black")
+    } else {
+      geom_blank()
+    },
+    # Mean
+    geom_hline(yintercept = df_summary$mean, linetype = 1, color = "red")
   )
 }
 
@@ -171,33 +194,16 @@ plot_cumsummary <- function(data, x, y) {
     # Summary lines
     geom_line(data = df_cumsummary,
               mapping = aes_string(x = deparse(x_q), y = "cummedian"), 
-              linetype = 2, color = "black"),
+              linetype = 1, color = "black"),
     geom_line(data = df_cumsummary,
               mapping = aes_string(x = deparse(x_q), y = "cum1stqu"), 
-              linetype = 3, color = "black"),
+              linetype = 2, color = "black"),
     geom_line(data = df_cumsummary,
               mapping = aes_string(x = deparse(x_q), y = "cum3rdqu"), 
-              linetype = 3, color = "black"),
+              linetype = 2, color = "black"),
     geom_line(data = df_cumsummary,
               mapping = aes_string(x = deparse(x_q), y = "cummean"), 
-              linetype = 1, color = "red"),
-    # Labels of summary lines
-    geom_text(data = df_summary,
-              mapping = aes_string(x = "max.x", y = "median", 
-                                   label = deparse("median")),
-              size = 3, vjust = .3, hjust = -.1),
-    geom_text(data = df_summary,
-              mapping = aes_string(x = "max.x", y = "qu1", 
-                                   label = deparse("1st qu.")),
-              size = 3, vjust = .3, hjust = -.1),
-    geom_text(data = df_summary,
-              mapping = aes_string(x = "max.x", y = "qu3", 
-                                   label = deparse("3rd qu.")),
-              size = 3, vjust = .3, hjust = -.1),
-    geom_text(data = df_summary,
-              mapping = aes_string(x = "max.x", y = "mean", 
-                                   label = deparse("mean")),
-              size = 3, vjust = .3, hjust = -.1, color = "red")
+              linetype = 1, color = "red")
   )
 }
 
