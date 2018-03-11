@@ -1,5 +1,5 @@
 
-# EDA in an Issue Tracking Data Set
+# EDA in an Issue Tracking System Data Set
 
 *by Dannyel Cardoso da Fonseca*
 
@@ -111,10 +111,28 @@ blue).
 
 <img src="project_05_files/figure-gfm/Cumulated Number of Issues Created per Month-1.png" width="672" />
 
-We note that…
+We note that the first 11 months (from May 2013 to March 2014) of the
+project had very low demand, approximately 5% of the total. Some reasons
+for this were:
 
-Officially, the project started in
-04/18/2013.
+  - The customer and company teams were small;
+  - There were no work processes between customer and company;
+  - That was the first time that the customer outsourced the development
+    and deployment of systems;
+  - The customer’s team had no experience with systems being deployed
+    and the company’s team did not know the customer’s day-to-day
+    business deeply.
+
+The work processes and knowledge on both sides (customer and company)
+were being built over those 11 months. The teams grew in size and new
+modules started development and deployment. The next 12 months (from
+April 2014 to March 2015) there was significant growth curve in demand
+(activities), approximately 25% of growth over the previous 11 months.
+From June 2015 the demand growth seems to stabilize, sometimes taking
+small growth curves. In this period occurred approximately 65% of
+project activities. Besides, the trend line fitted with growth curve
+demonstrating that the project began to have a standardized
+behavior.
 
 <img src="project_05_files/figure-gfm/Distribution of Number of Issues Created per Month-1.png" width="672" />
 
