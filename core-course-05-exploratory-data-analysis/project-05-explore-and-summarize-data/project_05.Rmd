@@ -5,13 +5,18 @@ EDA in an Issue Tracking System Data Set
 ================================================================================
 *by Dannyel Cardoso da Fonseca* 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, "Global Set Up"}
 # Cleaning the environment before start
 # This is useful when execute "Restart R and Run All Chuncks"
 rm(list = ls())
+
+.LC_TIME <- Sys.setlocale("LC_TIME","en_US.UTF-8")
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
+                      fig.path = "project_05_files/plots/", fig.retina = 3)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, "Load Packages"}
+```{r "Load Packages"}
 library(ggplot2)
 library(dplyr)
 library(lubridate)
@@ -20,10 +25,8 @@ library(grid)
 source("project_05.R")
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, "Set Up"}
+```{r "Project Set Up"}
 # NOTE: To run this notebook set up current work directory to this file location
-
-lc_time <- Sys.setlocale("LC_TIME","en_US.UTF-8")
 
 # Set up default theme for plots
 theme_set(theme_classic() %+replace%
@@ -31,7 +34,7 @@ theme_set(theme_classic() %+replace%
                   plot.margin = unit(c(.3, 0, .5, 2), "cm")))
 ```
 
-```{r echo=FALSE, "Load Data Set"}
+```{r "Load Data Set"}
 dataset <- load_dataset("issues_tracking.csv")
 
 issues <- 
@@ -82,7 +85,7 @@ The issues data set contains `r nrow(dataset)` rows and `r ncol(dataset)`
 variables. Of these 24 variables `r ncol(issues)` are about issue data and 
 `r ncol(logs)-1` about issue's logs.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, "Structure of the Data Set"}
+```{r "Structure of the Data Set"}
 # Show the issues' dataframe structure
 str(dataset, max.level=1, vec.len=1, nchar.max=50)
 ```
@@ -95,7 +98,7 @@ number of logs represents `r round(nrow(logs)*100/nrow(dataset))`% of it. The
 (`r nrow(dataset)-nrow(logs)` rows) represents issues that do not have history 
 logs. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 plot_number_logs_per_issue <- function(df_number_logs_per_issue) {
   summ_number_logs_per_issue <- df_summary(df_number_logs_per_issue, score)
   
@@ -128,7 +131,7 @@ df_number_logs_per_issue <-
 The distribution and the summaries of number of logs per issue are ploted in the
 histogram below.
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Logs per Issue"}
+```{r "Distribution of the Number of Logs per Issue"}
 df_number_logs_per_issue %>% 
   plot_number_logs_per_issue()
 ```
@@ -138,7 +141,7 @@ quartile, the black and red solid lines represent, respectivaly, median and mean
 and the black dotted line represent the upper threshold to the outliers 
 (3rd qu. + 1.5 IQR).
 
-``` {r echo=FALSE, message=FALSE, warning=FALSE}
+``` {r}
 amount_upper_outiler <- 
   round(
     nrow(subset(df_number_logs_per_issue, score > 12)) * 100
@@ -173,7 +176,7 @@ The data set analyzed comprises issues created in the period between
 `r format(max(issues$issue_creation_date), "%H:%M:%S")` of
 `r format(max(issues$issue_creation_date), "%m/%d/%Y")`. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 score_issue_created_by_month <- function(df_issue_created_by_month) {
   df_score_issue_created_by_month <- 
     df_issue_created_by_month %>% 
@@ -249,7 +252,7 @@ To get a sense of how it was the demand throughout the project see the plot
 below that shows the cumulated number of issues created along the project and 
 the trend line (in blue).
 
-```{r echo=FALSE, fig.retina=3, warning=FALSE, "Cumulated Number of Issues Created"}
+```{r "Cumulated Number of Issues Created"}
 df_issue_created_by_month %>% 
   plot_cum_score_issue_created_by_month()
 ```
@@ -278,7 +281,7 @@ In the barplot below, we can see the project's behavior in another way. This
 plot shows the distribution of the number of issues created per month and
 their cumulated summaries.
 
-```{r echo=FALSE, fig.retina=3, warning=FALSE, "Distribution of the Number of Issues Created per Month"}
+```{r "Distribution of the Number of Issues Created per Month"}
 df_issue_created_by_month %>% 
   plot_score_issue_created_by_month()
 ```
@@ -311,7 +314,7 @@ decline in activities. The reason is the low administrative and academic
 activities at the university in this period. Thus, the demand for customization 
 and maintenance of the systems decreases.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 plot_score_issue_created_by_wday <- function(df_issue_created_by_wday,
                                              subtitle_complement = NULL) {
   
@@ -358,7 +361,7 @@ df_issue_created_by_wday <-
 During the week, the demand for new activities were concentrated on business days 
 (from Monday to Friday) as we can note in the barplot below.
 
-```{r echo=FALSE, fig.retina=3, "Frequency of Issues Created per Weekday"}
+```{r "Frequency of Issues Created per Weekday"}
 df_issue_created_by_wday %>% 
   plot_score_issue_created_by_wday()
 ```
@@ -373,7 +376,7 @@ creation.  One of the reasons for this is that, from April 2014, the work began
 to be planned by sprints. These sprints were planned every Tuesday morning and 
 issues were created in the afternoon.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 df_issue_created_by_weekend <-
   df_issue_created_by_wday %>% 
     filter(issue_creation_wday == "Sat" | issue_creation_wday == "Sun")
@@ -384,7 +387,7 @@ considered outliers. These are issues created on weekend shift that was done
 during the enrollment periods. Theses outliers pull the mean and 1st quartile 
 down. Removing them, we have a new barplot. See the plot below.
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Created per Weekday (No Weekend)"}
+```{r "Distribution of the Number of Issues Created per Weekday (No Weekend)"}
 df_issue_created_by_wday %>% 
   filter(!(issue_creation_wday %in% 
              df_issue_created_by_weekend$issue_creation_wday)) %>% 
@@ -398,7 +401,7 @@ Note that the summaries are now approximated. The median and mean overlap and
 the distance between 1st and 3rd quartile became narrow. These new summaries 
 better reflect the behavior of issue creation.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 plot_issue_created_by_hour <- function(df_issue_created_by_hour,
                                        subtitle_complement = NULL) {
   
@@ -435,7 +438,7 @@ df_issue_created_by_hour <-
 Analysing how was the behaviour of the issues creation per hour of the day we 
 have the bimodal distribution below.
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Created per Hour of the Day"}
+```{r "Distribution of the Number of Issues Created per Hour of the Day"}
 df_issue_created_by_hour %>% 
   plot_issue_created_by_hour()
 ```
@@ -454,7 +457,7 @@ differ by a few minutes.
 Ploting this distribution again but with only office hours (from 8:00h to 18:00h) 
 we have the same summaries of the distribution before. See the plot below.
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Created per Hour of the Day"}
+```{r "Distribution of the Number of Issues Created per Hour of the Day (Only Office Hours)"}
 df_issue_created_by_hour %>%
   filter(issue_creation_hour >= 8 & issue_creation_hour <= 18) %>% 
   plot_issue_created_by_hour("with only office hours")
@@ -470,7 +473,7 @@ This shows us that the high issue creation volume actually comprises between
 
 ...
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Started per Month"}
+```{r "Distribution of the Number of Issues Started per Month"}
 df_issue_start_date_month <- 
   issues %>% 
     filter(!is.na(issue_start_date)) %>% 
@@ -526,7 +529,7 @@ print(plot_cum_score_issue_start_date_month)
 print(plot_score_issue_start_date_month)
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Started per Weekday"}
+```{r "Distribution of the Number of Issues Started per Weekday"}
 df_issue_start_wday <- 
   issues %>% 
     filter(!is.na(issue_start_date)) %>% 
@@ -567,7 +570,7 @@ print(plot_score_issue_start_wday)
 
 ### Issue Deadline Date
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Deadline per Month"}
+```{r "Distribution of the Number of Issues Deadline per Month"}
 df_issue_deadline_date_month <- 
   issues %>% 
     filter(!is.na(issue_deadline_date)) %>% 
@@ -623,7 +626,7 @@ print(plot_cum_score_issue_deadline_date_month)
 print(plot_score_issue_deadline_date_month)
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Deadline per Weekday"}
+```{r "Distribution of the Number of Issues Deadline per Weekday"}
 df_issue_deadline_wday <- 
   issues %>% 
     filter(!is.na(issue_deadline_date)) %>% 
@@ -664,7 +667,7 @@ print(plot_score_issue_deadline_wday)
 
 ### Issue Time Spent
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Time Spent in a Issue per Hour"}
+```{r "Distribution of the Number of Time Spent in a Issue per Hour"}
 df_issue_time_spent_hour <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
@@ -693,7 +696,7 @@ print(rbind(x = summ_issue_time_spent_hour))
 print(plot_issue_time_spent_hour)
 ```
 
-```{r echo=FALSE, fig.retina=3, message=FALSE, "Distribution of the Number of Time Spent in a Issue per Hour (Zoomed In)"}
+```{r "Distribution of the Number of Time Spent in a Issue per Hour (Zoomed In)"}
 plot_issue_time_spent_hour + 
   scale_x_continuous(breaks = seq(0, 24, 1)) +
   scale_y_continuous(breaks = seq(0, 2700, 175)) +
@@ -702,7 +705,7 @@ plot_issue_time_spent_hour +
                            "zoomed in to the first 24 hours"))
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour)"}
+```{r "Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour)"}
 df_issue_time_spent_min <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
@@ -732,7 +735,7 @@ print(rbind(x = summ_issue_time_spent_min))
 print(plot_issue_time_spent_min)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, "Head Issue Time Spent"}
+```{r "Head Issue Time Spent"}
 df_issue_time_spent_min %>% 
   group_by(issue_time_spent) %>% 
   summarise(score = sum(!is.na(issue_time_spent))) %>% 
@@ -741,7 +744,7 @@ df_issue_time_spent_min %>%
   as.data.frame()
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour and Non  0)"}
+```{r "Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour and Non  0)"}
 df_issue_time_spent_min <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
@@ -771,7 +774,7 @@ print(rbind(x = summ_issue_time_spent_min))
 print(plot_issue_time_spent_min)
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Time Spent in a Issue (Non 0)"}
+```{r "Distribution of the Number of Time Spent in a Issue (Non 0)"}
 df_issue_time_spent_hour <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
@@ -808,13 +811,13 @@ print(plot_issue_time_spent_hour)
 In the issue tracking system, 4 types of issues were used to classify the 
 purpose of a issue. They are:
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, "Issue Type Values"}
+```{r "Issue Type Values"}
 levels(issues$issue_type)
 ```
 
 The frequency of issues created by each issue type is shown in the graph below.
 
-```{r echo=FALSE, fig.retina=3, "Frequency of Issue Type"}
+```{r "Frequency of Issue Type"}
 df_issue_type <- 
   issues %>% 
     filter(!is.na(issue_type)) %>% 
@@ -856,7 +859,7 @@ issues creation timeline by system/subsystem may answer that assumption.
 
 ### Issue System
 
-```{r echo=FALSE, fig.retina=3, "Frequency of Issue System"}
+```{r "Frequency of Issue System"}
 df_issue_system <-
   issues %>% 
     filter(!is.na(issue_system)) %>% 
@@ -885,7 +888,7 @@ plot_score_issue_system
 
 ### Issue Subsystem
 
-```{r echo=FALSE, fig.retina=3, "Frequency of Issue Subsystem"}
+```{r "Frequency of Issue Subsystem"}
 df_issue_subsystem <-
   issues %>% 
     filter(!is.na(issue_subsystem)) %>% 
@@ -919,7 +922,7 @@ plot_score_top15_issue_subsystem
 
 ### Issue Stakeholder
 
-```{r echo=FALSE, fig.retina=3, "Frequency of Issue Stakeholder"}
+```{r "Frequency of Issue Stakeholder"}
 df_issue_stakeholder <-
   issues %>% 
     filter(!is.na(issue_stakeholder)) %>% 
@@ -948,7 +951,7 @@ plot_score_issue_stakeholder
 
 ### Issue Created By
 
-```{r echo=FALSE, fig.retina=3, "Frequency of Issue Created By"}
+```{r "Frequency of Issue Created By"}
 df_issue_created_by <-
   issues %>% 
     filter(!is.na(issue_created_by)) %>% 
@@ -983,7 +986,7 @@ plot_score_top15_issue_created_by
 
 ### Issue Status
 
-```{r echo=FALSE, fig.retina=3, "Frequency of Issue Status"}
+```{r "Frequency of Issue Status"}
 df_issue_status <-
   issues %>% 
     filter(!is.na(issue_status)) %>%
@@ -1012,7 +1015,7 @@ plot_score_issue_status
 
 ### Issue Priority Number
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Priority Number per Issue"}
+```{r "Distribution of the Priority Number per Issue"}
 df_issue_priority_number <- 
   issues %>% 
     filter(!is.na(issue_priority_number)) %>%
@@ -1040,7 +1043,7 @@ plot_issue_priority_number <-
 plot_issue_priority_number
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, "Head Issue Priority Number"}
+```{r "Head Issue Priority Number"}
 df_issue_priority_number %>% 
   group_by(issue_priority_number) %>% 
   summarise(score = sum(!is.na(issue_priority_number))) %>% 
@@ -1049,7 +1052,7 @@ df_issue_priority_number %>%
   as.data.frame()
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Priority Number per Issue (Dropped 999 and Zoomed In to 100)"}
+```{r "Distribution of the Priority Number per Issue (Dropped 999 and Zoomed In to 100)"}
 df_issue_priority_number <- 
   issues %>% 
     filter(!is.na(issue_priority_number)) %>%
@@ -1079,7 +1082,7 @@ plot_issue_priority_number <-
 plot_issue_priority_number
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Priority Number per Issue (Less than or Equal to 20)"}
+```{r "Distribution of the Priority Number per Issue (Less than or Equal to 20)"}
 df_issue_priority_number <- 
   issues %>% 
     filter(!is.na(issue_priority_number)) %>%
@@ -1110,7 +1113,7 @@ plot_issue_priority_number
 
 ### Issue Priority Scale
 
-```{r echo=FALSE, fig.retina=3, "Frequency of Issue Priority Scale"}
+```{r "Frequency of Issue Priority Scale"}
 df_issue_priority_scale <-
   issues %>% 
     filter(!is.na(issue_priority_scale)) %>%
@@ -1140,7 +1143,7 @@ plot_score_issue_priority_scale
 
 ### Issue Progress
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Progress per Issue"}
+```{r "Distribution of the Progress per Issue"}
 df_issue_progress <- 
   issues %>% 
     filter(!is.na(issue_progress)) %>% 
@@ -1168,7 +1171,7 @@ plot_issue_progress <-
 plot_issue_progress
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, "Head Issue Progress"}
+```{r "Head Issue Progress"}
 df_issue_progress %>% 
   group_by(issue_progress) %>% 
   summarise(score = sum(!is.na(issue_progress))) %>% 
@@ -1179,7 +1182,7 @@ df_issue_progress %>%
 
 ### Log Build Info
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of the Issues per System's Version"}
+```{r "Distribution of the Number of the Issues per System's Version"}
 df_log_build_info <-
   logs %>% 
     filter(!is.na(log_build_info)) %>% 
@@ -1209,7 +1212,7 @@ plot_log_build_info <-
 plot_log_build_info
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)"}
+```{r "Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)"}
 df_log_build_info <- 
   logs %>% 
     filter(!is.na(log_build_info)) %>% 
