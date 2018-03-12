@@ -23,6 +23,8 @@ source("project_05.R")
 ```{r echo=FALSE, message=FALSE, warning=FALSE, "Set Up"}
 # NOTE: To run this notebook set up current work directory to this file location
 
+lc_time <- Sys.setlocale("LC_TIME","en_US.UTF-8")
+
 # Set up default theme for plots
 theme_set(theme_classic() %+replace%
             theme(panel.grid.major.y = element_line(size=.05, color="gray"),
@@ -282,7 +284,8 @@ df_issue_created_by_month %>%
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
-quartile, the black and red solid lines represent, respectivaly, median and mean.
+cumulated quartile, the black and red solid lines represent, respectivaly, 
+cumulated median and mean.
 
 Analysing the plot above, we note that the year 2013 had the lowest demand. The
 accumulated mean variates between 10 and 20 issues per month. At the end of 2013 
@@ -351,20 +354,45 @@ df_issue_created_by_wday <-
              issue_creation_wday = wday(issue_creation_date, label = TRUE))
 ```
 
-During the week, the activities were concentrated on business days (from Monday to
-Friday) as can be noted in the barplot below.
+During the week, the demand for new activities were concentrated on business days 
+(from Monday to Friday) as we can note in the barplot below.
 
 ```{r echo=FALSE, fig.retina=3, "Frequency of Issues Created per Weekday"}
-plot_score_issue_created_by_wday(df_issue_created_by_wday)
+df_issue_created_by_wday %>% 
+  plot_score_issue_created_by_wday()
 ```
 
-...
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean.
+
+Note that whether we sort business days by the frequency of issues creation we 
+have Tue > Wed > Thu > Fri > Mon. Tuesday is the weekday that has more issues 
+creation (mode). Monday and Friday are the business days with less issues 
+creation.  One of the reasons for this is that, from April 2014, the work began 
+to be planned by sprints. These sprints were planned every Tuesday morning and 
+issues were created in the afternoon.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+df_issue_created_by_weekend <-
+  df_issue_created_by_wday %>% 
+    filter(issue_creation_wday == "Sat" | issue_creation_wday == "Sun")
+```
+
+Issues created on weenkend (`r nrow(df_issue_created_by_weekend)` issues) may be 
+considered outliers. These are issues created on weekend shift that was done 
+during the enrollment periods. Theses outliers pull the mean and 1st quartile 
+down. Removing them, we have a new barplot. See the plot below.
 
 ```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Created per Weekday (No Weekend)"}
 df_issue_created_by_wday %>% 
-  filter(issue_creation_wday != "Sat" & issue_creation_wday != "Sun") %>% 
+  filter(!(issue_creation_wday %in% 
+             df_issue_created_by_weekend$issue_creation_wday)) %>% 
   plot_score_issue_created_by_wday("without the weekend")
 ```
+
+Note that the summaries are now approximated. The median and mean overlap and 
+the distance between 1st and 3rd quartile became narrow. These new summaries 
+better reflect the daily behavior of issue creation.
 
 ```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Created per Hour of the Day"}
 df_issue_created_by_hour <- 
