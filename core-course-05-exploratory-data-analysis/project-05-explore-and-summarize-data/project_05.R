@@ -73,9 +73,8 @@ text_df_summary <- function(df_summary) {
          "    median: ", round(df_summary$median, 1),
          "    mean: ", round(df_summary$mean, 1),
          "    3rd qu.: ", round(df_summary$qu3, 1),
-         "    1.5 IQR: ", round(df_summary$iqr * 1.5, 1),
          "    90%: ", round(df_summary$pc90, 1),
-         "    max: ", round(df_summary$max), 1)
+         "    max: ", round(df_summary$max, 1))
 }
 
 subtitle <- function(observations, complement = NULL, df_summary = NULL) {

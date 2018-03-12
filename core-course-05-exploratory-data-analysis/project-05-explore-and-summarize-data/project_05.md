@@ -75,7 +75,7 @@ The distribution and the summaries of number of logs per issue are
 ploted in the histogram
 below.
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Logs per Issue-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Logs per Issue-1.png" width="672" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
@@ -93,9 +93,9 @@ there shoud be an activity flow pattern to resolve an issue. This flow
 pattern migth be observed in a commom sequence of log status. See more
 informations in the [Log Status](#log-status) section.
 
-The next 4 sections show the analisys of the timeline variables:
+The next 4 sections show the analisys of the temporal variables:
 `issue_creation_date`, `issue_start_date`, `issue_deadline_date` and
-`issue_time_spent`. In an issue tracking system, timeline variables is
+`issue_time_spent`. In an issue tracking system, temporal variables is
 the fundamental piece for monitoring and control of activities.
 
 ### Issue Creation Date
@@ -109,14 +109,14 @@ plot below that shows the cumulated number of issues created along the
 project and the trend line (in
 blue).
 
-<img src="project_05_files/figure-gfm/Cumulated Number of Issues Created per Month-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Cumulated Number of Issues Created-1.png" width="672" />
 
 We note that the first 11 months (from May 2013 to March 2014) of the
 project had very low demand, approximately 5% of the total. Some reasons
 for this were:
 
   - The customer and company teams were small;
-  - There were no work processes between customer and company;
+  - There were no defined work processes between customer and company;
   - That was the first time that the customer outsourced the development
     and deployment of systems;
   - The customer’s team had no experience with systems being deployed
@@ -126,87 +126,96 @@ for this were:
 The work processes and knowledge on both sides (customer and company)
 were being built over those 11 months. The teams grew in size and new
 modules started development and deployment. The next 12 months (from
-April 2014 to March 2015) there was significant growth curve in demand
-(activities), approximately 25% of growth over the previous 11 months.
-From June 2015 the demand growth seems to stabilize, sometimes taking
-small growth curves. In this period occurred approximately 65% of
+April 2014 to March 2015) there was significant growth curve in the
+activities, approximately 25% of growth over the previous 11 months.
+From June 2015 the activities growth seems to stabilize, sometimes
+taking small growth curves. In this period occurred approximately 65% of
 project activities. Besides, the trend line fitted with growth curve
-demonstrating that the project began to have a standardized
-behavior.
+demonstrating that the project began to have a standardized behavior.
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Issues Created per Month-1.png" width="672" />
+In the barplot below, we can see the project’s behavior in another way.
+This plot shows the distribution of the number of issues created per
+month and their cumulated
+summaries.
+
+<img src="project_05_files/figure-gfm/Distribution of the Number of Issues Created per Month-1.png" width="672" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
 > respectivaly, median and mean.
 
 Analysing the plot above, we note that the year 2013 had the lowest
-demand. The accumulated mean (red solid line) variates between 10 and 20
-issues per month. At the end of 2013 and begin of 2014 there was a drop
-in activities because of the low administrative and academic activities
-at the university in this period. From April of 2014 until February of
-2015 there was significant growth in activities. The accumulated mean
+demand. The accumulated mean variates between 10 and 20 issues per
+month. At the end of 2013 and begin of 2014 there was a drop in
+activities because of the low administrative and academic activities at
+the university at the end of year. From April of 2014 until February of
+2015 there was significant growth in activities. The cumulated mean
 increases from 10 to 70 issues per month. The accumulated mean overcame
-the accumulated median and the distance between accumulated 3rd quartile
-and accumulated median became greater than distance between accumulated
-1st quartile and accumulated median. This means that theses months had a
-high number of issues created in relation to the past.
+the cumulated median and the distance between cumulated 3rd quartile and
+accumulated median became greater than distance between cumulated 1st
+quartile and accumulated median. This means that these months had a high
+number of issues created in relation to the past.
 
 But from August of 2015 the pace of growth dropped. Now, we can note
-that the distance between accumulated 1st quartile and accumulated
-median becomes greater than distance between accumulated 3rd quartile
-and accumulated median. This invertion provocated the overlap between
-accumulated mean and accumulated median. The stabilization of growth
-also contributed to that. The average of growth pass to be only 10
-monthly issues from February 2015.
+that the distance between cumulated 1st quartile and cumulated median
+becomes greater than distance between cumulated 3rd quartile and
+cumulated median. This invertion provocated the overlap between
+cumulated mean and median. The stabilization of the growth also
+contributed to that. The average of growth pass to be only 10 monthly
+issues from February 2015.
 
-We also note that except the significant growth period (April of 2014
-until February of 2015) the months from September to December of each
-year had a decline in activities. The reason is the low administrative
-and academic activities at the university in this period. Thus, the
-demand for the systems decreases.
+We also note that except the significant growth period (from April 2014
+to February 2015) the months between September and December of each year
+had a decline in activities. The reason is the low administrative and
+academic activities at the university in this period. Thus, the demand
+for customization and maintenance of the systems decreases.
 
-    ##   min qu1 median     mean qu3 iqr  pc90  max
-    ## y   1 406    817 643.2857 928 522 984.6 1017
+During the week, the activities were concentrated on business days (from
+Monday to Friday) as can be noted in the barplot
+below.
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Issues Created per Weekday-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Frequency of Issues Created per Weekday-1.png" width="672" />
+
+…
+
+<img src="project_05_files/figure-gfm/Distribution of the Number of Issues Created per Weekday (No Weekend)-1.png" width="672" />
 
     ##   min qu1 median     mean qu3 iqr pc90 max
     ## x   0  10     13 12.64624  15   5   16  23
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Issues Created per Hour of the Day-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Issues Created per Hour of the Day-1.png" width="672" />
 
 ### Issue Start Date
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Issues Started per Month-1.png" width="672" /><img src="project_05_files/figure-gfm/Distribution of Number of Issues Started per Month-2.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Issues Started per Month-1.png" width="672" /><img src="project_05_files/figure-gfm/Distribution of the Number of Issues Started per Month-2.png" width="672" />
 
     ##   min qu1 median     mean qu3 iqr  pc90  max
     ## y   5 406    810 641.2857 921 515 993.6 1020
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Issues Started per Weekday-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Issues Started per Weekday-1.png" width="672" />
 
 ### Issue Deadline Date
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Issues Deadline per Month-1.png" width="672" /><img src="project_05_files/figure-gfm/Distribution of Number of Issues Deadline per Month-2.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Issues Deadline per Month-1.png" width="672" /><img src="project_05_files/figure-gfm/Distribution of the Number of Issues Deadline per Month-2.png" width="672" />
 
     ##   min    qu1 median     mean   qu3   iqr  pc90 max
     ## y   1 258.75  282.5 250.6667 323.5 64.75 342.5 350
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Issues Deadline per Weekday-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Issues Deadline per Weekday-1.png" width="672" />
 
 ### Issue Time Spent
 
     ##   min qu1 median     mean qu3 iqr pc90   max
     ## x   0   0    0.5 2.205639 2.1 2.1 5.58 107.4
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Time Spent in a Issue per Hour-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Time Spent in a Issue per Hour-1.png" width="672" />
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Time Spent in a Issue per Hour (Zoomed In)-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Time Spent in a Issue per Hour (Zoomed In)-1.png" width="672" />
 
     ##   min qu1 median     mean qu3 iqr pc90 max
     ## x   0   0      0 10.87472  18  18   36  54
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Time Spent in a Issue (Less Than 1 Hour)-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour)-1.png" width="672" />
 
     ##   issue_time_spent score
     ## 1                0  1430
@@ -218,12 +227,12 @@ demand for the systems decreases.
     ##   min qu1 median     mean qu3 iqr pc90 max
     ## x   6  12     18 23.29553  36  24   48  54
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Time Spent in a Issue (Less Than 1 Hour and Non  0)-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour and Non  0)-1.png" width="672" />
 
     ##   min qu1 median     mean qu3 iqr pc90   max
     ## x 0.1 0.5    1.3 3.232018 3.4 2.9 7.78 107.4
 
-<img src="project_05_files/figure-gfm/Distribution of Number of Time Spent in a Issue (Non 0)-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of Time Spent in a Issue (Non 0)-1.png" width="672" />
 
 ### Issue Type
 
@@ -275,7 +284,7 @@ assumption.
 
 ### Issue Priority Number
 
-<img src="project_05_files/figure-gfm/Distribution of Priority Number per Issue-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Priority Number per Issue-1.png" width="672" />
 
     ##   issue_priority_number score
     ## 1                   999  2272
@@ -284,9 +293,9 @@ assumption.
     ## 4                     2   192
     ## 5                     3   148
 
-<img src="project_05_files/figure-gfm/Distribution of Priority Number per Issue (Dropped 999 and Zoomed In to 100)-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Priority Number per Issue (Dropped 999 and Zoomed In to 100)-1.png" width="672" />
 
-<img src="project_05_files/figure-gfm/Distribution of Priority Number per Issue (Less than or Equal to 20)-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Priority Number per Issue (Less than or Equal to 20)-1.png" width="672" />
 
 ### Issue Priority Scale
 
@@ -294,7 +303,7 @@ assumption.
 
 ### Issue Progress
 
-<img src="project_05_files/figure-gfm/Distribution of Progress per Issue-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Progress per Issue-1.png" width="672" />
 
     ##   issue_progress score
     ## 1            100  4492
@@ -305,9 +314,9 @@ assumption.
 
 ### Log Build Info
 
-<img src="project_05_files/figure-gfm/Distribution of Number of the Issues per System's Version-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of the Issues per System's Version-1.png" width="672" />
 
-<img src="project_05_files/figure-gfm/Distribution of Number of the Issues per System's Version (Less Than 6 Issues)-1.png" width="672" />
+<img src="project_05_files/figure-gfm/Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)-1.png" width="672" />
 
 ### Log Status
 

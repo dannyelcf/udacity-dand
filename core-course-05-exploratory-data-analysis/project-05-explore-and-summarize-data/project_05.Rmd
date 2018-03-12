@@ -93,37 +93,42 @@ number of logs represents `r round(nrow(logs)*100/nrow(dataset))`% of it. The
 (`r nrow(dataset)-nrow(logs)` rows) represents issues that do not have history 
 logs. 
 
-The distribution and the summaries of number of logs per issue are ploted in the
-histogram below. 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+plot_number_logs_per_issue <- function(df_number_logs_per_issue) {
+  summ_number_logs_per_issue <- df_summary(df_number_logs_per_issue, score)
+  
+  plot_number_logs_per_issue <-
+    df_number_logs_per_issue %>% 
+      ggplot(aes(x = score)) +
+        geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+                       boundary = summ_number_logs_per_issue$min, 
+                       closed = "left") +
+        plot_x_summary(df_number_logs_per_issue, score) +
+        scale_x_continuous(breaks = seq(0, 43, 2)) +
+        scale_y_continuous(breaks = seq(0, 800, 50)) +
+        labs(title = "Distribution of the Number of Logs per Issue",
+             subtitle = subtitle(observations = nrow(df_number_logs_per_issue),
+                                 df_summary = summ_number_logs_per_issue),
+             x = "Number of logs per issue",
+             y = "Frequency") +
+        theme(axis.text.x = element_text(size = 8.5)) 
+  
+  plot_number_logs_per_issue
+}
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Logs per Issue"}
 df_number_logs_per_issue <- 
   dataset %>%
     select(issue_id, log_creation_date) %>%
     group_by(issue_id) %>% 
-    summarise(score = sum(!is.na(log_creation_date))) %>% 
-    as.data.frame()
+    summarise(score = sum(!is.na(log_creation_date)))
+```
 
-summ_number_logs_per_issue <- df_summary(df_number_logs_per_issue, score)
+The distribution and the summaries of number of logs per issue are ploted in the
+histogram below.
 
-# Count number of issues for each number of logs per issue
-plot_number_logs_per_issue <-
-  df_number_logs_per_issue %>% 
-    ggplot(aes(x = score)) +
-      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
-                     boundary = summ_number_logs_per_issue$min, 
-                     closed = "left") +
-      plot_x_summary(df_number_logs_per_issue, score) +
-      scale_x_continuous(breaks = seq(0, 43, 2)) +
-      scale_y_continuous(breaks = seq(0, 800, 50)) +
-      labs(title = "Distribution of Number of Logs per Issue",
-           subtitle = subtitle(observations = nrow(df_number_logs_per_issue),
-                               df_summary = summ_number_logs_per_issue),
-           x = "Number of logs per issue",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
-
-print(plot_number_logs_per_issue)
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Logs per Issue"}
+df_number_logs_per_issue %>% 
+  plot_number_logs_per_issue()
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -151,9 +156,9 @@ shoud be an activity flow pattern to resolve an issue. This flow pattern migth
 be observed in a commom sequence of log status. See more informations in the 
 [Log Status](#log-status) section.
 
-The next 4 sections show the analisys of the timeline variables: 
+The next 4 sections show the analisys of the temporal variables: 
 `issue_creation_date`, `issue_start_date`, `issue_deadline_date` and 
-`issue_time_spent`. In an issue tracking system, timeline variables is the 
+`issue_time_spent`. In an issue tracking system, temporal variables is the 
 fundamental piece for monitoring and control of activities.
 
 ### Issue Creation Date
@@ -167,72 +172,91 @@ The data set analyzed comprises issues created in the period between
 `r format(max(issues$issue_creation_date), "%m/%d/%Y")`. 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+score_issue_created_by_month <- function(df_issue_created_by_month) {
+  df_score_issue_created_by_month <- 
+    df_issue_created_by_month %>% 
+      group_by(issue_creation_date) %>% 
+      summarise(score = n())
+  
+  df_score_issue_created_by_month
+}
+
+plot_score_issue_created_by_month <- function(df_issue_created_by_month) {
+  df_score_issue_created_by_month <- 
+    score_issue_created_by_month(df_issue_created_by_month)
+
+  plot_score_issue_created_by_month <-
+    df_score_issue_created_by_month %>% 
+      ggplot(aes(x = issue_creation_date, y = score)) +
+        geom_col(alpha = .3, color = "grey", width = 28) +
+        plot_cumsummary(df_score_issue_created_by_month, 
+                        x = issue_creation_date,
+                        y = score) +
+        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
+                     expand = c(0.01, 0)) +
+        scale_y_continuous(breaks = seq(0, 190, 15)) +
+        labs(title = "Distribution of the Number of Issues Created per Month",
+             subtitle = subtitle(nrow(df_issue_created_by_month)),
+             x = "Issue creation date (per month)",
+             y = "Frequency") +
+        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+  
+  plot_score_issue_created_by_month
+}
+
+plot_cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
+  df_score_issue_created_by_month <- 
+    score_issue_created_by_month(df_issue_created_by_month)
+  
+  df_cum_score_issue_created_by_month <- 
+    df_score_issue_created_by_month %>%
+      mutate(cumscore = cumsum(score))
+  
+  plot_cum_score_issue_created_by_month <-
+    df_cum_score_issue_created_by_month %>% 
+      ggplot(aes(x = issue_creation_date, y = cumscore)) +
+        geom_area(alpha = .3, color = "grey") +
+        geom_smooth(method = "lm") +
+        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
+                     expand = c(0.02, 0)) +
+        scale_y_continuous(breaks = seq(0, 4600, 400),
+                           sec.axis = sec_axis(
+                             trans = ~. / nrow(df_issue_created_by_month),
+                             breaks = seq(0, 1, .1),
+                             labels = scales::percent
+                           )) +
+        coord_cartesian(ylim = c(0, 4600)) +
+        labs(title = "Cumulated Number of Issues Created",
+             subtitle = subtitle(nrow(df_issue_created_by_month)),
+             x = "Issue creation date",
+             y = "Number of issues") +
+        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+  
+  plot_cum_score_issue_created_by_month
+}
+
 df_issue_created_by_month <- 
   issues %>% 
     filter(!is.na(issue_creation_date)) %>% 
     distinct(issue_id, 
              issue_creation_date = as.Date(floor_date(issue_creation_date,
                                                       "month")))
-
-df_score_issue_created_by_month <- 
-  df_issue_created_by_month %>% 
-    group_by(issue_creation_date) %>% 
-    summarise(score = n())
-
-plot_score_issue_created_by_month <-
-  df_score_issue_created_by_month %>% 
-    ggplot(aes(x = issue_creation_date, y = score)) +
-      geom_col(alpha = .3, color = "grey", width = 28) +
-      plot_cumsummary(df_score_issue_created_by_month, 
-                      x = issue_creation_date,
-                      y = score) +
-      scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                   expand = c(0.01, 0)) +
-      scale_y_continuous(breaks = seq(0, 190, 15)) +
-      labs(title = "Distribution of Number of Issues Created per Month",
-           subtitle = subtitle(nrow(df_issue_created_by_month)),
-           x = "Issue creation date (per month)",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
-
-df_cum_score_issue_created_by_month <- 
-  df_score_issue_created_by_month %>%
-    mutate(cumscore = cumsum(score))
-
-plot_cum_score_issue_created_by_month <-
-  df_cum_score_issue_created_by_month %>% 
-    ggplot(aes(x = issue_creation_date, y = cumscore)) +
-      geom_area(alpha = .3, color = "grey") +
-      geom_smooth(method = "lm") +
-      scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                   expand = c(0.02, 0)) +
-      scale_y_continuous(breaks = seq(0, 4600, 400),
-                         sec.axis = sec_axis(
-                           trans = ~. / nrow(df_issue_created_by_month),
-                           breaks = seq(0, 1, .1),
-                           labels = scales::percent
-                         )) +
-      coord_cartesian(ylim = c(0, 4600)) +
-      labs(title = "Cumulated Number of Issues Created per Month",
-           subtitle = subtitle(nrow(df_issue_created_by_month)),
-           x = "Issue creation date (per month)",
-           y = "Number of issues") +
-      theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
 ```
 
 To get a sense of how it was the demand throughout the project see the plot 
 below that shows the cumulated number of issues created along the project and 
 the trend line (in blue).
 
-```{r echo=FALSE, fig.retina=3, warning=FALSE, "Cumulated Number of Issues Created per Month"}
-print(plot_cum_score_issue_created_by_month)
+```{r echo=FALSE, fig.retina=3, warning=FALSE, "Cumulated Number of Issues Created"}
+df_issue_created_by_month %>% 
+  plot_cum_score_issue_created_by_month()
 ```
 
 We note that the first 11 months (from May 2013 to March 2014) of the project 
 had very low demand, approximately 5% of the total. Some reasons for this were:
 
 - The customer and company teams were small;
-- There were no work processes between customer and company;
+- There were no defined work processes between customer and company;
 - That was the first time that the customer outsourced the development and 
 deployment of systems;
 - The customer's team had no experience with systems being deployed and the 
@@ -241,84 +265,108 @@ company's team did not know the customer's day-to-day business deeply.
 The work processes and knowledge on both sides (customer and company) were 
 being built over those 11 months. The teams grew in size and new modules started
 development and deployment. The next 12 months (from April 2014 to March 2015) 
-there was significant growth curve in demand (activities), approximately 25% of
-growth over the previous 11 months. From June 2015 the demand growth seems to 
-stabilize, sometimes taking small growth curves. In this period occurred 
+there was significant growth curve in the activities, approximately 25% of
+growth over the previous 11 months. From June 2015 the activities growth seems 
+to stabilize, sometimes taking small growth curves. In this period occurred 
 approximately 65% of project activities. Besides, the trend line fitted with 
 growth curve demonstrating that the project began to have a standardized 
 behavior.
 
-```{r echo=FALSE, fig.retina=3, warning=FALSE, "Distribution of Number of Issues Created per Month"}
-print(plot_score_issue_created_by_month)
+In the barplot below, we can see the project's behavior in another way. This
+plot shows the distribution of the number of issues created per month and
+their cumulated summaries.
+
+```{r echo=FALSE, fig.retina=3, warning=FALSE, "Distribution of the Number of Issues Created per Month"}
+df_issue_created_by_month %>% 
+  plot_score_issue_created_by_month()
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
 quartile, the black and red solid lines represent, respectivaly, median and mean.
 
 Analysing the plot above, we note that the year 2013 had the lowest demand. The
-accumulated mean (red solid line) variates between 10 and 20 issues per month. At 
-the end of 2013 and begin of 2014 there was a drop in activities because of the 
-low administrative and academic activities at the university in this period. From
-April of 2014 until February of 2015 there was significant growth in activities.
-The accumulated mean increases from 10 to 70 issues per month. The accumulated mean
-overcame the accumulated median and the distance between accumulated 3rd quartile 
-and accumulated median became greater than distance between accumulated 1st 
-quartile and accumulated median. This means that theses months had a high number 
+accumulated mean variates between 10 and 20 issues per month. At the end of 2013 
+and begin of 2014 there was a drop in activities because of the low administrative 
+and academic activities at the university at the end of year. From April of 2014 
+until February of 2015 there was significant growth in activities.
+The cumulated mean increases from 10 to 70 issues per month. The accumulated mean
+overcame the cumulated median and the distance between cumulated 3rd quartile 
+and accumulated median became greater than distance between cumulated 1st 
+quartile and accumulated median. This means that these months had a high number 
 of issues created in relation to the past. 
 
 But from August of 2015 the pace of growth dropped. Now, we can note that the 
-distance between accumulated 1st quartile and accumulated median becomes greater 
-than distance between accumulated 3rd quartile and accumulated median. This 
-invertion provocated the overlap between accumulated mean and accumulated median. 
-The stabilization of growth also contributed to that. The average of growth pass 
+distance between cumulated 1st quartile and cumulated median becomes greater 
+than distance between cumulated 3rd quartile and cumulated median. This 
+invertion provocated the overlap between cumulated mean and median. The 
+stabilization of the growth also contributed to that. The average of growth pass 
 to be only 10 monthly issues from February 2015. 
 
-We also note that except the significant growth period (April of 2014 until 
-February of 2015) the months from September to December of each year had a 
+We also note that except the significant growth period (from April 2014 to 
+February 2015) the months between September and December of each year had a 
 decline in activities. The reason is the low administrative and academic 
-activities at the university in this period. Thus, the demand for the systems 
-decreases.
+activities at the university in this period. Thus, the demand for customization 
+and maintenance of the systems decreases.
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Created per Weekday"}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+plot_score_issue_created_by_wday <- function(df_issue_created_by_wday,
+                                             subtitle_complement = NULL) {
+  summ_issue_created_by_wday <- 
+    df_issue_created_by_wday %>% 
+      group_by(issue_creation_wday) %>% 
+      summarise(frequency = n()) %>% 
+      df_summary(frequency)
+  
+  df_score_issue_created_by_wday <- 
+    df_issue_created_by_wday %>% 
+      group_by(issue_creation_wday) %>% 
+      summarise(score = n())
+  
+  plot_score_issue_created_by_wday <- 
+    df_score_issue_created_by_wday %>% 
+      ggplot(aes(x = issue_creation_wday, y = score)) +
+        geom_col(color = "grey", alpha = .3) +
+        plot_y_summary(df_issue_created_by_wday, issue_creation_wday) +
+        scale_y_continuous(breaks = seq(0, 1020, 100),
+                           sec.axis = sec_axis(
+                             trans = ~. / nrow(df_issue_created_by_wday),
+                             breaks = seq(0, 1, .02),
+                             labels = scales::percent
+                           )) +
+        labs(title = "Frequency of Issues Created per Weekday",
+             subtitle = subtitle(nrow(df_issue_created_by_wday),
+                                 subtitle_complement,
+                                 summ_issue_created_by_wday),
+             x = "Weekday",
+             y = "Frequency") +
+        theme(axis.text.x = element_text(size = 8.5)) 
+  
+  plot_score_issue_created_by_wday
+}
+
 df_issue_created_by_wday <- 
   issues %>% 
     filter(!is.na(issue_creation_date)) %>% 
     distinct(issue_id, 
              issue_creation_wday = wday(issue_creation_date, label = TRUE))
-
-summ_issue_created_by_wday <- 
-  df_issue_created_by_wday %>% 
-    group_by(issue_creation_wday) %>% 
-    summarise(frequency = n()) %>% 
-    df_summary(frequency)
-
-df_score_issue_created_by_wday <- 
-  df_issue_created_by_wday %>% 
-    group_by(issue_creation_wday) %>% 
-    summarise(score = n())
-
-plot_score_issue_created_by_wday <- 
-  df_score_issue_created_by_wday %>% 
-    ggplot(aes(x = issue_creation_wday, y = score)) +
-      geom_col(color = "grey", alpha = .3) +
-      plot_y_summary(df_issue_created_by_wday, issue_creation_wday) +
-      scale_y_continuous(breaks = seq(0, 1020, 100),
-                         sec.axis = sec_axis(
-                           trans = ~. / nrow(df_issue_created_by_wday),
-                           breaks = seq(0, 1, .02),
-                           labels = scales::percent
-                         )) +
-      labs(title = "Frequency of Issues Created per Weekday",
-           subtitle = subtitle(nrow(df_issue_created_by_wday)),
-           x = "Weekday",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
-
-print(rbind(y = summ_issue_created_by_wday))
-print(plot_score_issue_created_by_wday)
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Created per Hour of the Day"}
+During the week, the activities were concentrated on business days (from Monday to
+Friday) as can be noted in the barplot below.
+
+```{r echo=FALSE, fig.retina=3, "Frequency of Issues Created per Weekday"}
+plot_score_issue_created_by_wday(df_issue_created_by_wday)
+```
+
+...
+
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Created per Weekday (No Weekend)"}
+df_issue_created_by_wday %>% 
+  filter(issue_creation_wday != "Sat" & issue_creation_wday != "Sun") %>% 
+  plot_score_issue_created_by_wday("without the weekend")
+```
+
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Created per Hour of the Day"}
 df_issue_created_by_hour <- 
   issues %>% 
     filter(!is.na(issue_creation_date)) %>%
@@ -337,7 +385,7 @@ plot_issue_created_by_hour <-
       plot_x_summary(df_issue_created_by_hour, issue_creation_hour) +
       scale_x_continuous(breaks = seq(0, 23, 1)) +
       scale_y_continuous(limits = c(0, 700), breaks = seq(0, 700, 50)) +
-      labs(title = "Distribution of Number of Issues Created per Hour of the Day",
+      labs(title = "Distribution of the Number of Issues Created per Hour of the Day",
            subtitle = subtitle(nrow(df_issue_created_by_hour)),
            x = "Hour of the day",
            y = "Frequency") +
@@ -349,7 +397,7 @@ print(plot_issue_created_by_hour)
 
 ### Issue Start Date
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Started per Month"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Started per Month"}
 df_issue_start_date_month <- 
   issues %>% 
     filter(!is.na(issue_start_date)) %>% 
@@ -372,7 +420,7 @@ plot_score_issue_start_date_month <-
       scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
                    expand = c(0.01, 0)) +
       scale_y_continuous(breaks = seq(0, 185, 15)) +
-      labs(title = "Distribution of Number of Issues Started per Month",
+      labs(title = "Distribution of the Number of Issues Started per Month",
            subtitle = subtitle(nrow(df_issue_start_date_month)),
            x = "Issue start date (per month)",
            y = "Frequency") +
@@ -405,7 +453,7 @@ print(plot_cum_score_issue_start_date_month)
 print(plot_score_issue_start_date_month)
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Started per Weekday"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Started per Weekday"}
 df_issue_start_wday <- 
   issues %>% 
     filter(!is.na(issue_start_date)) %>% 
@@ -446,7 +494,7 @@ print(plot_score_issue_start_wday)
 
 ### Issue Deadline Date
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Deadline per Month"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Deadline per Month"}
 df_issue_deadline_date_month <- 
   issues %>% 
     filter(!is.na(issue_deadline_date)) %>% 
@@ -469,7 +517,7 @@ plot_score_issue_deadline_date_month <-
       scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
                    expand = c(0.01, 0)) +
       scale_y_continuous(breaks = seq(0, 80, 5)) +
-      labs(title = "Distribution of Number of Issues Deadline per Month",
+      labs(title = "Distribution of the Number of Issues Deadline per Month",
            subtitle = subtitle(nrow(df_issue_deadline_date_month)),
            x = "Issue deadline date (per month)",
            y = "Frequency") +
@@ -502,7 +550,7 @@ print(plot_cum_score_issue_deadline_date_month)
 print(plot_score_issue_deadline_date_month)
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Issues Deadline per Weekday"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Issues Deadline per Weekday"}
 df_issue_deadline_wday <- 
   issues %>% 
     filter(!is.na(issue_deadline_date)) %>% 
@@ -543,7 +591,7 @@ print(plot_score_issue_deadline_wday)
 
 ### Issue Time Spent
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Time Spent in a Issue per Hour"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Time Spent in a Issue per Hour"}
 df_issue_time_spent_hour <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
@@ -562,7 +610,7 @@ plot_issue_time_spent_hour <-
       plot_x_summary(df_issue_time_spent_hour, issue_time_spent) +
       scale_x_continuous(breaks = seq(0, 110, 5)) +
       scale_y_continuous(breaks = seq(0, 3000, 250)) +
-      labs(title = "Distribution of Number of Time Spent in a Issue per Hour",
+      labs(title = "Distribution of the Number of Time Spent in a Issue per Hour",
            subtitle = subtitle(nrow(df_issue_time_spent_hour)),
            x = "Hours spent",
            y = "Frequency") +
@@ -572,7 +620,7 @@ print(rbind(x = summ_issue_time_spent_hour))
 print(plot_issue_time_spent_hour)
 ```
 
-```{r echo=FALSE, fig.retina=3, message=FALSE, "Distribution of Number of Time Spent in a Issue per Hour (Zoomed In)"}
+```{r echo=FALSE, fig.retina=3, message=FALSE, "Distribution of the Number of Time Spent in a Issue per Hour (Zoomed In)"}
 plot_issue_time_spent_hour + 
   scale_x_continuous(breaks = seq(0, 24, 1)) +
   scale_y_continuous(breaks = seq(0, 2700, 175)) +
@@ -581,7 +629,7 @@ plot_issue_time_spent_hour +
                            "zoomed in to the first 24 hours"))
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Time Spent in a Issue (Less Than 1 Hour)"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour)"}
 df_issue_time_spent_min <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
@@ -600,7 +648,7 @@ plot_issue_time_spent_min <-
       plot_x_summary(df_issue_time_spent_min, issue_time_spent) +
       scale_x_continuous(breaks = seq(0, 60, 5)) +
       scale_y_continuous(breaks = seq(0, 1700, 150)) +
-      labs(title = "Distribution of Number of Time Spent in a Issue",
+      labs(title = "Distribution of the Number of Time Spent in a Issue",
            subtitle = subtitle(nrow(df_issue_time_spent_min), 
                              "less than 1 hour"),
            x = "Minutes spent",
@@ -620,7 +668,7 @@ df_issue_time_spent_min %>%
   as.data.frame()
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Time Spent in a Issue (Less Than 1 Hour and Non  0)"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour and Non  0)"}
 df_issue_time_spent_min <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
@@ -639,7 +687,7 @@ plot_issue_time_spent_min <-
       plot_x_summary(df_issue_time_spent_min, issue_time_spent) +
       scale_x_continuous(breaks = seq(6, 60, 10)) +
       scale_y_continuous(breaks = seq(0, 500, 50)) +
-      labs(title = "Distribution of Number of Time Spent in a Issue",
+      labs(title = "Distribution of the Number of Time Spent in a Issue",
            subtitle = subtitle(nrow(df_issue_time_spent_min), 
                              "less than 1 hour and non 0"),
            x = "Minutes spent",
@@ -650,7 +698,7 @@ print(rbind(x = summ_issue_time_spent_min))
 print(plot_issue_time_spent_min)
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of Time Spent in a Issue (Non 0)"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of Time Spent in a Issue (Non 0)"}
 df_issue_time_spent_hour <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
@@ -671,7 +719,7 @@ plot_issue_time_spent_hour <-
       scale_x_continuous(breaks = seq(0, 24, 1)) +
       scale_y_continuous(breaks = seq(0, 2700, 150)) +
       coord_cartesian(xlim = c(0, 24)) +
-      labs(title = "Distribution of Number of Time Spent in a Issue",
+      labs(title = "Distribution of the Number of Time Spent in a Issue",
            subtitle = subtitle(nrow(df_issue_time_spent_hour), 
                                "non 0 zoomed in to the first 24 hours"),
            x = "Hours spent",
@@ -891,7 +939,7 @@ plot_score_issue_status
 
 ### Issue Priority Number
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Priority Number per Issue"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Priority Number per Issue"}
 df_issue_priority_number <- 
   issues %>% 
     filter(!is.na(issue_priority_number)) %>%
@@ -909,7 +957,7 @@ plot_issue_priority_number <-
       plot_x_summary(df_issue_priority_number, issue_priority_number) +
       scale_x_continuous(breaks = seq(0, 999, 50)) +
       scale_y_continuous(breaks = seq(0, 2700, 150)) +
-      labs(title = "Distribution of Priority Number per Issue",
+      labs(title = "Distribution of the Priority Number per Issue",
            subtitle = subtitle(nrow(df_issue_priority_number),
                                df_summary = summ_issue_priority_number),
            x = "Issue priority number",
@@ -928,7 +976,7 @@ df_issue_priority_number %>%
   as.data.frame()
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Priority Number per Issue (Dropped 999 and Zoomed In to 100)"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Priority Number per Issue (Dropped 999 and Zoomed In to 100)"}
 df_issue_priority_number <- 
   issues %>% 
     filter(!is.na(issue_priority_number)) %>%
@@ -948,7 +996,7 @@ plot_issue_priority_number <-
       scale_x_continuous(breaks = seq(0, 280, 10)) +
       scale_y_continuous(breaks = seq(0, 1600, 150)) +
       coord_cartesian(xlim = c(0, 100)) +
-      labs(title = "Distribution of Priority Number per Issue (Dropped 999)",
+      labs(title = "Distribution of the Priority Number per Issue (Dropped 999)",
            subtitle = subtitle(nrow(df_issue_priority_number),
                                df_summary = summ_issue_priority_number),
            x = "Issue priority number",
@@ -958,7 +1006,7 @@ plot_issue_priority_number <-
 plot_issue_priority_number
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Priority Number per Issue (Less than or Equal to 20)"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Priority Number per Issue (Less than or Equal to 20)"}
 df_issue_priority_number <- 
   issues %>% 
     filter(!is.na(issue_priority_number)) %>%
@@ -977,7 +1025,7 @@ plot_issue_priority_number <-
       plot_x_summary(df_issue_priority_number, issue_priority_number) +
       scale_x_continuous(breaks = seq(0, 20, 1)) +
       scale_y_continuous(breaks = seq(0, 450, 50)) +
-      labs(title = "Distribution of Priority Number per Issue (Less Than or Equal to 20)",
+      labs(title = "Distribution of the Priority Number per Issue (Less Than or Equal to 20)",
            subtitle = subtitle(nrow(df_issue_priority_number),
                                df_summary = summ_issue_priority_number),
            x = "Issue priority number",
@@ -1019,7 +1067,7 @@ plot_score_issue_priority_scale
 
 ### Issue Progress
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Progress per Issue"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Progress per Issue"}
 df_issue_progress <- 
   issues %>% 
     filter(!is.na(issue_progress)) %>% 
@@ -1037,7 +1085,7 @@ plot_issue_progress <-
       plot_x_summary(df_issue_progress, issue_progress) +
       scale_x_continuous(breaks = seq(0, 100, 10)) +
       scale_y_continuous(breaks = seq(0, 4600, 500)) +
-      labs(title = "Distribution of Progress per Issue",
+      labs(title = "Distribution of the Progress per Issue",
            subtitle = subtitle(nrow(df_issue_progress),
                                df_summary = summ_issue_progress),
            x = "Issue progress",
@@ -1058,7 +1106,7 @@ df_issue_progress %>%
 
 ### Log Build Info
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of the Issues per System's Version"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of the Issues per System's Version"}
 df_log_build_info <-
   logs %>% 
     filter(!is.na(log_build_info)) %>% 
@@ -1078,7 +1126,7 @@ plot_log_build_info <-
       plot_x_summary(df_log_build_info, score) +
       scale_x_continuous(breaks = seq(1, 125, 5)) +
       scale_y_continuous(breaks = seq(0, 320, 20)) +
-      labs(title = "Distribution of Number of the Issues per System's Version",
+      labs(title = "Distribution of the Number of the Issues per System's Version",
            subtitle = subtitle(nrow(df_log_build_info),
                                df_summary = summ_log_build_info),
            x = "Number of issues",
@@ -1088,7 +1136,7 @@ plot_log_build_info <-
 plot_log_build_info
 ```
 
-```{r echo=FALSE, fig.retina=3, "Distribution of Number of the Issues per System's Version (Less Than 6 Issues)"}
+```{r echo=FALSE, fig.retina=3, "Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)"}
 df_log_build_info <- 
   logs %>% 
     filter(!is.na(log_build_info)) %>% 
@@ -1109,7 +1157,7 @@ plot_log_build_info <-
       plot_x_summary(df_log_build_info, score) +
       scale_x_continuous(breaks = seq(1, 5, 1)) +
       scale_y_continuous(breaks = seq(0, 90, 10)) +
-      labs(title = "Distribution of Number of the Issues per System's Version",
+      labs(title = "Distribution of the Number of the Issues per System's Version",
            subtitle = subtitle(nrow(df_log_build_info),
                                df_summary = summ_log_build_info),
            x = "Number of issues",
