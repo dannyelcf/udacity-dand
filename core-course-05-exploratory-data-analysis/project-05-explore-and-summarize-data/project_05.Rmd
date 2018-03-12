@@ -391,6 +391,9 @@ df_issue_created_by_wday %>%
   plot_score_issue_created_by_wday("without the weekend")
 ```
 
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean.
+
 Note that the summaries are now approximated. The median and mean overlap and 
 the distance between 1st and 3rd quartile became narrow. These new summaries 
 better reflect the behavior of issue creation.
@@ -437,6 +440,11 @@ df_issue_created_by_hour %>%
   plot_issue_created_by_hour()
 ```
 
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted lines represent the lower and upper threshold to the 
+outliers (lower = 1st qu. - 1.5 IQR, upper = 3rd qu. + 1.5 IQR).
+
 The high volume of issue creation comprises between 8:00h and 18:00h, office 
 hours. The peak hours are around 10:00h and 15:00h. At lunch time, the demand 
 for new issues decreases. We note that this bimodal distribution is quasi 
@@ -451,6 +459,9 @@ df_issue_created_by_hour %>%
   filter(issue_creation_hour >= 8 & issue_creation_hour <= 18) %>% 
   plot_issue_created_by_hour("with only office hours")
 ```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean.
 
 This shows us that the high issue creation volume actually comprises between 
 8:00h and 18:00h.
