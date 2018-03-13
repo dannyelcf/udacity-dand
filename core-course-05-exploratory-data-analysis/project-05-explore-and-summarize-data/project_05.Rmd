@@ -13,7 +13,8 @@ rm(list = ls())
 .LC_TIME <- Sys.setlocale("LC_TIME","en_US.UTF-8")
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
-                      fig.path = "project_05_files/plots/", fig.retina = 3)
+                      fig.path = "project_05_files/plots/", fig.retina = 3,
+                      fig.height = 3.5, out.width = "86%")
 ```
 
 ```{r "Load Packages"}
@@ -21,6 +22,7 @@ library(ggplot2)
 library(dplyr)
 library(lubridate)
 library(grid)
+library(gridExtra)
 
 source("project_05.R")
 ```
@@ -31,7 +33,18 @@ source("project_05.R")
 # Set up default theme for plots
 theme_set(theme_classic() %+replace%
             theme(panel.grid.major.y = element_line(size=.05, color="gray"),
-                  plot.margin = unit(c(.3, 0, .5, 2), "cm")))
+                  plot.margin = unit(c(.3, 0, .5, 2), "cm"),
+                  axis.text = element_text(size = rel(0.7), colour = "grey30"),
+                  axis.title.x = element_text(size = rel(0.9),
+                                              margin = margin(t = 5.5),
+                                              vjust = 1),
+                  axis.title.y = element_text(size = rel(0.9),
+                                              angle = 90,
+                                              margin = margin(r = 5.5), 
+                                              vjust = 1),
+                  plot.subtitle = element_text(size = rel(0.8), 
+                                               hjust = 0, vjust = 1, 
+                                               margin = margin(b = 5.5 * 0.9))))
 ```
 
 ```{r "Load Data Set"}
@@ -110,13 +123,12 @@ plot_number_logs_per_issue <- function(df_number_logs_per_issue) {
                        closed = "left") +
         plot_x_summary(df_number_logs_per_issue, score) +
         scale_x_continuous(breaks = seq(0, 43, 2)) +
-        scale_y_continuous(breaks = seq(0, 800, 50)) +
+        scale_y_continuous(breaks = seq(0, 800, 100)) +
         labs(title = "Distribution of the Number of Logs per Issue",
              subtitle = subtitle(observations = nrow(df_number_logs_per_issue),
                                  df_summary = summ_number_logs_per_issue),
              x = "Number of logs per issue",
-             y = "Frequency") +
-        theme(axis.text.x = element_text(size = 8.5)) 
+             y = "Frequency") 
   
   plot_number_logs_per_issue
 }
@@ -132,8 +144,11 @@ The distribution and the summaries of number of logs per issue are ploted in the
 histogram below.
 
 ```{r "Distribution of the Number of Logs per Issue"}
-df_number_logs_per_issue %>% 
-  plot_number_logs_per_issue()
+plt_number_logs_per_issue <-
+  df_number_logs_per_issue %>% 
+    plot_number_logs_per_issue()
+
+plt_number_logs_per_issue
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -224,7 +239,7 @@ plot_cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
         geom_smooth(method = "lm") +
         scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
                      expand = c(0.02, 0)) +
-        scale_y_continuous(breaks = seq(0, 4600, 400),
+        scale_y_continuous(breaks = seq(0, 4600, 500),
                            sec.axis = sec_axis(
                              trans = ~. / nrow(df_issue_created_by_month),
                              breaks = seq(0, 1, .1),
@@ -253,8 +268,11 @@ below that shows the cumulated number of issues created along the project and
 the trend line (in blue).
 
 ```{r "Cumulated Number of Issues Created"}
-df_issue_created_by_month %>% 
-  plot_cum_score_issue_created_by_month()
+plt_cum_score_issue_created_by_month <-
+  df_issue_created_by_month %>% 
+    plot_cum_score_issue_created_by_month()
+
+plt_cum_score_issue_created_by_month
 ```
 
 We note that the first 11 months (from May 2013 to March 2014) of the project 
@@ -282,8 +300,11 @@ plot shows the distribution of the number of issues created per month and
 their cumulated summaries.
 
 ```{r "Distribution of the Number of Issues Created per Month"}
-df_issue_created_by_month %>% 
-  plot_score_issue_created_by_month()
+plt_score_issue_created_by_month <- 
+  df_issue_created_by_month %>% 
+    plot_score_issue_created_by_month()
+
+plt_score_issue_created_by_month
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -345,8 +366,7 @@ plot_score_issue_created_by_wday <- function(df_issue_created_by_wday,
                                  subtitle_complement,
                                  summ_issue_created_by_wday),
              x = "Weekday",
-             y = "Frequency") +
-        theme(axis.text.x = element_text(size = 8.5)) 
+             y = "Frequency") 
   
   plot_score_issue_created_by_wday
 }
@@ -362,8 +382,11 @@ During the week, the demand for new activities were concentrated on business day
 (from Monday to Friday) as we can note in the barplot below.
 
 ```{r "Frequency of Issues Created per Weekday"}
-df_issue_created_by_wday %>% 
-  plot_score_issue_created_by_wday()
+plt_score_issue_created_by_wday <-
+  df_issue_created_by_wday %>% 
+    plot_score_issue_created_by_wday()
+
+plt_score_issue_created_by_wday
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -388,10 +411,13 @@ during the enrollment periods. Theses outliers pull the mean and 1st quartile
 down. Removing them, we have a new barplot. See the plot below.
 
 ```{r "Distribution of the Number of Issues Created per Weekday (No Weekend)"}
-df_issue_created_by_wday %>% 
-  filter(!(issue_creation_wday %in% 
-             df_issue_created_by_weekend$issue_creation_wday)) %>% 
-  plot_score_issue_created_by_wday("without the weekend")
+plt_score_issue_created_by_nowend <- 
+  df_issue_created_by_wday %>% 
+    filter(!(issue_creation_wday %in% 
+               df_issue_created_by_weekend$issue_creation_wday)) %>% 
+    plot_score_issue_created_by_wday("without the weekend")
+
+plt_score_issue_created_by_nowend
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -416,14 +442,13 @@ plot_issue_created_by_hour <- function(df_issue_created_by_hour,
                        closed = "left") +
         plot_x_summary(df_issue_created_by_hour, issue_creation_hour) +
         scale_x_continuous(breaks = seq(0, 23, 1)) +
-        scale_y_continuous(limits = c(0, 700), breaks = seq(0, 700, 50)) +
+        scale_y_continuous(limits = c(0, 700), breaks = seq(0, 700, 100)) +
         labs(title = "Distribution of the Number of Issues Created per Hour of the Day",
              subtitle = subtitle(nrow(df_issue_created_by_hour),
                                  subtitle_complement,
                                  summ_number_issue_created_by_hour),
              x = "Hour of the day",
-             y = "Frequency") +
-        theme(axis.text.x = element_text(size = 8.5)) 
+             y = "Frequency") 
   
   plot_issue_created_by_hour
 }
@@ -439,8 +464,11 @@ Analysing how was the behaviour of the issues creation per hour of the day we
 have the bimodal distribution below.
 
 ```{r "Distribution of the Number of Issues Created per Hour of the Day"}
-df_issue_created_by_hour %>% 
-  plot_issue_created_by_hour()
+plt_issue_created_by_hour <-
+  df_issue_created_by_hour %>% 
+    plot_issue_created_by_hour()
+
+plt_issue_created_by_hour
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -458,9 +486,12 @@ Ploting this distribution again but with only office hours (from 8:00h to 18:00h
 we have the same summaries of the distribution before. See the plot below.
 
 ```{r "Distribution of the Number of Issues Created per Hour of the Day (Only Office Hours)"}
-df_issue_created_by_hour %>%
-  filter(issue_creation_hour >= 8 & issue_creation_hour <= 18) %>% 
-  plot_issue_created_by_hour("with only office hours")
+plt_issue_created_by_office_hour <-
+  df_issue_created_by_hour %>%
+    filter(issue_creation_hour >= 8 & issue_creation_hour <= 18) %>% 
+    plot_issue_created_by_hour("with only office hours")
+
+plt_issue_created_by_office_hour
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -471,9 +502,108 @@ This shows us that the high issue creation volume actually comprises between
 
 ### Issue Start Date
 
-...
+The behavior of the project in relation to the beginning of a task activity is 
+similar to the behavior of its creation. The plots are very similar. See below
+the comparison of their plots.
 
-```{r "Distribution of the Number of Issues Started per Month"}
+```{r}
+score_issue_start_date_month <- function(df_issue_start_date_month) {
+  df_score_issue_start_date_month <- 
+    df_issue_start_date_month %>% 
+      group_by(issue_start_date) %>% 
+      summarise(score = n())
+  
+  df_score_issue_start_date_month
+}
+
+plot_score_issue_start_date_month <- function(df_issue_start_date_month) {
+  df_score_issue_start_date_month <- 
+    score_issue_start_date_month(df_issue_start_date_month)
+  
+  plot_score_issue_start_date_month <-   
+    df_score_issue_start_date_month %>% 
+      ggplot(aes(x = issue_start_date, y = score)) +
+        geom_col(alpha = .3, color = "grey", width = 28) +
+        plot_cumsummary(df_score_issue_start_date_month, 
+                        x = issue_start_date,
+                        y = score) +
+        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
+                     expand = c(0.01, 0)) +
+        scale_y_continuous(breaks = seq(0, 185, 15)) +
+        labs(title = "Distribution of the Number of Issues Started per Month",
+             subtitle = subtitle(nrow(df_issue_start_date_month)),
+             x = "Issue start date (per month)",
+             y = "Frequency") +
+        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+  
+  plot_score_issue_start_date_month
+}
+
+plot_cum_score_issue_start_date_month <- function(df_issue_start_date_month) {
+  df_score_issue_start_date_month <- 
+    score_issue_start_date_month(df_issue_start_date_month)
+  
+  df_cum_score_issue_start_date_month <- 
+    df_score_issue_start_date_month %>%
+      mutate(cumscore = cumsum(score))
+  
+  plot_cum_score_issue_start_date_month <-
+    df_cum_score_issue_start_date_month %>% 
+      ggplot(aes(x = issue_start_date, y = cumscore)) +
+        geom_area(alpha = .3, color = "grey") +
+        geom_smooth(method = "lm") +
+        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
+                     expand = c(0.02, 0)) +
+        scale_y_continuous(breaks = seq(0, 4600, 500),
+                           sec.axis = sec_axis(
+                             trans = ~. / nrow(df_issue_start_date_month),
+                             breaks = seq(0, 1, .1),
+                             labels = scales::percent
+                           )) +
+        coord_cartesian(ylim = c(0, 4600)) +
+        labs(title = "Cumulated Number of Issues Started",
+             subtitle = subtitle(nrow(df_issue_start_date_month)),
+             x = "Issue start date",
+             y = "Number of issues") +
+        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+  
+  plot_cum_score_issue_start_date_month
+}
+
+plot_score_issue_start_wday <- function(df_issue_start_wday,
+                                        subtitle_complement = NULL) { 
+  summ_issue_start_wday <- 
+    df_issue_start_wday %>% 
+      group_by(issue_start_wday) %>% 
+      summarise(frequency = n()) %>% 
+      df_summary(frequency)
+  
+  df_score_issue_start_wday <- 
+    df_issue_start_wday %>% 
+      group_by(issue_start_wday) %>% 
+      summarise(score = n())
+
+  plot_score_issue_start_wday <- 
+    df_score_issue_start_wday %>% 
+      ggplot(aes(x = issue_start_wday, y = score)) +
+        geom_col(color = "grey", alpha = .3) +
+        plot_y_summary(df_issue_start_wday, issue_start_wday) +
+        scale_y_continuous(breaks = seq(0, 1020, 100),
+                           sec.axis = sec_axis(
+                             trans = ~. / nrow(df_issue_start_wday),
+                             breaks = seq(0, 1, .02),
+                             labels = scales::percent
+                           )) +
+        labs(title = "Frequency of Issues Started per Weekday",
+             subtitle = subtitle(nrow(df_issue_start_wday),
+                                 subtitle_complement,
+                                 summ_issue_start_wday),
+             x = "Weekday",
+             y = "Frequency") 
+  
+  plot_score_issue_start_wday
+}
+
 df_issue_start_date_month <- 
   issues %>% 
     filter(!is.na(issue_start_date)) %>% 
@@ -481,92 +611,86 @@ df_issue_start_date_month <-
              issue_start_date = as.Date(floor_date(issue_start_date,
                                                    "month")))
 
-df_score_issue_start_date_month <- 
-  df_issue_start_date_month %>% 
-    group_by(issue_start_date) %>% 
-    summarise(score = n())
-
-plot_score_issue_start_date_month <-   
-  df_score_issue_start_date_month %>% 
-    ggplot(aes(x = issue_start_date, y = score)) +
-      geom_col(alpha = .3, color = "grey", width = 28) +
-      plot_cumsummary(df_score_issue_start_date_month, 
-                      x = issue_start_date,
-                      y = score) +
-      scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                   expand = c(0.01, 0)) +
-      scale_y_continuous(breaks = seq(0, 185, 15)) +
-      labs(title = "Distribution of the Number of Issues Started per Month",
-           subtitle = subtitle(nrow(df_issue_start_date_month)),
-           x = "Issue start date (per month)",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
-
-df_cum_score_issue_start_date_month <- 
-  df_score_issue_start_date_month %>%
-    mutate(cumscore = cumsum(score))
-
-plot_cum_score_issue_start_date_month <-
-  df_cum_score_issue_start_date_month %>% 
-    ggplot(aes(x = issue_start_date, y = cumscore)) +
-      geom_area(alpha = .3, color = "grey") +
-      geom_smooth(method = "lm") +
-      scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                   expand = c(0.02, 0)) +
-      scale_y_continuous(breaks = seq(0, 4600, 400),
-                         sec.axis = sec_axis(
-                           trans = ~. / nrow(df_issue_start_date_month),
-                           breaks = seq(0, 1, .1),
-                           labels = scales::percent
-                         )) +
-      labs(title = "Cumulated Number of Issues Started per Month",
-           subtitle = subtitle(nrow(df_issue_start_date_month)),
-           x = "Issue start date (per month)",
-           y = "Number of issues") +
-      theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
-
-print(plot_cum_score_issue_start_date_month)
-print(plot_score_issue_start_date_month)
-```
-
-```{r "Distribution of the Number of Issues Started per Weekday"}
 df_issue_start_wday <- 
   issues %>% 
     filter(!is.na(issue_start_date)) %>% 
     distinct(issue_id, 
              issue_start_wday = wday(issue_start_date, label = TRUE))
-
-summ_issue_start_wday <- 
-  df_issue_start_wday %>% 
-    group_by(issue_start_wday) %>% 
-    summarise(frequency = n()) %>% 
-    df_summary(frequency)
-
-df_score_issue_start_wday <- 
-  df_issue_start_wday %>% 
-    group_by(issue_start_wday) %>% 
-    summarise(score = n())
-
-plot_score_issue_start_wday <- 
-  df_score_issue_start_wday %>% 
-    ggplot(aes(x = issue_start_wday, y = score)) +
-      geom_col(color = "grey", alpha = .3) +
-      plot_y_summary(df_issue_start_wday, issue_start_wday) +
-      scale_y_continuous(breaks = seq(0, 1020, 100),
-                         sec.axis = sec_axis(
-                           trans = ~. / nrow(df_issue_start_wday),
-                           breaks = seq(0, 1, .02),
-                           labels = scales::percent
-                         )) +
-      labs(title = "Frequency of Issues Started per Weekday",
-           subtitle = subtitle(nrow(df_issue_start_wday)),
-           x = "Weekday",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
-
-print(rbind(y = summ_issue_start_wday))
-print(plot_score_issue_start_wday)
 ```
+
+Comparison between cumulated number of issues created and started.
+
+```{r fig.height=5.5, "Comparison between Cumulated Number of Issues Created and Started"} 
+plt_cum_score_issue_start_date_month <-
+  df_issue_start_date_month %>% 
+    plot_cum_score_issue_start_date_month()
+
+grid.arrange(plt_cum_score_issue_created_by_month + 
+               scale_y_continuous(breaks = seq(0, 4600, 750)), 
+             plt_cum_score_issue_start_date_month + 
+               scale_y_continuous(breaks = seq(0, 4600, 750)),
+             ncol = 1)
+```
+
+Comparison between distribution of the number of issues created and started per 
+month.
+
+```{r fig.height=5.5, "Comparison between Distribution of the Number of Issues Created and Started per Month"} 
+plt_score_issue_start_date_month <-
+  df_issue_start_date_month %>% 
+    plot_score_issue_start_date_month()
+
+grid.arrange(plt_score_issue_created_by_month + 
+               scale_y_continuous(breaks = seq(0, 200, 50)), 
+             plt_score_issue_start_date_month + 
+               scale_y_continuous(breaks = seq(0, 200, 50)),
+             ncol = 1)
+
+```
+
+Comparison between distribution of the number of issues created and started per 
+weekday.
+
+```{r fig.height=5.5, "Comparison between Distribution of the Number of Issues Created and Started per Weekday"}
+plt_score_issue_start_wday <-
+  df_issue_start_wday %>% 
+    plot_score_issue_start_wday()
+
+
+grid.arrange(plt_score_issue_created_by_wday + 
+               scale_y_continuous(breaks = seq(0, 1020, 200)), 
+             plt_score_issue_start_wday + 
+               scale_y_continuous(breaks = seq(0, 1020, 200)),
+             ncol = 1)
+```
+
+Comparison between distribution of the number of issues created and started per 
+business day.
+
+```{r fig.height=5.5, "Comparison between Distribution of the Number of Issues Created and Started per Weekday (No Weekend)"}
+df_issue_start_weekend <-
+  df_issue_start_wday %>% 
+    filter(issue_start_wday == "Sat" | issue_start_wday == "Sun")
+
+plt_score_issue_start_nowend <- 
+  df_issue_start_wday %>% 
+    filter(!(issue_start_wday %in% 
+               df_issue_start_weekend$issue_start_wday)) %>% 
+    plot_score_issue_start_wday("without the weekend")
+
+grid.arrange(plt_score_issue_created_by_nowend + 
+               scale_y_continuous(breaks = seq(0, 1020, 200)), 
+             plt_score_issue_start_nowend + 
+               scale_y_continuous(breaks = seq(0, 1020, 200)),
+             ncol = 1)
+```
+
+The differences are practically that creation date has time information while 
+start date does not have and there are more observation of creation date than 
+start date.
+
+This similarity in the behavior of these two variables induces us to believe 
+that there was no delay between the creation and the starting of a issue. 
 
 ### Issue Deadline Date
 
@@ -658,12 +782,13 @@ plot_score_issue_deadline_wday <-
       labs(title = "Frequency of Issues Deadline per Weekday",
            subtitle = subtitle(nrow(df_issue_deadline_wday)),
            x = "Weekday",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency") 
 
 print(rbind(y = summ_issue_deadline_wday))
 print(plot_score_issue_deadline_wday)
 ```
+
+### Issue First Delivery Date
 
 ### Issue Time Spent
 
@@ -689,8 +814,7 @@ plot_issue_time_spent_hour <-
       labs(title = "Distribution of the Number of Time Spent in a Issue per Hour",
            subtitle = subtitle(nrow(df_issue_time_spent_hour)),
            x = "Hours spent",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency") 
 
 print(rbind(x = summ_issue_time_spent_hour))
 print(plot_issue_time_spent_hour)
@@ -699,7 +823,7 @@ print(plot_issue_time_spent_hour)
 ```{r "Distribution of the Number of Time Spent in a Issue per Hour (Zoomed In)"}
 plot_issue_time_spent_hour + 
   scale_x_continuous(breaks = seq(0, 24, 1)) +
-  scale_y_continuous(breaks = seq(0, 2700, 175)) +
+  scale_y_continuous(breaks = seq(0, 2700, 200)) +
   coord_cartesian(xlim = c(0, 24)) +
   labs(subtitle = subtitle(nrow(df_issue_time_spent_hour), 
                            "zoomed in to the first 24 hours"))
@@ -728,8 +852,7 @@ plot_issue_time_spent_min <-
            subtitle = subtitle(nrow(df_issue_time_spent_min), 
                              "less than 1 hour"),
            x = "Minutes spent",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency")  
 
 print(rbind(x = summ_issue_time_spent_min))
 print(plot_issue_time_spent_min)
@@ -767,8 +890,7 @@ plot_issue_time_spent_min <-
            subtitle = subtitle(nrow(df_issue_time_spent_min), 
                              "less than 1 hour and non 0"),
            x = "Minutes spent",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency") 
 
 print(rbind(x = summ_issue_time_spent_min))
 print(plot_issue_time_spent_min)
@@ -799,8 +921,7 @@ plot_issue_time_spent_hour <-
            subtitle = subtitle(nrow(df_issue_time_spent_hour), 
                                "non 0 zoomed in to the first 24 hours"),
            x = "Hours spent",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency") 
 
 print(rbind(x = summ_issue_time_spent_hour))
 print(plot_issue_time_spent_hour)
@@ -838,8 +959,7 @@ plot_score_issue_type <-
       labs(title = "Frequency of Issue Type",
            subtitle = subtitle(nrow(df_issue_type)),
            x = "Issue type",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 7)) 
+           y = "Frequency")  
 
 plot_score_issue_type
 ```
@@ -881,7 +1001,7 @@ plot_score_issue_system <-
            subtitle = subtitle(nrow(df_issue_system)),
            x = "Issue system",
            y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 20, hjust = 1, size = 7)) 
+      theme(axis.text.x = element_text(angle = 20, hjust = 1)) 
 
 plot_score_issue_system
 ```
@@ -915,7 +1035,7 @@ plot_score_top15_issue_subsystem <-
            subtitle = subtitle(nrow(df_issue_subsystem)),
            x = "Issue subsystem",
            y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 25, hjust = 1, size = 7)) 
+      theme(axis.text.x = element_text(angle = 25, hjust = 1)) 
 
 plot_score_top15_issue_subsystem
 ```
@@ -943,8 +1063,7 @@ plot_score_issue_stakeholder <-
       labs(title = "Frequency of Issue Stakeholder",
            subtitle = subtitle(nrow(df_issue_stakeholder)),
            x = "Issue stakeholder",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 7)) 
+           y = "Frequency") 
 
 plot_score_issue_stakeholder
 ```
@@ -979,7 +1098,7 @@ plot_score_top15_issue_created_by <-
            subtitle = subtitle(nrow(df_issue_created_by)),
            x = "Issue created by",
            y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 25, hjust = 1, size = 7)) 
+      theme(axis.text.x = element_text(angle = 25, hjust = 1)) 
 
 plot_score_top15_issue_created_by
 ```
@@ -1008,7 +1127,7 @@ plot_score_issue_status <-
            subtitle = subtitle(nrow(df_issue_status)),
            x = "Issue stakeholder",
            y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 20, hjust = 1, size = 7)) 
+      theme(axis.text.x = element_text(angle = 20, hjust = 1)) 
 
 plot_score_issue_status
 ```
@@ -1032,13 +1151,12 @@ plot_issue_priority_number <-
                      closed = "left") +
       plot_x_summary(df_issue_priority_number, issue_priority_number) +
       scale_x_continuous(breaks = seq(0, 999, 50)) +
-      scale_y_continuous(breaks = seq(0, 2700, 150)) +
+      scale_y_continuous(breaks = seq(0, 2700, 200)) +
       labs(title = "Distribution of the Priority Number per Issue",
            subtitle = subtitle(nrow(df_issue_priority_number),
                                df_summary = summ_issue_priority_number),
            x = "Issue priority number",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency")
 
 plot_issue_priority_number
 ```
@@ -1076,8 +1194,7 @@ plot_issue_priority_number <-
            subtitle = subtitle(nrow(df_issue_priority_number),
                                df_summary = summ_issue_priority_number),
            x = "Issue priority number",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency") 
 
 plot_issue_priority_number
 ```
@@ -1105,8 +1222,7 @@ plot_issue_priority_number <-
            subtitle = subtitle(nrow(df_issue_priority_number),
                                df_summary = summ_issue_priority_number),
            x = "Issue priority number",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency") 
 
 plot_issue_priority_number
 ```
@@ -1135,8 +1251,7 @@ plot_score_issue_priority_scale <-
       labs(title = "Frequency of Issue Priority Scale",
            subtitle = subtitle(nrow(df_issue_priority_scale)),
            x = "Issue priority scale",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 7)) 
+           y = "Frequency") 
 
 plot_score_issue_priority_scale
 ```
@@ -1165,8 +1280,7 @@ plot_issue_progress <-
            subtitle = subtitle(nrow(df_issue_progress),
                                df_summary = summ_issue_progress),
            x = "Issue progress",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency") 
 
 plot_issue_progress
 ```
@@ -1201,13 +1315,12 @@ plot_log_build_info <-
                      closed = "left") +
       plot_x_summary(df_log_build_info, score) +
       scale_x_continuous(breaks = seq(1, 125, 5)) +
-      scale_y_continuous(breaks = seq(0, 320, 20)) +
+      scale_y_continuous(breaks = seq(0, 320, 30)) +
       labs(title = "Distribution of the Number of the Issues per System's Version",
            subtitle = subtitle(nrow(df_log_build_info),
                                df_summary = summ_log_build_info),
            x = "Number of issues",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency") 
 
 plot_log_build_info
 ```
@@ -1237,8 +1350,7 @@ plot_log_build_info <-
            subtitle = subtitle(nrow(df_log_build_info),
                                df_summary = summ_log_build_info),
            x = "Number of issues",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(size = 8.5)) 
+           y = "Frequency") 
 
 plot_log_build_info
 ```

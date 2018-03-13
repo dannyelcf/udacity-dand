@@ -75,7 +75,7 @@ The distribution and the summaries of number of logs per issue are
 ploted in the histogram
 below.
 
-<img src="project_05_files/plots/Distribution of the Number of Logs per Issue-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Logs per Issue-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
@@ -109,7 +109,7 @@ plot below that shows the cumulated number of issues created along the
 project and the trend line (in
 blue).
 
-<img src="project_05_files/plots/Cumulated Number of Issues Created-1.png" width="672" />
+<img src="project_05_files/plots/Cumulated Number of Issues Created-1.png" width="86%" />
 
 We note that the first 11 months (from May 2013 to March 2014) of the
 project had very low demand, approximately 5% of the total. Some reasons
@@ -138,7 +138,7 @@ This plot shows the distribution of the number of issues created per
 month and their cumulated
 summaries.
 
-<img src="project_05_files/plots/Distribution of the Number of Issues Created per Month-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Issues Created per Month-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd cumulated quartile, the black and red solid lines represent,
@@ -174,7 +174,7 @@ During the week, the demand for new activities were concentrated on
 business days (from Monday to Friday) as we can note in the barplot
 below.
 
-<img src="project_05_files/plots/Frequency of Issues Created per Weekday-1.png" width="672" />
+<img src="project_05_files/plots/Frequency of Issues Created per Weekday-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
@@ -194,7 +194,7 @@ periods. Theses outliers pull the mean and 1st quartile down. Removing
 them, we have a new barplot. See the plot
 below.
 
-<img src="project_05_files/plots/Distribution of the Number of Issues Created per Weekday (No Weekend)-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Issues Created per Weekday (No Weekend)-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
@@ -208,7 +208,7 @@ Analysing how was the behaviour of the issues creation per hour of the
 day we have the bimodal distribution
 below.
 
-<img src="project_05_files/plots/Distribution of the Number of Issues Created per Hour of the Day-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Issues Created per Hour of the Day-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
@@ -227,49 +227,75 @@ to 18:00h) we have the same summaries of the distribution before. See
 the plot
 below.
 
-<img src="project_05_files/plots/Distribution of the Number of Issues Created per Hour of the Day (Only Office Hours)-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Issues Created per Hour of the Day (Only Office Hours)-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
 > respectivaly, median and mean.
 
 This shows us that the high issue creation volume actually comprises
-between 8:00h and
-18:00h.
+between 8:00h and 18:00h.
 
 ### Issue Start Date
 
-…
+The behavior of the project in relation to the beginning of a task
+activity is similar to the behavior of its creation. The plots are very
+similar. See below the comparison of their plots.
 
-<img src="project_05_files/plots/Distribution of the Number of Issues Started per Month-1.png" width="672" /><img src="project_05_files/plots/Distribution of the Number of Issues Started per Month-2.png" width="672" />
+Comparison between cumulated number of issues created and
+started.
 
-    ##   min qu1 median     mean qu3 iqr  pc90  max
-    ## y   5 406    810 641.2857 921 515 993.6 1020
+<img src="project_05_files/plots/Comparison between Cumulated Number of Issues Created and Started-1.png" width="86%" />
 
-<img src="project_05_files/plots/Distribution of the Number of Issues Started per Weekday-1.png" width="672" />
+Comparison between distribution of the number of issues created and
+started per
+month.
+
+<img src="project_05_files/plots/Comparison between Distribution of the Number of Issues Created and Started per Month-1.png" width="86%" />
+
+Comparison between distribution of the number of issues created and
+started per
+weekday.
+
+<img src="project_05_files/plots/Comparison between Distribution of the Number of Issues Created and Started per Weekday-1.png" width="86%" />
+
+Comparison between distribution of the number of issues created and
+started per business
+day.
+
+<img src="project_05_files/plots/Comparison between Distribution of the Number of Issues Created and Started per Weekday (No Weekend)-1.png" width="86%" />
+
+The differences are practically that creation date has time information
+while start date does not have and there are more observation of
+creation date than start date.
+
+This similarity in the behavior of these two variables induces us to
+believe that there was no delay between the creation and the starting of
+a
+issue.
 
 ### Issue Deadline Date
 
-<img src="project_05_files/plots/Distribution of the Number of Issues Deadline per Month-1.png" width="672" /><img src="project_05_files/plots/Distribution of the Number of Issues Deadline per Month-2.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Issues Deadline per Month-1.png" width="86%" /><img src="project_05_files/plots/Distribution of the Number of Issues Deadline per Month-2.png" width="86%" />
 
     ##   min    qu1 median     mean   qu3   iqr  pc90 max
     ## y   1 258.75  282.5 250.6667 323.5 64.75 342.5 350
 
-<img src="project_05_files/plots/Distribution of the Number of Issues Deadline per Weekday-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Issues Deadline per Weekday-1.png" width="86%" />
 
 ### Issue Time Spent
 
     ##   min qu1 median     mean qu3 iqr pc90   max
     ## x   0   0    0.5 2.205639 2.1 2.1 5.58 107.4
 
-<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue per Hour-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue per Hour-1.png" width="86%" />
 
-<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue per Hour (Zoomed In)-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue per Hour (Zoomed In)-1.png" width="86%" />
 
     ##   min qu1 median     mean qu3 iqr pc90 max
     ## x   0   0      0 10.87472  18  18   36  54
 
-<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour)-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour)-1.png" width="86%" />
 
     ##   issue_time_spent score
     ## 1                0  1430
@@ -281,12 +307,12 @@ between 8:00h and
     ##   min qu1 median     mean qu3 iqr pc90 max
     ## x   6  12     18 23.29553  36  24   48  54
 
-<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour and Non  0)-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour and Non  0)-1.png" width="86%" />
 
     ##   min qu1 median     mean qu3 iqr pc90   max
     ## x 0.1 0.5    1.3 3.232018 3.4 2.9 7.78 107.4
 
-<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue (Non 0)-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue (Non 0)-1.png" width="86%" />
 
 ### Issue Type
 
@@ -298,7 +324,7 @@ the purpose of a issue. They are:
 The frequency of issues created by each issue type is shown in the graph
 below.
 
-<img src="project_05_files/plots/Frequency of Issue Type-1.png" width="672" />
+<img src="project_05_files/plots/Frequency of Issue Type-1.png" width="86%" />
 
 Analysing the plot above, we note that most of the issues are of the
 MAINTENANCE type (around 75%). Next comes the issues of the
@@ -318,27 +344,27 @@ assumption.
 
 ### Issue System
 
-<img src="project_05_files/plots/Frequency of Issue System-1.png" width="672" />
+<img src="project_05_files/plots/Frequency of Issue System-1.png" width="86%" />
 
 ### Issue Subsystem
 
-<img src="project_05_files/plots/Frequency of Issue Subsystem-1.png" width="672" />
+<img src="project_05_files/plots/Frequency of Issue Subsystem-1.png" width="86%" />
 
 ### Issue Stakeholder
 
-<img src="project_05_files/plots/Frequency of Issue Stakeholder-1.png" width="672" />
+<img src="project_05_files/plots/Frequency of Issue Stakeholder-1.png" width="86%" />
 
 ### Issue Created By
 
-<img src="project_05_files/plots/Frequency of Issue Created By-1.png" width="672" />
+<img src="project_05_files/plots/Frequency of Issue Created By-1.png" width="86%" />
 
 ### Issue Status
 
-<img src="project_05_files/plots/Frequency of Issue Status-1.png" width="672" />
+<img src="project_05_files/plots/Frequency of Issue Status-1.png" width="86%" />
 
 ### Issue Priority Number
 
-<img src="project_05_files/plots/Distribution of the Priority Number per Issue-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Priority Number per Issue-1.png" width="86%" />
 
     ##   issue_priority_number score
     ## 1                   999  2272
@@ -347,17 +373,17 @@ assumption.
     ## 4                     2   192
     ## 5                     3   148
 
-<img src="project_05_files/plots/Distribution of the Priority Number per Issue (Dropped 999 and Zoomed In to 100)-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Priority Number per Issue (Dropped 999 and Zoomed In to 100)-1.png" width="86%" />
 
-<img src="project_05_files/plots/Distribution of the Priority Number per Issue (Less than or Equal to 20)-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Priority Number per Issue (Less than or Equal to 20)-1.png" width="86%" />
 
 ### Issue Priority Scale
 
-<img src="project_05_files/plots/Frequency of Issue Priority Scale-1.png" width="672" />
+<img src="project_05_files/plots/Frequency of Issue Priority Scale-1.png" width="86%" />
 
 ### Issue Progress
 
-<img src="project_05_files/plots/Distribution of the Progress per Issue-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Progress per Issue-1.png" width="86%" />
 
     ##   issue_progress score
     ## 1            100  4492
@@ -368,9 +394,9 @@ assumption.
 
 ### Log Build Info
 
-<img src="project_05_files/plots/Distribution of the Number of the Issues per System's Version-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of the Issues per System's Version-1.png" width="86%" />
 
-<img src="project_05_files/plots/Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)-1.png" width="672" />
+<img src="project_05_files/plots/Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)-1.png" width="86%" />
 
 ### Log Status
 
