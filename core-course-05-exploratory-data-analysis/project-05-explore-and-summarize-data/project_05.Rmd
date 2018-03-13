@@ -5,26 +5,25 @@ EDA in an Issue Tracking System Data Set
 ================================================================================
 *by Dannyel Cardoso da Fonseca* 
 
-```{r echo=FALSE, "Global Set Up"}
+```{r include=FALSE, "Global Set Up"}
 # Cleaning the environment before start
 # This is useful when execute "Restart R and Run All Chuncks"
 rm(list = ls())
 
-.LC_TIME <- Sys.setlocale("LC_TIME","en_US.UTF-8")
+Sys.setlocale("LC_TIME","en_US.UTF-8")
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
                       fig.path = "project_05_files/plots/", fig.retina = 3,
                       fig.height = 3.5, out.width = "86%")
 ```
 
-```{r "Load Packages"}
-library(ggplot2)
-library(dplyr)
-library(lubridate)
-library(grid)
-library(gridExtra)
-
+```{r results="hide", "Load Packages"}
 source("project_05.R")
+load_packages(c("ggplot2", 
+               "dplyr", 
+               "lubridate", 
+               "grid", 
+               "gridExtra"))
 ```
 
 ```{r "Project Set Up"}
