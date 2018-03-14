@@ -15,10 +15,10 @@ maintenance and customization of many integrated systems.
 Usage
 =====
 
-issues <- read.csv("issues_tracking.csv", 
-                   stringsAsFactors=FALSE, 
-                   na.strings = "",
-                   colClasses = c(...))
+dataset <- read.csv("issues_tracking.csv", 
+                    stringsAsFactors=FALSE, 
+                    na.strings = "",
+                    colClasses = c(...))
 
 To load the data set with correct column classes see the 'Load Data Set' section 
 in 'project_05.Rmd' file.

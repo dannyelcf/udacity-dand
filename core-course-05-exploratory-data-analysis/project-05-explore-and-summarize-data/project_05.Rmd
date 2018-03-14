@@ -22,6 +22,7 @@ source("project_05.R")
 load_packages(c("ggplot2", 
                "dplyr", 
                "lubridate", 
+               "bizdays",
                "grid", 
                "gridExtra"))
 ```
@@ -60,7 +61,6 @@ logs <-
     select(issue_id, starts_with("log_")) %>%
     filter(!is.na(log_creation_date)) %>% 
     as.data.frame()
-
 ```
 
 This project aims to explore a data set containing `r nrow(dataset)` observations 
@@ -245,7 +245,7 @@ plot_cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
                              labels = scales::percent
                            )) +
         coord_cartesian(ylim = c(0, 4600)) +
-        labs(title = "Cumulated Number of Issues Created",
+        labs(title = "Cumulative Number of Issues Created",
              subtitle = subtitle(nrow(df_issue_created_by_month)),
              x = "Issue creation date",
              y = "Number of issues") +
@@ -263,10 +263,10 @@ df_issue_created_by_month <-
 ```
 
 To get a sense of how it was the demand throughout the project see the plot 
-below that shows the cumulated number of issues created along the project and 
+below that shows the cumulative number of issues created along the project and 
 the trend line (in blue).
 
-```{r "Cumulated Number of Issues Created"}
+```{r "Cumulative Number of Issues Created"}
 plt_cum_score_issue_created_by_month <-
   df_issue_created_by_month %>% 
     plot_cum_score_issue_created_by_month()
@@ -296,7 +296,7 @@ behavior.
 
 In the barplot below, we can see the project's behavior in another way. This
 plot shows the distribution of the number of issues created per month and
-their cumulated summaries.
+their cumulative summaries.
 
 ```{r "Distribution of the Number of Issues Created per Month"}
 plt_score_issue_created_by_month <- 
@@ -311,14 +311,14 @@ cumulated quartile, the black and red solid lines represent, respectivaly,
 cumulated median and mean.
 
 Analysing the plot above, we note that the year 2013 had the lowest demand. The
-accumulated mean variates between 10 and 20 issues per month. At the end of 2013 
+cumulated mean variates between 10 and 20 issues per month. At the end of 2013 
 and begin of 2014 there was a drop in activities because of the low administrative 
 and academic activities at the university at the end of year. From April of 2014 
 until February of 2015 there was significant growth in activities.
 The cumulated mean increases from 10 to 70 issues per month. The accumulated mean
 overcame the cumulated median and the distance between cumulated 3rd quartile 
 and accumulated median became greater than distance between cumulated 1st 
-quartile and accumulated median. This means that these months had a high number 
+quartile and cumulated median. This means that these months had a high number 
 of issues created in relation to the past. 
 
 But from August of 2015 the pace of growth dropped. Now, we can note that the 
@@ -501,7 +501,7 @@ This shows us that the high issue creation volume actually comprises between
 
 ### Issue Start Date
 
-The behavior of the project in relation to the beginning of a task activity is 
+The behavior of the project in relation to the starting of a issue activity is 
 similar to the behavior of its creation. The plots are very similar. See below
 the comparison of their plots.
 
@@ -560,7 +560,7 @@ plot_cum_score_issue_start_date_month <- function(df_issue_start_date_month) {
                              labels = scales::percent
                            )) +
         coord_cartesian(ylim = c(0, 4600)) +
-        labs(title = "Cumulated Number of Issues Started",
+        labs(title = "Cumulative Number of Issues Started",
              subtitle = subtitle(nrow(df_issue_start_date_month)),
              x = "Issue start date",
              y = "Number of issues") +
@@ -617,9 +617,9 @@ df_issue_start_wday <-
              issue_start_wday = wday(issue_start_date, label = TRUE))
 ```
 
-Comparison between cumulated number of issues created and started.
+Comparison between cumulative number of issues created and started.
 
-```{r fig.height=5.5, "Comparison between Cumulated Number of Issues Created and Started"} 
+```{r fig.height=5.5, "Comparison between Cumulative Number of Issues Created and Started"} 
 plt_cum_score_issue_start_date_month <-
   df_issue_start_date_month %>% 
     plot_cum_score_issue_start_date_month()
@@ -691,62 +691,164 @@ start date.
 This similarity in the behavior of these two variables induces us to believe 
 that there was no delay between the creation and the starting of a issue. 
 
+```{r}
+plot_issue_delay_start <- function(df_issue_delay_start) {
+  summ_issue_delay_start <- df_summary(df_issue_delay_start, 
+                                       issue_delay_start)
+  
+  plot_issue_delay_start <-
+    df_issue_delay_start %>% 
+      ggplot(aes(x = issue_delay_start)) +
+        geom_histogram(binwidth = 7, color = "gray", alpha = .3, 
+                       boundary = summ_issue_delay_start$min, 
+                       closed = "left") +
+        plot_x_summary(df_issue_delay_start, issue_delay_start) +
+        scale_x_continuous(breaks = seq(0, 500, 7)) +
+        scale_y_continuous(limits = c(0, 4000), breaks = seq(0, 4000, 300)) +
+        coord_cartesian(xlim = c(0, 70)) +
+        labs(title = "Distribution of the Number of Days to Start an Issue",
+             subtitle = subtitle(nrow(df_issue_delay_start),
+                                 df_summary = summ_issue_delay_start),
+             x = "Number of days",
+             y = "Frequency") 
+  
+  plot_issue_delay_start
+}
+
+df_issue_delay_start <-
+  issues %>% 
+    select(issue_id, issue_creation_date, issue_start_date) %>% 
+    filter(!is.na(issue_start_date)) %>% 
+    mutate(issue_creation_date = as.Date(floor_date(issue_creation_date,
+                                                    unit = "day"))) %>% 
+    mutate(issue_delay_start = difftime(issue_start_date,
+                                        issue_creation_date,
+                                        units = "days")) %>% 
+    filter(issue_delay_start >= 0)
+```
+
+```{r "Distribution of the Number of Days to Start an Issue"}
+df_issue_delay_start %>% 
+  plot_issue_delay_start()
+```
+
 ### Issue Deadline Date
 
-```{r "Distribution of the Number of Issues Deadline per Month"}
+Issue deadline date represents the planning date to deliver the issue. It seems 
+to follow the same behaviour that issue creation date and issues start date but 
+it has some peculiarities. Issue deadline date has more `NA` values than those, 
+approximately 
+`r round(nrow(issues %>% filter(is.na(issue_deadline_date)))*100/nrow(issues))`%
+of the number of issues. Its cumulative number of issues deadline it is a bit 
+different from the others cumulative plots. See the plot below.
+
+```{r}
+score_issue_deadline_date_month <- function(df_issue_deadline_date_month) {
+  df_score_issue_deadline_date_month <- 
+    df_issue_deadline_date_month %>% 
+      group_by(issue_deadline_date) %>% 
+      summarise(score = n())
+  
+  df_score_issue_deadline_date_month
+}
+
+plot_score_issue_deadline_date_month <- function(df_issue_deadline_date_month) {
+  df_score_issue_deadline_date_month <- 
+    score_issue_deadline_date_month(df_issue_deadline_date_month)
+    
+  plot_score_issue_deadline_date_month <- 
+    df_score_issue_deadline_date_month %>% 
+      ggplot(aes(x = issue_deadline_date, y = score)) +
+        geom_col(alpha = .3, color = "grey", width = 28) +
+        plot_cumsummary(df_score_issue_deadline_date_month, 
+                        x = issue_deadline_date,
+                        y = score) +
+        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
+                     expand = c(0.01, 0)) +
+        scale_y_continuous(breaks = seq(0, 80, 5)) +
+        labs(title = "Distribution of the Number of Issues Deadline per Month",
+             subtitle = subtitle(nrow(df_issue_deadline_date_month)),
+             x = "Issue deadline date (per month)",
+             y = "Frequency") +
+        theme(axis.text.x = element_text(angle = 40, hjust = 1))
+  
+  plot_score_issue_deadline_date_month
+}
+
+plot_cum_score_issue_deadline_date_month <- function(df_issue_deadline_date_month) {
+  df_score_issue_deadline_date_month <- 
+    score_issue_deadline_date_month(df_issue_deadline_date_month)
+  
+  df_cum_score_issue_deadline_date_month <- 
+    df_score_issue_deadline_date_month %>%
+      mutate(cumscore = cumsum(score))
+  
+  plot_cum_score_issue_deadline_date_month <-
+    df_cum_score_issue_deadline_date_month %>% 
+      ggplot(aes(x = issue_deadline_date, y = cumscore)) +
+        geom_area(alpha = .3, color = "grey") +
+        geom_smooth(method = "lm") +
+        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
+                     expand = c(0.02, 0)) +
+        scale_y_continuous(breaks = seq(0, 1600, 200),
+                           sec.axis = sec_axis(
+                             trans = ~. / nrow(df_issue_deadline_date_month),
+                             breaks = seq(0, 1, .1),
+                             labels = scales::percent
+                           )) +
+        coord_cartesian(ylim = c(0, 1600)) +
+        labs(title = "Cumulative Number of Issues Deadline",
+             subtitle = subtitle(nrow(df_issue_deadline_date_month)),
+             x = "Issue deadline date",
+             y = "Number of issues") +
+        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+  
+  plot_cum_score_issue_deadline_date_month
+}
+
 df_issue_deadline_date_month <- 
   issues %>% 
     filter(!is.na(issue_deadline_date)) %>% 
     distinct(issue_id, 
              issue_deadline_date = as.Date(floor_date(issue_deadline_date,
-                                                   "month")))
+                                                      "month")))
+```
 
-df_score_issue_deadline_date_month <- 
+```{r "Cumulative Number of Issues Deadline"}
+plt_cum_score_issue_deadline_date_month <- 
   df_issue_deadline_date_month %>% 
-    group_by(issue_deadline_date) %>% 
-    summarise(score = n())
-  
-plot_score_issue_deadline_date_month <- 
-  df_score_issue_deadline_date_month %>% 
-    ggplot(aes(x = issue_deadline_date, y = score)) +
-      geom_col(alpha = .3, color = "grey", width = 28) +
-      plot_cumsummary(df_score_issue_deadline_date_month, 
-                      x = issue_deadline_date,
-                      y = score) +
-      scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                   expand = c(0.01, 0)) +
-      scale_y_continuous(breaks = seq(0, 80, 5)) +
-      labs(title = "Distribution of the Number of Issues Deadline per Month",
-           subtitle = subtitle(nrow(df_issue_deadline_date_month)),
-           x = "Issue deadline date (per month)",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+    plot_cum_score_issue_deadline_date_month()
 
-df_cum_score_issue_deadline_date_month <- 
-  df_score_issue_deadline_date_month %>%
-    mutate(cumscore = cumsum(score))
+plt_cum_score_issue_deadline_date_month
+```
 
-plot_cum_score_issue_deadline_date_month <-
-  df_cum_score_issue_deadline_date_month %>% 
-    ggplot(aes(x = issue_deadline_date, y = cumscore)) +
-      geom_area(alpha = .3, color = "grey") +
-      geom_smooth(method = "lm") +
-      scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                   expand = c(0.02, 0)) +
-      scale_y_continuous(breaks = seq(0, 1600, 200),
-                         sec.axis = sec_axis(
-                           trans = ~. / nrow(df_issue_deadline_date_month),
-                           breaks = seq(0, 1, .1),
-                           labels = scales::percent
-                         )) +
-      labs(title = "Cumulated Number of Issues Deadline per Month",
-           subtitle = subtitle(nrow(df_issue_deadline_date_month)),
-           x = "Issue deadline date (per month)",
-           y = "Number of issues") +
-      theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+We note that trend line does not fit perfectly with growth curve. There is a 
+drop in the end of growth curve.
 
-print(plot_cum_score_issue_deadline_date_month)
-print(plot_score_issue_deadline_date_month)
+```{r}
+df_issue_deadline_size <-
+  issues %>% 
+    select(issue_id, issue_creation_date, issue_start_date, issue_deadline_date) %>% 
+    filter(!is.na(issue_deadline_date)) %>% 
+    mutate(issue_creation_date = as.Date(floor_date(issue_creation_date,
+                                                    unit = "day"))) %>%
+    mutate(from_creation_to_deadline = difftime(issue_deadline_date,
+                                                issue_creation_date,
+                                                units = "days")) %>% 
+    mutate(from_start_to_deadline = difftime(issue_deadline_date,
+                                             issue_start_date,
+                                             units = "days")) %>% 
+    filter(from_creation_to_deadline >= 0) %>% 
+    arrange(desc(from_creation_to_deadline))
+
+```
+
+```{r "Distribution of the Number of Issues Deadline per Month"}
+plt_score_issue_deadline_date_month <- 
+  df_issue_deadline_date_month %>% 
+    plot_score_issue_deadline_date_month()
+
+plt_score_issue_deadline_date_month
 ```
 
 ```{r "Distribution of the Number of Issues Deadline per Weekday"}

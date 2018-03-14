@@ -217,6 +217,19 @@ plot_cumsummary <- function(data, x, y) {
   )
 }
 
+# count_weekend_days = function(start_date, end_date) {
+#   count <- vector("integer", length(start_date))
+#   
+#   for(i in seq_along(start_date)) {
+#     vector_with_days = strftime(seq(as.POSIXlt(start_date[i]), 
+#                                     as.POSIXlt(end_date[i]), 
+#                                     by = 24 * 3600), '%A')
+#     count[i] <- sum(vector_with_days %in% c('Saturday', 'Sunday'))
+#   }
+#   
+#   count
+# }
+
 add_label <- function(y) {
   geom_text(aes_string(label = deparse(y)),
             vjust = -1, size = 3)
