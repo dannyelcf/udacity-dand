@@ -501,7 +501,7 @@ This shows us that the high issue creation volume actually comprises between
 ### Issue Start Date
 
 The behavior of the project in relation to the starting of a issue activity is 
-similar to the behavior of its creation. The plots also are very similar. See 
+similar to the behavior of its creation. The plots are also very similar. See 
 below the comparison of their plots.
 
 ```{r}
@@ -646,6 +646,10 @@ grid.arrange(plt_score_issue_created_by_month +
 
 ```
 
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+cumulated quartile, the black and red solid lines represent, respectivaly, 
+cumulated median and mean.
+
 Comparison between distribution of the number of issues created and started per 
 weekday.
 
@@ -661,6 +665,11 @@ grid.arrange(plt_score_issue_created_by_wday +
                scale_y_continuous(breaks = seq(0, 1020, 200)),
              ncol = 1)
 ```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted lines represent the lower and upper threshold to the 
+outliers (lower = 1st qu. - 1.5 IQR, upper = 3rd qu. + 1.5 IQR).
 
 Comparison between distribution of the number of issues created and started per 
 business day.
@@ -683,6 +692,11 @@ grid.arrange(plt_score_issue_created_by_nowend +
              ncol = 1)
 ```
 
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted lines represent the lower and upper threshold to the 
+outliers (lower = 1st qu. - 1.5 IQR, upper = 3rd qu. + 1.5 IQR).
+
 The differences are practically that creation date has time information while 
 start date does not have and there are more observation of creation date than 
 start date.
@@ -702,7 +716,7 @@ plot_issue_delay_start <- function(df_issue_delay_start) {
         scale_x_continuous(breaks = seq(0, 500, 5)) +
         scale_y_continuous(limits = c(0, 4000), breaks = seq(0, 4000, 300)) +
         coord_cartesian(xlim = c(0, 70)) +
-        labs(title = "Distribution of the Number of Calendar Days to Start an Issue",
+        labs(title = "Distribution of the Delay Days Between Creation and Start Date",
              subtitle = subtitle(nrow(df_issue_delay_start),
                                  df_summary = summ_issue_delay_start),
              x = "Number of calendar days",
@@ -731,10 +745,18 @@ This similarity in the behavior of these two variables induces us to believe
 that there was not a big delay between the creation and the starting of a issue.
 In fact, it can be seen in the plot below.
 
-```{r "Distribution of the Number of Calendar Days to Start an Issue"}
-df_issue_delay_start %>% 
-  plot_issue_delay_start()
+```{r "Distribution of the Delay Days Between Creation and Start Date"}
+plt_issue_delay_start <-
+  df_issue_delay_start %>% 
+    plot_issue_delay_start()
+
+plt_issue_delay_start
 ```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted lines represents the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
 
 ```{r}
 percent_delay_lte_5_days <- 
@@ -826,7 +848,7 @@ plot_cum_score_issue_deadline_date_month <- function(df_issue_deadline_date_mont
                              labels = scales::percent
                            )) +
         coord_cartesian(ylim = c(0, 1600)) +
-        labs(title = "Cumulative Number of Issues Deadline",
+        labs(title = "Cumulative Number of Issues Deadlines",
              subtitle = subtitle(nrow(df_issue_deadline_date_month)),
              x = "Issue deadline date",
              y = "Number of issues") +
@@ -843,7 +865,7 @@ df_issue_deadline_date_month <-
                                                       "month")))
 ```
 
-```{r "Cumulative Number of Issues Deadline"}
+```{r "Cumulative Number of Issues Deadlines"}
 plt_cum_score_issue_deadline_date_month <- 
   df_issue_deadline_date_month %>% 
     plot_cum_score_issue_deadline_date_month()
@@ -855,22 +877,51 @@ We note that trend line does not fit perfectly with growth curve. There is a
 drop in the end of growth curve.
 
 ```{r}
+plot_issue_deadline_size <- function(df_issue_deadline_size) {
+  summ_issue_deadline_size <- df_summary(df_issue_deadline_size, 
+                                       from_start_to_deadline)
+  
+  plot_issue_deadline_size <-
+    df_issue_deadline_size %>% 
+      ggplot(aes(x = from_start_to_deadline)) +
+        geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+                       boundary = summ_issue_deadline_size$min, 
+                       closed = "left") +
+        plot_x_summary(df_issue_deadline_size, from_start_to_deadline) +
+        scale_x_continuous(breaks = seq(0, 45, 2)) +
+        scale_y_continuous(limits = c(0, 400), breaks = seq(0, 400, 30)) +
+        coord_cartesian(xlim = c(0, 45)) +
+        labs(title = "Distribution of the Delay Days Between Start and Deadline Date",
+             subtitle = subtitle(nrow(df_issue_deadline_size),
+                                 df_summary = summ_issue_deadline_size),
+             x = "Number of calendar days",
+             y = "Frequency") 
+  
+  plot_issue_deadline_size
+}
+
 df_issue_deadline_size <-
   issues %>% 
-    select(issue_id, issue_creation_date, issue_start_date, issue_deadline_date) %>% 
+    select(issue_id, issue_start_date, issue_deadline_date) %>% 
     filter(!is.na(issue_deadline_date)) %>% 
-    mutate(issue_creation_date = as.Date(floor_date(issue_creation_date,
-                                                    unit = "day"))) %>%
-    mutate(from_creation_to_deadline = difftime(issue_deadline_date,
-                                                issue_creation_date,
-                                                units = "days")) %>% 
     mutate(from_start_to_deadline = difftime(issue_deadline_date,
                                              issue_start_date,
                                              units = "days")) %>% 
-    filter(from_creation_to_deadline >= 0) %>% 
-    arrange(desc(from_creation_to_deadline))
-
+    filter(from_start_to_deadline >= 0)
 ```
+
+```{r "Distribution of the Delay Days Between Start and Deadline Date"}
+plt_issue_deadline_size <- 
+  df_issue_deadline_size %>% 
+    plot_issue_deadline_size()
+
+plt_issue_deadline_size
+```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represents upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
 
 ```{r "Distribution of the Number of Issues Deadline per Month"}
 plt_score_issue_deadline_date_month <- 
