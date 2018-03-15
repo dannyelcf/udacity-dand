@@ -22,7 +22,6 @@ source("project_05.R")
 load_packages(c("ggplot2", 
                "dplyr", 
                "lubridate", 
-               "bizdays",
                "grid", 
                "gridExtra"))
 ```
@@ -502,8 +501,8 @@ This shows us that the high issue creation volume actually comprises between
 ### Issue Start Date
 
 The behavior of the project in relation to the starting of a issue activity is 
-similar to the behavior of its creation. The plots are very similar. See below
-the comparison of their plots.
+similar to the behavior of its creation. The plots also are very similar. See 
+below the comparison of their plots.
 
 ```{r}
 score_issue_start_date_month <- function(df_issue_start_date_month) {
@@ -688,9 +687,6 @@ The differences are practically that creation date has time information while
 start date does not have and there are more observation of creation date than 
 start date.
 
-This similarity in the behavior of these two variables induces us to believe 
-that there was no delay between the creation and the starting of a issue. 
-
 ```{r}
 plot_issue_delay_start <- function(df_issue_delay_start) {
   summ_issue_delay_start <- df_summary(df_issue_delay_start, 
@@ -699,17 +695,17 @@ plot_issue_delay_start <- function(df_issue_delay_start) {
   plot_issue_delay_start <-
     df_issue_delay_start %>% 
       ggplot(aes(x = issue_delay_start)) +
-        geom_histogram(binwidth = 7, color = "gray", alpha = .3, 
+        geom_histogram(binwidth = 5, color = "gray", alpha = .3, 
                        boundary = summ_issue_delay_start$min, 
                        closed = "left") +
         plot_x_summary(df_issue_delay_start, issue_delay_start) +
-        scale_x_continuous(breaks = seq(0, 500, 7)) +
+        scale_x_continuous(breaks = seq(0, 500, 5)) +
         scale_y_continuous(limits = c(0, 4000), breaks = seq(0, 4000, 300)) +
         coord_cartesian(xlim = c(0, 70)) +
-        labs(title = "Distribution of the Number of Days to Start an Issue",
+        labs(title = "Distribution of the Number of Calendar Days to Start an Issue",
              subtitle = subtitle(nrow(df_issue_delay_start),
                                  df_summary = summ_issue_delay_start),
-             x = "Number of days",
+             x = "Number of calendar days",
              y = "Frequency") 
   
   plot_issue_delay_start
@@ -724,23 +720,56 @@ df_issue_delay_start <-
     mutate(issue_delay_start = difftime(issue_start_date,
                                         issue_creation_date,
                                         units = "days")) %>% 
+    # mutate(issue_delay_start = issue_delay_start - 
+    #                            count_weekend_days(issue_start_date,
+    #                                               issue_creation_date)) %>% 
     filter(issue_delay_start >= 0)
+
 ```
 
-```{r "Distribution of the Number of Days to Start an Issue"}
+This similarity in the behavior of these two variables induces us to believe 
+that there was not a big delay between the creation and the starting of a issue.
+In fact, it can be seen in the plot below.
+
+```{r "Distribution of the Number of Calendar Days to Start an Issue"}
 df_issue_delay_start %>% 
   plot_issue_delay_start()
 ```
 
+```{r}
+percent_delay_lte_5_days <- 
+  round(
+    nrow(subset(df_issue_delay_start, 
+                issue_delay_start >=0 & issue_delay_start <= 5)) * 100
+    /
+    nrow(df_issue_delay_start)
+  )
+```
+
+About `r percent_delay_lte_5_days`% of `r nrow(df_issue_delay_start)` issues, 
+with start date information, have less than or equal 5 calendar days of delay 
+to start and 90% of them have less than or equal 16 calendar days. These days 
+are insignificant in the overall view of project behavior.
+
 ### Issue Deadline Date
+
+```{r}
+na_deadline_date <- 
+  round(
+    nrow(subset(issues, is.na(issue_deadline_date))) * 100
+    / 
+    nrow(issues)
+  )
+```
 
 Issue deadline date represents the planning date to deliver the issue. It seems 
 to follow the same behaviour that issue creation date and issues start date but 
-it has some peculiarities. Issue deadline date has more `NA` values than those, 
-approximately 
-`r round(nrow(issues %>% filter(is.na(issue_deadline_date)))*100/nrow(issues))`%
-of the number of issues. Its cumulative number of issues deadline it is a bit 
-different from the others cumulative plots. See the plot below.
+it has some peculiarities, starting by `NA` values. Issue deadline date has more 
+`NA` values than those, approximately `r na_deadline_date`% of the number of 
+issues. 
+
+Its cumulative number of issues deadling is also a bit different from the others 
+cumulative plots. See the plot below.
 
 ```{r}
 score_issue_deadline_date_month <- function(df_issue_deadline_date_month) {
