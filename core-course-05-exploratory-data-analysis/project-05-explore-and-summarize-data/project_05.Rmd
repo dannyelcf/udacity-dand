@@ -23,7 +23,8 @@ load_packages(c("ggplot2",
                "dplyr", 
                "lubridate", 
                "grid", 
-               "gridExtra"))
+               "gridExtra",
+               "boot"))
 ```
 
 ```{r "Project Set Up"}
@@ -31,7 +32,7 @@ load_packages(c("ggplot2",
 
 # Set up default theme for plots
 theme_set(theme_classic() %+replace%
-            theme(panel.grid.major.y = element_line(size=.05, color="gray"),
+            theme(panel.grid.major.y = element_line(size=.05, color="grey50"),
                   plot.margin = unit(c(.3, 0, .5, 2), "cm"),
                   axis.text = element_text(size = rel(0.7), colour = "grey30"),
                   axis.title.x = element_text(size = rel(0.9),
@@ -116,7 +117,7 @@ plot_number_logs_per_issue <- function(df_number_logs_per_issue) {
   plot_number_logs_per_issue <-
     df_number_logs_per_issue %>% 
       ggplot(aes(x = score)) +
-        geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+        geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
                        boundary = summ_number_logs_per_issue$min, 
                        closed = "left") +
         plot_x_summary(df_number_logs_per_issue, score) +
@@ -199,30 +200,7 @@ score_issue_created_by_month <- function(df_issue_created_by_month) {
   df_score_issue_created_by_month
 }
 
-plot_score_issue_created_by_month <- function(df_issue_created_by_month) {
-  df_score_issue_created_by_month <- 
-    score_issue_created_by_month(df_issue_created_by_month)
-
-  plot_score_issue_created_by_month <-
-    df_score_issue_created_by_month %>% 
-      ggplot(aes(x = issue_creation_date, y = score)) +
-        geom_col(alpha = .3, color = "grey", width = 28) +
-        plot_cumsummary(df_score_issue_created_by_month, 
-                        x = issue_creation_date,
-                        y = score) +
-        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                     expand = c(0.01, 0)) +
-        scale_y_continuous(breaks = seq(0, 190, 15)) +
-        labs(title = "Distribution of the Number of Issues Created per Month",
-             subtitle = subtitle(nrow(df_issue_created_by_month)),
-             x = "Issue creation date (per month)",
-             y = "Frequency") +
-        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
-  
-  plot_score_issue_created_by_month
-}
-
-plot_cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
+cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
   df_score_issue_created_by_month <- 
     score_issue_created_by_month(df_issue_created_by_month)
   
@@ -230,11 +208,22 @@ plot_cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
     df_score_issue_created_by_month %>%
       mutate(cumscore = cumsum(score))
   
+  df_cum_score_issue_created_by_month
+}
+```
+
+```{r}
+plot_cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
+  df_cum_score_issue_created_by_month <- 
+    cum_score_issue_created_by_month(df_issue_created_by_month)
+  
   plot_cum_score_issue_created_by_month <-
     df_cum_score_issue_created_by_month %>% 
       ggplot(aes(x = issue_creation_date, y = cumscore)) +
-        geom_area(alpha = .3, color = "grey") +
-        geom_smooth(method = "lm") +
+        geom_area(color = "grey50", alpha = .1) +
+        geom_point(color = "grey50") +
+        plot_year_vline() +
+        geom_smooth(method = "lm", size = .5, fill = "blue", alpha = .2) +
         scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
                      expand = c(0.02, 0)) +
         scale_y_continuous(breaks = seq(0, 4600, 500),
@@ -244,9 +233,9 @@ plot_cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
                              labels = scales::percent
                            )) +
         coord_cartesian(ylim = c(0, 4600)) +
-        labs(title = "Cumulative Number of Issues Created",
+        labs(title = "Cumulative Number of Issues Created per Month",
              subtitle = subtitle(nrow(df_issue_created_by_month)),
-             x = "Issue creation date",
+             x = "Issue creation date (month)",
              y = "Number of issues") +
         theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
   
@@ -263,7 +252,7 @@ df_issue_created_by_month <-
 
 To get a sense of how it was the demand throughout the project see the plot 
 below that shows the cumulative number of issues created along the project and 
-the trend line (in blue).
+its trend line (in blue).
 
 ```{r "Cumulative Number of Issues Created"}
 plt_cum_score_issue_created_by_month <-
@@ -293,7 +282,34 @@ approximately 65% of project activities. Besides, the trend line fitted with
 growth curve demonstrating that the project began to have a standardized 
 behavior.
 
-In the barplot below, we can see the project's behavior in another way. This
+```{r}
+plot_score_issue_created_by_month <- function(df_issue_created_by_month) {
+  df_score_issue_created_by_month <- 
+    score_issue_created_by_month(df_issue_created_by_month)
+
+  plot_score_issue_created_by_month <-
+    df_score_issue_created_by_month %>% 
+      ggplot(aes(x = issue_creation_date, y = score)) +
+        geom_area(color = "grey50", alpha = .1) +
+        geom_point(color = "grey50") +
+        plot_year_vline() +
+        plot_cumsummary(df_score_issue_created_by_month, 
+                        x = issue_creation_date,
+                        y = score) +
+        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
+                     expand = c(0.01, 0)) +
+        scale_y_continuous(breaks = seq(0, 190, 15)) +
+        labs(title = "Distribution of the Number of Issues Created per Month",
+             subtitle = subtitle(nrow(df_issue_created_by_month)),
+             x = "Issue creation date (month)",
+             y = "Frequency") +
+        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
+  
+  plot_score_issue_created_by_month
+}
+```
+
+In the area plot below, we can see the project's behavior in another way. This
 plot shows the distribution of the number of issues created per month and
 their cumulative summaries.
 
@@ -351,7 +367,7 @@ plot_score_issue_created_by_wday <- function(df_issue_created_by_wday,
   plot_score_issue_created_by_wday <- 
     df_score_issue_created_by_wday %>% 
       ggplot(aes(x = issue_creation_wday, y = score)) +
-        geom_col(color = "grey", alpha = .3) +
+        geom_col(color = "grey50", alpha = .1) +
         plot_y_summary(df_issue_created_by_wday, issue_creation_wday) +
         scale_y_continuous(breaks = seq(0, 1020, 100),
                            sec.axis = sec_axis(
@@ -435,7 +451,7 @@ plot_issue_created_by_hour <- function(df_issue_created_by_hour,
   plot_issue_created_by_hour <-
     df_issue_created_by_hour %>% 
       ggplot(aes(x = issue_creation_hour)) +
-        geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+        geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
                        boundary = summ_number_issue_created_by_hour$min, 
                        closed = "left") +
         plot_x_summary(df_issue_created_by_hour, issue_creation_hour) +
@@ -501,8 +517,9 @@ This shows us that the high issue creation volume actually comprises between
 ### Issue Start Date
 
 The behavior of the project in relation to the starting of a issue activity is 
-similar to the behavior of its creation. The plots are also very similar. See 
-below the comparison of their plots.
+similar to the behavior of its creation. The main differences are that the 
+creation date has time information while start date does not have and there are 
+more observation of creation date than start date.
 
 ```{r}
 score_issue_start_date_month <- function(df_issue_start_date_month) {
@@ -514,30 +531,7 @@ score_issue_start_date_month <- function(df_issue_start_date_month) {
   df_score_issue_start_date_month
 }
 
-plot_score_issue_start_date_month <- function(df_issue_start_date_month) {
-  df_score_issue_start_date_month <- 
-    score_issue_start_date_month(df_issue_start_date_month)
-  
-  plot_score_issue_start_date_month <-   
-    df_score_issue_start_date_month %>% 
-      ggplot(aes(x = issue_start_date, y = score)) +
-        geom_col(alpha = .3, color = "grey", width = 28) +
-        plot_cumsummary(df_score_issue_start_date_month, 
-                        x = issue_start_date,
-                        y = score) +
-        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                     expand = c(0.01, 0)) +
-        scale_y_continuous(breaks = seq(0, 185, 15)) +
-        labs(title = "Distribution of the Number of Issues Started per Month",
-             subtitle = subtitle(nrow(df_issue_start_date_month)),
-             x = "Issue start date (per month)",
-             y = "Frequency") +
-        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
-  
-  plot_score_issue_start_date_month
-}
-
-plot_cum_score_issue_start_date_month <- function(df_issue_start_date_month) {
+cum_score_issue_start_date_month <- function(df_issue_start_date_month) {
   df_score_issue_start_date_month <- 
     score_issue_start_date_month(df_issue_start_date_month)
   
@@ -545,11 +539,22 @@ plot_cum_score_issue_start_date_month <- function(df_issue_start_date_month) {
     df_score_issue_start_date_month %>%
       mutate(cumscore = cumsum(score))
   
+  df_cum_score_issue_start_date_month
+}
+```
+
+```{r}
+plot_cum_score_issue_start_date_month <- function(df_issue_start_date_month) {
+  df_cum_score_issue_start_date_month <- 
+    cum_score_issue_start_date_month(df_issue_start_date_month)
+  
   plot_cum_score_issue_start_date_month <-
     df_cum_score_issue_start_date_month %>% 
       ggplot(aes(x = issue_start_date, y = cumscore)) +
-        geom_area(alpha = .3, color = "grey") +
-        geom_smooth(method = "lm") +
+        geom_area(color = "grey50", alpha = .1) +
+        geom_point(color = "grey50") +
+        plot_year_vline() +
+        geom_smooth(method = "lm", size = .5, fill = "blue", alpha = .2) +
         scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
                      expand = c(0.02, 0)) +
         scale_y_continuous(breaks = seq(0, 4600, 500),
@@ -559,47 +564,13 @@ plot_cum_score_issue_start_date_month <- function(df_issue_start_date_month) {
                              labels = scales::percent
                            )) +
         coord_cartesian(ylim = c(0, 4600)) +
-        labs(title = "Cumulative Number of Issues Started",
+        labs(title = "Cumulative Number of Issues Started per Month",
              subtitle = subtitle(nrow(df_issue_start_date_month)),
-             x = "Issue start date",
+             x = "Issue start date (month)",
              y = "Number of issues") +
         theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
   
   plot_cum_score_issue_start_date_month
-}
-
-plot_score_issue_start_wday <- function(df_issue_start_wday,
-                                        subtitle_complement = NULL) { 
-  summ_issue_start_wday <- 
-    df_issue_start_wday %>% 
-      group_by(issue_start_wday) %>% 
-      summarise(frequency = n()) %>% 
-      df_summary(frequency)
-  
-  df_score_issue_start_wday <- 
-    df_issue_start_wday %>% 
-      group_by(issue_start_wday) %>% 
-      summarise(score = n())
-
-  plot_score_issue_start_wday <- 
-    df_score_issue_start_wday %>% 
-      ggplot(aes(x = issue_start_wday, y = score)) +
-        geom_col(color = "grey", alpha = .3) +
-        plot_y_summary(df_issue_start_wday, issue_start_wday) +
-        scale_y_continuous(breaks = seq(0, 1020, 100),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_start_wday),
-                             breaks = seq(0, 1, .02),
-                             labels = scales::percent
-                           )) +
-        labs(title = "Frequency of Issues Started per Weekday",
-             subtitle = subtitle(nrow(df_issue_start_wday),
-                                 subtitle_complement,
-                                 summ_issue_start_wday),
-             x = "Weekday",
-             y = "Frequency") 
-  
-  plot_score_issue_start_wday
 }
 
 df_issue_start_date_month <- 
@@ -608,98 +579,41 @@ df_issue_start_date_month <-
     distinct(issue_id, 
              issue_start_date = as.Date(floor_date(issue_start_date,
                                                    "month")))
-
-df_issue_start_wday <- 
-  issues %>% 
-    filter(!is.na(issue_start_date)) %>% 
-    distinct(issue_id, 
-             issue_start_wday = wday(issue_start_date, label = TRUE))
 ```
 
-Comparison between cumulative number of issues created and started.
+To show how is similar the behavior between creation and start issue date see 
+the cumulative number of issues started along the project and its trend line 
+(in blue) in the plot below.
 
-```{r fig.height=5.5, "Comparison between Cumulative Number of Issues Created and Started"} 
+```{r "Cumulative Number of Issues Started per Month"} 
 plt_cum_score_issue_start_date_month <-
   df_issue_start_date_month %>% 
     plot_cum_score_issue_start_date_month()
 
-grid.arrange(plt_cum_score_issue_created_by_month + 
-               scale_y_continuous(breaks = seq(0, 4600, 750)), 
-             plt_cum_score_issue_start_date_month + 
-               scale_y_continuous(breaks = seq(0, 4600, 750)),
-             ncol = 1)
+plt_cum_score_issue_start_date_month
 ```
 
-Comparison between distribution of the number of issues created and started per 
-month.
+Pratically it has the same shape and values of the Cumulative Number of Issues
+Created per Month plot. 
 
-```{r fig.height=5.5, "Comparison between Distribution of the Number of Issues Created and Started per Month"} 
-plt_score_issue_start_date_month <-
-  df_issue_start_date_month %>% 
-    plot_score_issue_start_date_month()
+This similarity induces us to believe that there was not a big delay between 
+the creation and the starting of a issue. To verify this, I created a new 
+variable named `issue_delay_start` which represents the delay, in calendar days, 
+between creation of an issue and its start.
 
-grid.arrange(plt_score_issue_created_by_month + 
-               scale_y_continuous(breaks = seq(0, 200, 50)), 
-             plt_score_issue_start_date_month + 
-               scale_y_continuous(breaks = seq(0, 200, 50)),
-             ncol = 1)
-
+```{r}
+issues$issue_delay_start <-
+  issues %>% 
+    select(issue_id, issue_creation_date, issue_start_date) %>% 
+    mutate(issue_creation_date = as.Date(floor_date(issue_creation_date,
+                                                    unit = "day"))) %>% 
+    mutate(issue_delay_start = difftime(issue_start_date,
+                                        issue_creation_date,
+                                        units = "days")) %>% 
+    pull(issue_delay_start) 
 ```
 
-> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
-cumulated quartile, the black and red solid lines represent, respectivaly, 
-cumulated median and mean.
-
-Comparison between distribution of the number of issues created and started per 
-weekday.
-
-```{r fig.height=5.5, "Comparison between Distribution of the Number of Issues Created and Started per Weekday"}
-plt_score_issue_start_wday <-
-  df_issue_start_wday %>% 
-    plot_score_issue_start_wday()
-
-
-grid.arrange(plt_score_issue_created_by_wday + 
-               scale_y_continuous(breaks = seq(0, 1020, 200)), 
-             plt_score_issue_start_wday + 
-               scale_y_continuous(breaks = seq(0, 1020, 200)),
-             ncol = 1)
-```
-
-> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
-quartile, the black and red solid lines represent, respectivaly, median and mean
-and the black dotted lines represent the lower and upper threshold to the 
-outliers (lower = 1st qu. - 1.5 IQR, upper = 3rd qu. + 1.5 IQR).
-
-Comparison between distribution of the number of issues created and started per 
-business day.
-
-```{r fig.height=5.5, "Comparison between Distribution of the Number of Issues Created and Started per Weekday (No Weekend)"}
-df_issue_start_weekend <-
-  df_issue_start_wday %>% 
-    filter(issue_start_wday == "Sat" | issue_start_wday == "Sun")
-
-plt_score_issue_start_nowend <- 
-  df_issue_start_wday %>% 
-    filter(!(issue_start_wday %in% 
-               df_issue_start_weekend$issue_start_wday)) %>% 
-    plot_score_issue_start_wday("without the weekend")
-
-grid.arrange(plt_score_issue_created_by_nowend + 
-               scale_y_continuous(breaks = seq(0, 1020, 200)), 
-             plt_score_issue_start_nowend + 
-               scale_y_continuous(breaks = seq(0, 1020, 200)),
-             ncol = 1)
-```
-
-> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
-quartile, the black and red solid lines represent, respectivaly, median and mean
-and the black dotted lines represent the lower and upper threshold to the 
-outliers (lower = 1st qu. - 1.5 IQR, upper = 3rd qu. + 1.5 IQR).
-
-The differences are practically that creation date has time information while 
-start date does not have and there are more observation of creation date than 
-start date.
+### Issue Delay Start
 
 ```{r}
 plot_issue_delay_start <- function(df_issue_delay_start) {
@@ -709,7 +623,7 @@ plot_issue_delay_start <- function(df_issue_delay_start) {
   plot_issue_delay_start <-
     df_issue_delay_start %>% 
       ggplot(aes(x = issue_delay_start)) +
-        geom_histogram(binwidth = 5, color = "gray", alpha = .3, 
+        geom_histogram(binwidth = 5, color = "grey50", alpha = .1, 
                        boundary = summ_issue_delay_start$min, 
                        closed = "left") +
         plot_x_summary(df_issue_delay_start, issue_delay_start) +
@@ -727,23 +641,13 @@ plot_issue_delay_start <- function(df_issue_delay_start) {
 
 df_issue_delay_start <-
   issues %>% 
-    select(issue_id, issue_creation_date, issue_start_date) %>% 
-    filter(!is.na(issue_start_date)) %>% 
-    mutate(issue_creation_date = as.Date(floor_date(issue_creation_date,
-                                                    unit = "day"))) %>% 
-    mutate(issue_delay_start = difftime(issue_start_date,
-                                        issue_creation_date,
-                                        units = "days")) %>% 
-    # mutate(issue_delay_start = issue_delay_start - 
-    #                            count_weekend_days(issue_start_date,
-    #                                               issue_creation_date)) %>% 
+    filter(!is.na(issue_delay_start)) %>% 
     filter(issue_delay_start >= 0)
 
 ```
 
-This similarity in the behavior of these two variables induces us to believe 
-that there was not a big delay between the creation and the starting of a issue.
-In fact, it can be seen in the plot below.
+See in the plot below the distribution of the delay between creation and start 
+dates.
 
 ```{r "Distribution of the Delay Days Between Creation and Start Date"}
 plt_issue_delay_start <-
@@ -754,8 +658,9 @@ plt_issue_delay_start
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
-quartile, the black and red solid lines represent, respectivaly, median and mean
-and the black dotted lines represents the upper threshold to the outliers 
+quartile, the black and red solid lines represent, respectivaly, median and mean,
+the red shading represents the mean confidence interval (95%) and the black 
+dotted lines represents the upper threshold to the outliers 
 (3rd qu. + 1.5 IQR).
 
 ```{r}
@@ -770,8 +675,8 @@ percent_delay_lte_5_days <-
 
 About `r percent_delay_lte_5_days`% of `r nrow(df_issue_delay_start)` issues, 
 with start date information, have less than or equal 5 calendar days of delay 
-to start and 90% of them have less than or equal 16 calendar days. These days 
-are insignificant in the overall view of project behavior.
+to start. These amount of days is very short compared to the 30 days of the month 
+(granularity used in the plots).
 
 ### Issue Deadline Date
 
@@ -810,7 +715,7 @@ plot_score_issue_deadline_date_month <- function(df_issue_deadline_date_month) {
   plot_score_issue_deadline_date_month <- 
     df_score_issue_deadline_date_month %>% 
       ggplot(aes(x = issue_deadline_date, y = score)) +
-        geom_col(alpha = .3, color = "grey", width = 28) +
+        geom_col(alpha = .1, color = "grey50", width = 28) +
         plot_cumsummary(df_score_issue_deadline_date_month, 
                         x = issue_deadline_date,
                         y = score) +
@@ -837,8 +742,8 @@ plot_cum_score_issue_deadline_date_month <- function(df_issue_deadline_date_mont
   plot_cum_score_issue_deadline_date_month <-
     df_cum_score_issue_deadline_date_month %>% 
       ggplot(aes(x = issue_deadline_date, y = cumscore)) +
-        geom_area(alpha = .3, color = "grey") +
-        geom_smooth(method = "lm") +
+        geom_area(alpha = .1, color = "grey50") +
+        geom_smooth(method = "lm", size = .5, fill = "blue", alpha = .2) +
         scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
                      expand = c(0.02, 0)) +
         scale_y_continuous(breaks = seq(0, 1600, 200),
@@ -850,7 +755,7 @@ plot_cum_score_issue_deadline_date_month <- function(df_issue_deadline_date_mont
         coord_cartesian(ylim = c(0, 1600)) +
         labs(title = "Cumulative Number of Issues Deadlines",
              subtitle = subtitle(nrow(df_issue_deadline_date_month)),
-             x = "Issue deadline date",
+             x = "Issue deadline date (month)",
              y = "Number of issues") +
         theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
   
@@ -865,7 +770,7 @@ df_issue_deadline_date_month <-
                                                       "month")))
 ```
 
-```{r "Cumulative Number of Issues Deadlines"}
+```{r "Cumulative Number of Issues Deadlines per Month"}
 plt_cum_score_issue_deadline_date_month <- 
   df_issue_deadline_date_month %>% 
     plot_cum_score_issue_deadline_date_month()
@@ -884,7 +789,7 @@ plot_issue_deadline_size <- function(df_issue_deadline_size) {
   plot_issue_deadline_size <-
     df_issue_deadline_size %>% 
       ggplot(aes(x = from_start_to_deadline)) +
-        geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+        geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
                        boundary = summ_issue_deadline_size$min, 
                        closed = "left") +
         plot_x_summary(df_issue_deadline_size, from_start_to_deadline) +
@@ -952,7 +857,7 @@ df_score_issue_deadline_wday <-
 plot_score_issue_deadline_wday <- 
   df_score_issue_deadline_wday %>% 
     ggplot(aes(x = issue_deadline_wday, y = score)) +
-      geom_col(color = "grey", alpha = .3) +
+      geom_col(color = "grey50", alpha = .1) +
       plot_y_summary(df_issue_deadline_wday, issue_deadline_wday) +
       scale_y_continuous(breaks = seq(0, 500, 50),
                          sec.axis = sec_axis(
@@ -986,7 +891,7 @@ summ_issue_time_spent_hour <- df_summary(df_issue_time_spent_hour,
 plot_issue_time_spent_hour <- 
   df_issue_time_spent_hour %>% 
     ggplot(aes(x = issue_time_spent)) +
-      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+      geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
                      boundary = summ_issue_time_spent_hour$min, 
                      closed = "left") +
       plot_x_summary(df_issue_time_spent_hour, issue_time_spent) +
@@ -1023,7 +928,7 @@ summ_issue_time_spent_min <- df_summary(df_issue_time_spent_min,
 plot_issue_time_spent_min <- 
   df_issue_time_spent_min %>% 
     ggplot(aes(x = issue_time_spent)) +
-      geom_histogram(binwidth = 5, color = "gray", alpha = .3, 
+      geom_histogram(binwidth = 5, color = "grey50", alpha = .1, 
                      boundary = summ_issue_time_spent_min$min, 
                      closed = "left") +
       plot_x_summary(df_issue_time_spent_min, issue_time_spent) +
@@ -1061,7 +966,7 @@ summ_issue_time_spent_min <- df_summary(df_issue_time_spent_min,
 plot_issue_time_spent_min <- 
   df_issue_time_spent_min %>% 
     ggplot(aes(x = issue_time_spent)) +
-      geom_histogram(binwidth = 10, color = "gray", alpha = .3, 
+      geom_histogram(binwidth = 10, color = "grey50", alpha = .1, 
                      boundary = summ_issue_time_spent_min$min, 
                      closed = "left") +
       plot_x_summary(df_issue_time_spent_min, issue_time_spent) +
@@ -1091,7 +996,7 @@ summ_issue_time_spent_hour <- df_summary(df_issue_time_spent_hour,
 plot_issue_time_spent_hour <- 
   df_issue_time_spent_hour %>% 
     ggplot(aes(x = issue_time_spent)) +
-      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+      geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
                      boundary = summ_issue_time_spent_hour$min, 
                      closed = "left") +
       plot_x_summary(df_issue_time_spent_hour, issue_time_spent) +
@@ -1133,7 +1038,7 @@ df_score_issue_type <-
 plot_score_issue_type <- 
   df_score_issue_type %>% 
     ggplot(aes(x = reorder(issue_type, -score), y = score/sum(score))) +
-      geom_col(color = "grey", alpha = .3) +
+      geom_col(color = "grey50", alpha = .1) +
       add_label(df_score_issue_type$score) +
       scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
                          labels = scales::percent) + 
@@ -1174,7 +1079,7 @@ df_score_issue_system <-
 plot_score_issue_system <- 
   df_score_issue_system %>% 
     ggplot(aes(x = reorder(issue_system, -score), y = score/sum(score))) +
-      geom_col(color = "grey", alpha = .3) +
+      geom_col(color = "grey50", alpha = .1) +
       add_label(df_score_issue_system$score) +
       scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
                          labels = scales::percent) + 
@@ -1208,7 +1113,7 @@ plot_score_top15_issue_subsystem <-
     ggplot(aes(x = reorder(paste0("(", issue_system, ") ", issue_subsystem), 
                            -score), 
                y = score/sum(score))) +
-      geom_col(color = "grey", alpha = .3) +
+      geom_col(color = "grey50", alpha = .1) +
       add_label(df_score_top15_issue_subsystem$score) +
       scale_y_continuous(limits = c(0, .45), breaks = seq(0, 1, .1), 
                          labels = scales::percent) + 
@@ -1237,7 +1142,7 @@ df_score_issue_stakeholder <-
 plot_score_issue_stakeholder <- 
   df_score_issue_stakeholder %>% 
     ggplot(aes(x = reorder(issue_stakeholder, -score), y = score/sum(score))) +
-      geom_col(color = "grey", alpha = .3) +
+      geom_col(color = "grey50", alpha = .1) +
       add_label(df_score_issue_stakeholder$score) +
       scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
                          labels = scales::percent) + 
@@ -1271,7 +1176,7 @@ plot_score_top15_issue_created_by <-
     ggplot(aes(x = reorder(paste0("(", issue_stakeholder, ") ", issue_created_by), 
                            -score), 
                y = score/sum(score))) +
-      geom_col(color = "grey", alpha = .3) +
+      geom_col(color = "grey50", alpha = .1) +
       add_label(df_score_top15_issue_created_by$score) +
       scale_y_continuous(limits = c(0, .25), breaks = seq(0, 1, .05), 
                          labels = scales::percent) + 
@@ -1300,7 +1205,7 @@ df_score_issue_status <-
 plot_score_issue_status <- 
   df_score_issue_status %>% 
     ggplot(aes(x = reorder(issue_status, -score), y = score/sum(score))) +
-      geom_col(color = "grey", alpha = .3) +
+      geom_col(color = "grey50", alpha = .1) +
       add_label(df_score_issue_status$score) +
       scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, .15), 
                          labels = scales::percent) + 
@@ -1327,7 +1232,7 @@ summ_issue_priority_number <- df_summary(df_issue_priority_number,
 plot_issue_priority_number <- 
   df_issue_priority_number %>% 
     ggplot(aes(x = issue_priority_number)) +
-      geom_histogram(binwidth = 50, color = "gray", alpha = .3, 
+      geom_histogram(binwidth = 50, color = "grey50", alpha = .1, 
                      boundary = summ_issue_priority_number$min, 
                      closed = "left") +
       plot_x_summary(df_issue_priority_number, issue_priority_number) +
@@ -1364,7 +1269,7 @@ summ_issue_priority_number <- df_summary(df_issue_priority_number,
 plot_issue_priority_number <- 
   df_issue_priority_number %>% 
     ggplot(aes(x = issue_priority_number)) +
-      geom_histogram(binwidth = 10, color = "gray", alpha = .3, 
+      geom_histogram(binwidth = 10, color = "grey50", alpha = .1, 
                      boundary = summ_issue_priority_number$min, 
                      closed = "left") +
       plot_x_summary(df_issue_priority_number, issue_priority_number) +
@@ -1393,7 +1298,7 @@ summ_issue_priority_number <- df_summary(df_issue_priority_number,
 plot_issue_priority_number <- 
   df_issue_priority_number %>% 
     ggplot(aes(x = issue_priority_number)) +
-      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+      geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
                      boundary = summ_issue_priority_number$min, 
                      closed = "left") +
       plot_x_summary(df_issue_priority_number, issue_priority_number) +
@@ -1425,7 +1330,7 @@ df_score_issue_priority_scale <-
 plot_score_issue_priority_scale <- 
   df_score_issue_priority_scale %>% 
     ggplot(aes(x = issue_priority_scale, y = score/sum(score))) +
-      geom_col(color = "grey", alpha = .3) +
+      geom_col(color = "grey50", alpha = .1) +
       add_label(df_score_issue_priority_scale$score) +
       scale_y_continuous(limits = c(0, .7), breaks = seq(0, 1, .1), 
                          labels = scales::percent) + 
@@ -1451,7 +1356,7 @@ summ_issue_progress <- df_summary(df_issue_progress,
 plot_issue_progress <- 
   df_issue_progress %>% 
     ggplot(aes(x = issue_progress)) +
-      geom_histogram(binwidth = 10, color = "gray", alpha = .3, 
+      geom_histogram(binwidth = 10, color = "grey50", alpha = .1, 
                      boundary = summ_issue_progress$min, 
                      closed = "left") +
       plot_x_summary(df_issue_progress, issue_progress) +
@@ -1491,7 +1396,7 @@ summ_log_build_info <- df_summary(df_log_build_info, score)
 plot_log_build_info <- 
   df_log_build_info %>% 
     ggplot(aes(x = score)) +
-      geom_histogram(binwidth = 5, color = "gray", alpha = .3, 
+      geom_histogram(binwidth = 5, color = "grey50", alpha = .1, 
                      boundary = summ_log_build_info$min, 
                      closed = "left") +
       plot_x_summary(df_log_build_info, score) +
@@ -1521,7 +1426,7 @@ summ_log_build_info <- df_summary(df_log_build_info, score)
 plot_log_build_info <- 
   df_log_build_info %>% 
     ggplot(aes(x = score)) +
-      geom_histogram(binwidth = 1, color = "gray", alpha = .3, 
+      geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
                      boundary = summ_log_build_info$min, 
                      closed = "left") +
       plot_x_summary(df_log_build_info, score) +

@@ -59,22 +59,48 @@ load_dataset <- function(path) {
                      ))
 }
 
+ci.mean <- function(vec) {
+  if(length(vec) == 1) {
+    df_ci <- data.frame(mean = vec[1],
+                        se = 0,
+                        low = vec[1],
+                        high = vec[1])
+    return(df_ci)
+  }
+  
+  fun.mean <- function(vec, idx) {
+    mean(vec[idx], na.rm = TRUE)
+  }
+  
+  boot.mean <- boot(vec, fun.mean, R=5000)
+  boot.ci.mean <- boot.ci(boot.mean, type = "perc")
+  df_ci <- data.frame(mean = boot.mean$t0,
+                      se = sd(boot.mean$t[,1]),
+                      low = boot.ci.mean$percent[4],
+                      high = boot.ci.mean$percent[5])
+  return(df_ci)
+}
+
 df_summary <- function(df, variable) {
   .df_summary(df, substitute(variable))
 }
 
 .df_summary <- function(df, variable) {
-  variable <- eval(variable, df)
+  variable_e <- eval(variable, df)
+  ci.mean <- ci.mean(variable_e)
 
-  data.frame(min = min(variable),
-             qu1 = quantile(variable, probs = .25, names = FALSE),
-             median = quantile(variable, probs = .5, names = FALSE),
-             mean = mean(variable),
-             qu3 = quantile(variable, probs = .75, names = FALSE),
-             iqr = (quantile(variable, probs = .75, names = FALSE) -
-                      quantile(variable, probs = .25, names = FALSE)),
-             pc90 = quantile(variable, probs = .90, names = FALSE),
-             max = max(variable))
+  data.frame(min = min(variable_e),
+             qu1 = quantile(variable_e, probs = .25, names = FALSE),
+             median = quantile(variable_e, probs = .5, names = FALSE),
+             mean = mean(variable_e),
+             mean.ci.low = ci.mean$low,
+             mean.ci.high = ci.mean$high,
+             mean.se = ci.mean$se,
+             sd = sd(variable_e),
+             qu3 = quantile(variable_e, probs = .75, names = FALSE),
+             iqr = (quantile(variable_e, probs = .75, names = FALSE) -
+                      quantile(variable_e, probs = .25, names = FALSE)),
+             max = max(variable_e))
 
 }
 
@@ -83,8 +109,8 @@ text_df_summary <- function(df_summary) {
          "    1st qu.: ", round(df_summary$qu1, 1),
          "    median: ", round(df_summary$median, 1),
          "    mean: ", round(df_summary$mean, 1),
+         "    sd: ", round(df_summary$sd, 1),
          "    3rd qu.: ", round(df_summary$qu3, 1),
-         "    90%: ", round(df_summary$pc90, 1),
          "    max: ", round(df_summary$max, 1))
 }
 
@@ -97,6 +123,17 @@ subtitle <- function(observations, complement = NULL, df_summary = NULL) {
          } else {
            NULL
          })
+}
+
+plot_year_vline <- function() {
+  list(
+    geom_vline(xintercept = ymd("2013-01-01"), color = "grey50"),
+    geom_vline(xintercept = ymd("2014-01-01"), color = "grey50"),
+    geom_vline(xintercept = ymd("2015-01-01"), color = "grey50"),
+    geom_vline(xintercept = ymd("2016-01-01"), color = "grey50"),
+    geom_vline(xintercept = ymd("2017-01-01"), color = "grey50"),
+    geom_vline(xintercept = ymd("2018-01-01"), color = "grey50")
+  )
 }
 
 plot_x_summary <- function(data, x) {
@@ -126,7 +163,13 @@ plot_x_summary <- function(data, x) {
       geom_blank()
     },
     # Mean
-    geom_vline(xintercept = df_summary$mean, linetype = 1, color = "red")
+    geom_vline(xintercept = df_summary$mean, linetype = 1, color = "red"),
+    annotate("rect", 
+             xmin = df_summary$mean.ci.low,
+             xmax = df_summary$mean.ci.high,
+             ymin = -Inf,
+             ymax = Inf,
+             fill = "red", alpha = .2)
   )
 }
 
@@ -160,7 +203,13 @@ plot_y_summary <- function(data, y) {
       geom_blank()
     },
     # Mean
-    geom_hline(yintercept = df_summary$mean, linetype = 1, color = "red")
+    geom_hline(yintercept = df_summary$mean, linetype = 1, color = "red"),
+    annotate("rect", 
+             xmin = -Inf,
+             xmax = Inf,
+             ymin = df_summary$mean.ci.low,
+             ymax = df_summary$mean.ci.high,
+             fill = "red", alpha = .2)
   )
 }
 
@@ -178,13 +227,22 @@ plot_cumsummary <- function(data, x, y) {
   if(is.null(y)) {
     stop("'y' argument can't be NULL")
   }
-
+  
+  #https://stackoverflow.com/a/32833744/8645131
+  cummean.ci <- lapply(seq_along(y),
+                       function(n) {
+                         ci.mean(y[1:n])
+                       })
+  cummean.ci <- do.call(rbind, cummean.ci)
+  
   df_cumsummary <- data %>%
-                    # Create cumulative summaries variables
+                     # Create cumulative summaries variables
                      mutate(cummean = sapply(seq_along(y),
                                              function(n) {
                                                mean(y[1:n])
                                              }),
+                            cummean.low = cummean.ci$low,
+                            cummean.high = cummean.ci$high,
                             cummedian = sapply(seq_along(y),
                                                function(n) {
                                                  median(y[1:n])
@@ -196,9 +254,8 @@ plot_cumsummary <- function(data, x, y) {
                             cum3rdqu = sapply(seq_along(y),
                                               function(n) {
                                                 quantile(score[1:n], probs = .75)
-                                              }))
-  df_summary <- .df_summary(data, y_q)
-  df_summary$max.x <- max(x)
+                                              })) %>% 
+                      mutate()
 
   list <- list(
     # Summary lines
@@ -213,7 +270,10 @@ plot_cumsummary <- function(data, x, y) {
               linetype = 2, color = "black"),
     geom_line(data = df_cumsummary,
               mapping = aes_string(x = deparse(x_q), y = "cummean"),
-              linetype = 1, color = "red")
+              linetype = 1, color = "red"),
+    geom_ribbon(data = df_cumsummary,
+                aes_string(ymin = "cummean.low", ymax = "cummean.high"), 
+                fill = "red", alpha = .2)
   )
 }
 
