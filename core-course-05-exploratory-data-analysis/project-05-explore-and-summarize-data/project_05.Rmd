@@ -947,9 +947,10 @@ issues$issue_deadline_size <-
     pull(issue_deadline_size) 
 ```
 
-The issue deadline size represents the total planned time to solve an issue, 
-that is, the difference between issue start and deadline date. This variable is 
-interesting because it gives us an idea of the planning of the activities.
+The issue deadline size represents the total planned time to solve and deliver 
+an issue, that is, the difference between issue start and deadline date. This 
+variable is interesting because it gives us an idea of the planning of the 
+activities.
 
 ```{r}
 plot_issue_deadline_size <- function(df_issue_deadline_size) {
@@ -966,7 +967,7 @@ plot_issue_deadline_size <- function(df_issue_deadline_size) {
         scale_x_continuous(breaks = seq(0, 45, 2)) +
         scale_y_continuous(limits = c(0, 400), breaks = seq(0, 400, 30)) +
         coord_cartesian(xlim = c(0, 45)) +
-        labs(title = "Distribution of the Planned Time to Solve an Issue",
+        labs(title = "Distribution of the Deadline Size",
              subtitle = subtitle(nrow(df_issue_deadline_size),
                                  df_summary = summ_issue_deadline_size),
              x = "Number of calendar days",
@@ -984,7 +985,7 @@ df_issue_deadline_size <-
 
 See in the plot below how is the distribution of the deadline size.
 
-```{r "Distribution of the Planned Time to Solve an Issue"}
+```{r "Distribution of the Deadline Size"}
 plt_issue_deadline_size <- 
   df_issue_deadline_size %>% 
     plot_issue_deadline_size()

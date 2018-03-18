@@ -389,15 +389,15 @@ issues in the sprint had deadline of the sprint size.
 
 ### Issue Deadline Size
 
-The issue deadline size represents the total planned time to solve an
-issue, that is, the difference between issue start and deadline date.
-This variable is interesting because it gives us an idea of the planning
-of the activities.
+The issue deadline size represents the total planned time to solve and
+deliver an issue, that is, the difference between issue start and
+deadline date. This variable is interesting because it gives us an idea
+of the planning of the activities.
 
 See in the plot below how is the distribution of the deadline
 size.
 
-<img src="project_05_files/plots/Distribution of the Planned Time to Solve an Issue-1.png" width="86%" />
+<img src="project_05_files/plots/Distribution of the Deadline Size-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
@@ -417,7 +417,7 @@ later changed to one week
 ### Issue Time Spent
 
     ##   min qu1 median     mean mean.ci.low mean.ci.high    mean.se      sd qu3
-    ## x   0   0    0.5 2.205639    2.045867     2.376852 0.08478797 5.57809 2.1
+    ## x   0   0    0.5 2.205639    2.046354     2.370141 0.08295759 5.57809 2.1
     ##   iqr   max
     ## x 2.1 107.4
 
@@ -426,7 +426,7 @@ later changed to one week
 <img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue per Hour (Zoomed In)-1.png" width="86%" />
 
     ##   min qu1 median     mean mean.ci.low mean.ci.high   mean.se       sd qu3
-    ## x   0   0      0 10.87472    10.29754     11.45408 0.2943052 15.25582  18
+    ## x   0   0      0 10.87472    10.30425      11.4519 0.2948627 15.25582  18
     ##   iqr max
     ## x  18  54
 
@@ -440,14 +440,14 @@ later changed to one week
     ## 5               18   174
 
     ##   min qu1 median     mean mean.ci.low mean.ci.high   mean.se       sd qu3
-    ## x   6  12     18 23.29553    22.48574     24.10531 0.4054024 14.46379  36
+    ## x   6  12     18 23.29553    22.48574     24.09105 0.4081639 14.46379  36
     ##   iqr max
     ## x  24  54
 
 <img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour and Non  0)-1.png" width="86%" />
 
     ##   min qu1 median     mean mean.ci.low mean.ci.high   mean.se       sd qu3
-    ## x 0.1 0.5    1.3 3.232018    3.011687     3.468652 0.1168096 6.502356 3.4
+    ## x 0.1 0.5    1.3 3.232018    3.016829     3.467646 0.1159698 6.502356 3.4
     ##   iqr   max
     ## x 2.9 107.4
 
