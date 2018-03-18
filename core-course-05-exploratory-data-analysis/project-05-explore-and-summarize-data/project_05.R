@@ -261,19 +261,20 @@ plot_cumsummary <- function(data, x, y) {
     # Summary lines
     geom_line(data = df_cumsummary,
               mapping = aes_string(x = deparse(x_q), y = "cummedian"),
-              linetype = 1, color = "black"),
+              linetype = 1, color = "black", inherit.aes = FALSE),
     geom_line(data = df_cumsummary,
               mapping = aes_string(x = deparse(x_q), y = "cum1stqu"),
-              linetype = 2, color = "black"),
+              linetype = 2, color = "black", inherit.aes = FALSE),
     geom_line(data = df_cumsummary,
               mapping = aes_string(x = deparse(x_q), y = "cum3rdqu"),
-              linetype = 2, color = "black"),
+              linetype = 2, color = "black", inherit.aes = FALSE),
     geom_line(data = df_cumsummary,
               mapping = aes_string(x = deparse(x_q), y = "cummean"),
-              linetype = 1, color = "red"),
+              linetype = 1, color = "red", inherit.aes = FALSE),
     geom_ribbon(data = df_cumsummary,
-                aes_string(ymin = "cummean.low", ymax = "cummean.high"), 
-                fill = "red", alpha = .2)
+                aes_string(x = deparse(x_q), 
+                           ymin = "cummean.low", ymax = "cummean.high"), 
+                fill = "red", alpha = .2, inherit.aes = FALSE)
   )
 }
 
