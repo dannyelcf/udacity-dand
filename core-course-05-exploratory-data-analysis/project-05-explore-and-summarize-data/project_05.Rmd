@@ -1008,71 +1008,112 @@ changed to one week sprints.
 
 ### Issue Time Spent
 
-```{r "Distribution of the Number of Time Spent in a Issue per Hour"}
+```{r}
+plot_issue_time_spent_hour <- function(df_issue_time_spent_hour,
+                                       binwidth = 1,
+                                       complement = NULL,
+                                       x.breaks = waiver(),
+                                       y.breaks = waiver(),
+                                       xlim = NULL,
+                                       ylim = NULL) {
+
+  summ_issue_time_spent_hour <- df_summary(df_issue_time_spent_hour, 
+                                           issue_time_spent)
+  
+  plot_issue_time_spent_hour <- 
+    df_issue_time_spent_hour %>% 
+      ggplot(aes(x = issue_time_spent)) +
+        geom_histogram(binwidth = binwidth, color = "grey50", alpha = .1, 
+                       boundary = summ_issue_time_spent_hour$min, 
+                       closed = "left") +
+        plot_x_summary(df_issue_time_spent_hour, issue_time_spent) +
+        scale_x_continuous(breaks = x.breaks) +
+        scale_y_continuous(breaks = y.breaks) +
+        coord_cartesian(xlim = xlim, ylim = ylim) +
+        labs(title = "Distribution of the Number of Time Spent in a Issue per Hour",
+             subtitle = subtitle(nrow(df_issue_time_spent_hour),
+                                 complement,
+                                 summ_issue_time_spent_hour),
+             x = "Hours spent",
+             y = "Frequency") 
+  
+  plot_issue_time_spent_hour
+
+}
+
 df_issue_time_spent_hour <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
     distinct(issue_id, 
              issue_time_spent = (issue_time_spent / 3600))
-
-summ_issue_time_spent_hour <- df_summary(df_issue_time_spent_hour, 
-                                         issue_time_spent)
-
-plot_issue_time_spent_hour <- 
-  df_issue_time_spent_hour %>% 
-    ggplot(aes(x = issue_time_spent)) +
-      geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
-                     boundary = summ_issue_time_spent_hour$min, 
-                     closed = "left") +
-      plot_x_summary(df_issue_time_spent_hour, issue_time_spent) +
-      scale_x_continuous(breaks = seq(0, 110, 5)) +
-      scale_y_continuous(breaks = seq(0, 3000, 250)) +
-      labs(title = "Distribution of the Number of Time Spent in a Issue per Hour",
-           subtitle = subtitle(nrow(df_issue_time_spent_hour)),
-           x = "Hours spent",
-           y = "Frequency") 
-
-print(rbind(x = summ_issue_time_spent_hour))
-print(plot_issue_time_spent_hour)
 ```
+
+Issue time spent is the total time spent solving the issue. It is a derivation 
+of the sum of `log_time_spent`. In the dataset, issue time spent is represented 
+in seconds. The plot below shows its distribution per hour.
+
+```{r "Distribution of the Number of Time Spent in a Issue per Hour"}
+plt_issue_time_spent_hour <-
+  df_issue_time_spent_hour %>% 
+    plot_issue_time_spent_hour(x.breaks = seq(0, 110, 5),
+                               y.breaks = seq(0, 3000, 250))
+
+plt_issue_time_spent_hour
+```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean,
+the red shading represents the 95% of mean confidence interval (not visible in 
+this plot because its narrow interval) and the black dotted line represent the 
+upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+Note as the distribution comprises below 5 hours (upper threshold to the 
+outliers). The median is 30 minutes (0.5 hour). That is, 50% of time spent is 
+less than 30 minutes. Also note that the mean and the 3rd quartile are almost 
+the same, approximately 2 hours. This means the dispersion after 5 hours is 
+insignicant in relation to the data mass less than 2 hours. Thus, lets zoom in
+this plot to first 24 hours. See the result in the plot below.
 
 ```{r "Distribution of the Number of Time Spent in a Issue per Hour (Zoomed In)"}
-plot_issue_time_spent_hour + 
-  scale_x_continuous(breaks = seq(0, 24, 1)) +
-  scale_y_continuous(breaks = seq(0, 2700, 200)) +
-  coord_cartesian(xlim = c(0, 24)) +
-  labs(subtitle = subtitle(nrow(df_issue_time_spent_hour), 
-                           "zoomed in to the first 24 hours"))
+plt_issue_time_spent_24h <-
+  df_issue_time_spent_hour %>% 
+    plot_issue_time_spent_hour(complement = "zoomed in to the first 24 hours",
+                               x.breaks = seq(0, 24, 1),
+                               y.breaks = seq(0, 2700, 200),
+                               xlim = c(0, 24))
+plt_issue_time_spent_24h
 ```
 
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean,
+the red shading represents the 95% of mean confidence interval and the black 
+dotted line represent the upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+In the plot above, we can see better that time spent on an issue is usually less
+than 1 hour. Thus, in the plot below we will analyze it on this scale.
+
 ```{r "Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour)"}
-df_issue_time_spent_min <- 
+df_issue_time_spent_1h <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
     distinct(issue_id, issue_time_spent = (issue_time_spent / 60)) %>% 
     filter(issue_time_spent < 60)
 
-summ_issue_time_spent_min <- df_summary(df_issue_time_spent_min, 
-                                        issue_time_spent)
-
-plot_issue_time_spent_min <- 
-  df_issue_time_spent_min %>% 
-    ggplot(aes(x = issue_time_spent)) +
-      geom_histogram(binwidth = 5, color = "grey50", alpha = .1, 
-                     boundary = summ_issue_time_spent_min$min, 
-                     closed = "left") +
-      plot_x_summary(df_issue_time_spent_min, issue_time_spent) +
-      scale_x_continuous(breaks = seq(0, 60, 5)) +
-      scale_y_continuous(breaks = seq(0, 1700, 150)) +
-      labs(title = "Distribution of the Number of Time Spent in a Issue",
-           subtitle = subtitle(nrow(df_issue_time_spent_min), 
-                             "less than 1 hour"),
-           x = "Minutes spent",
-           y = "Frequency")  
-
-print(rbind(x = summ_issue_time_spent_min))
-print(plot_issue_time_spent_min)
+plt_issue_time_spent_1h <-
+  df_issue_time_spent_1h %>% 
+    plot_issue_time_spent_hour(binwidth = 5,
+                               complement = "less than 1 hour",
+                               x.breaks = seq(0, 60, 5),
+                               y.breaks = seq(0, 1500, 150))
+plt_issue_time_spent_1h
 ```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean,
+the red shading represents the 95% of mean confidence interval and the black 
+dotted line represent the upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+
 
 ```{r "Head Issue Time Spent"}
 df_issue_time_spent_min %>% 

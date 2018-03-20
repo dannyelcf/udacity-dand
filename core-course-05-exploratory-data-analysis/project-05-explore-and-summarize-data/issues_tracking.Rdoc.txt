@@ -100,14 +100,9 @@ issue_status (unordered factor):
 	A classifier for the issue which represents its status. There are 10 
 	possible values (levels) for the status.
 
-issue_time_spent (lubridate Period):
+issue_time_spent (integer):
 
-	Total time spent solving the issue. Its format is: hH mM sS or mM sS or 
-	sS.
-	
-        Examples: 14H 12M 0S
-                      42M 0S
-                          0S
+	Total time spent (in seconds) to solving the issue.
 
 issue_priority_number (integer):
 
@@ -162,14 +157,9 @@ log_progress (integer):
 	A number representing the rate of progress of the completion of one 
 	activity to the issue. Its range value is 0 (lowest) and 100 (highest).
 
-log_time_spent (lubridate Period):
+log_time_spent (integer):
 
-	Total time spent solving one activity to the issue. Its format is: hH mM 
-	sS or mM sS or sS.
-	
-        Examples: 14H 12M 0S
-                      42M 0S
-                          0S
+	Total time spent (in seconds) to solving one activity to the issue.
 
 log_created_by (character):
 	
