@@ -96,12 +96,12 @@ there shoud be an activity flow pattern to resolve an issue. This flow
 pattern migth be observed in a commom sequence of log status. See more
 informations in the [Log Status](#log-status) section.
 
-The next 6 sections show the analisys of the temporal variables: four
-originally in the data set (`issue_creation_date`, `issue_start_date`,
-`issue_deadline_date` and `issue_time_spent`) and two derived from the
-calculation (`issue_delay_start` and `issue_deadline_size`). In an issue
-tracking system, temporal variables is the fundamental piece for
-monitoring and control of activities.
+The next 6 sections show the analisys of the temporal issues variables:
+four originally in the data set (`issue_creation_date`,
+`issue_start_date`, `issue_deadline_date` and `issue_time_spent`) and
+two derived from the calculation (`issue_delay_start` and
+`issue_deadline_size`). In an issue tracking system, temporal variables
+is the fundamental piece for monitoring and control of activities.
 
 ### Issue Creation Date
 
@@ -411,26 +411,59 @@ priority.
 
 The reason for some issues have 14 days of deadline size is had a period
 in the project that there were two weeks sprints. But this planning was
-later changed to one week
-    sprints.
+later changed to one week sprints.
 
 ### Issue Time Spent
 
-    ##   min qu1 median     mean mean.ci.low mean.ci.high    mean.se      sd qu3
-    ## x   0   0    0.5 2.205639    2.046354     2.370141 0.08295759 5.57809 2.1
-    ##   iqr   max
-    ## x 2.1 107.4
+Issue time spent is the total time spent solving the issue. It is a
+derivation of the sum of `log_time_spent`. In the dataset, issue time
+spent is represented in seconds. The plot below shows its distribution
+per
+hour.
 
-<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue per Hour-1.png" width="86%" />
+<img src="project_05_files/plots/Distribution of the Number of Time Spent on a Issue per Hour-1.png" width="86%" />
 
-<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue per Hour (Zoomed In)-1.png" width="86%" />
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean, the red shading represents the 95% of
+> mean confidence interval (not visible in this plot because its narrow
+> interval) and the black dotted line represent the upper threshold to
+> the outliers (3rd qu. + 1.5 IQR).
 
-    ##   min qu1 median     mean mean.ci.low mean.ci.high   mean.se       sd qu3
-    ## x   0   0      0 10.87472    10.30425      11.4519 0.2948627 15.25582  18
-    ##   iqr max
-    ## x  18  54
+Note as the distribution comprises below 5 hours (upper threshold to the
+outliers). The median is 30 minutes (0.5 hour). That is, 50% of time
+spent is less than 30 minutes. Also note that the mean and the 3rd
+quartile are almost the same, approximately 2 hours. This means the
+dispersion after 5 hours is insignicant in relation to the data mass
+less than 2 hours. Thus, lets zoom in this plot to first 24 hours. See
+the result in the plot
+below.
 
-<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour)-1.png" width="86%" />
+<img src="project_05_files/plots/Distribution of the Number of Time Spent on a Issue per Hour (Zoomed In)-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean, the red shading represents the 95% of
+> mean confidence interval and the black dotted line represent the upper
+> threshold to the outliers (3rd qu. + 1.5 IQR).
+
+In the plot above, we can see better that time spent on an issue is
+usually less than 1 hour. Thus, in the plot below we will analyze it on
+this
+scale.
+
+<img src="project_05_files/plots/Distribution of the Number of Time Spent on a Issue (Less Than 1 Hour)-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean, the red shading represents the 95% of
+> mean confidence interval and the black dotted line represent the upper
+> threshold to the outliers (3rd qu. + 1.5 IQR).
+
+Note that the time spent is spread almost uniformly between 5 and 55
+minutes and is well concentrated below 5 minutes. To better analyze the
+range between 0 and 5 minutes I listed below the first 5 highest
+frequencies of the number of time spent on an issue.
 
     ##   issue_time_spent score
     ## 1                0  1430
@@ -439,19 +472,30 @@ later changed to one week
     ## 4               30   187
     ## 5               18   174
 
-    ##   min qu1 median     mean mean.ci.low mean.ci.high   mean.se       sd qu3
-    ## x   6  12     18 23.29553    22.48574     24.09105 0.4081639 14.46379  36
-    ##   iqr max
-    ## x  24  54
+Note that 1/3 of the issues spend 0 seconds. As there are no `NA` values
+in this variable, we can induce that the default behavior of the tool is
+to set 0 for issues that do not have time spent logged. Removing the 0s
+we have the following
+distribution.
 
-<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue (Less Than 1 Hour and Non  0)-1.png" width="86%" />
+<img src="project_05_files/plots/Distribution of the Number of Time Spent on a Issue (Less Than 1 Hour and Non 0)-1.png" width="86%" />
 
-    ##   min qu1 median     mean mean.ci.low mean.ci.high   mean.se       sd qu3
-    ## x 0.1 0.5    1.3 3.232018    3.016829     3.467646 0.1159698 6.502356 3.4
-    ##   iqr   max
-    ## x 2.9 107.4
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean, and red shading represents the 95% of
+> mean confidence interval.
 
-<img src="project_05_files/plots/Distribution of the Number of Time Spent in a Issue (Non 0)-1.png" width="86%" />
+Now, notice that 75% of the issues, with the time spent less than an
+hour, took about 36 minutes to resolve. This time represents about 25%
+of the time spent when analyzing all issues. See this in the plot below
+that recreates the visualization of the time spent on an issue less than
+24
+hours.
+
+<img src="project_05_files/plots/Distribution of the Number of Time Spent on a Issue (Non 0)-1.png" width="86%" />
+
+Now, the mean and 75% of issues spend more or less 3 hours and 30
+minutes to be resolved.
 
 ### Issue Type
 
