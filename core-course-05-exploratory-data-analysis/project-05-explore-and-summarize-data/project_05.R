@@ -67,18 +67,45 @@ ci.mean <- function(vec) {
                         high = vec[1])
     return(df_ci)
   }
-  
+
   fun.mean <- function(vec, idx) {
     mean(vec[idx], na.rm = TRUE)
   }
-  
-  boot.mean <- boot(vec, fun.mean, R=5000)
+
+  boot.mean <- boot(vec, fun.mean, R=1000)
   boot.ci.mean <- boot.ci(boot.mean, type = "perc")
   df_ci <- data.frame(mean = boot.mean$t0,
                       se = sd(boot.mean$t[,1]),
                       low = boot.ci.mean$percent[4],
                       high = boot.ci.mean$percent[5])
   return(df_ci)
+}
+
+ci.frequency <- function(df, variable) {
+  var_q <- variable#substitute(variable)
+
+  df_aux <- df %>%
+              group_by_(var_q) %>%
+              summarise(score = n()) %>%
+              select_(var_q)
+
+  fun.freq <- function(df, idx) {
+    df[idx, ] %>%
+      group_by_(var_q) %>%
+      summarise(score = n()) %>%
+      right_join(df_aux, by = deparse(var_q)) %>%
+      mutate(score = ifelse(is.na(score), 0, score)) %>%
+      pull(score)
+  }
+
+  boot.freq <- boot(df, fun.freq, R=1000)
+
+  df_ci <- data.frame(low = double(), high = double())
+  for(i in 1:dim(boot.freq$t)[2]) {
+    df_ci[i, ] <- boot.ci(boot.freq, type = "perc", index = i)$percent[4:5]
+  }
+
+  return(cbind(df_aux, df_ci))
 }
 
 df_summary <- function(df, variable) {
@@ -164,12 +191,29 @@ plot_x_summary <- function(data, x) {
     },
     # Mean
     geom_vline(xintercept = df_summary$mean, linetype = 1, color = "red"),
-    annotate("rect", 
+    annotate("rect",
              xmin = df_summary$mean.ci.low,
              xmax = df_summary$mean.ci.high,
              ymin = -Inf,
              ymax = Inf,
              fill = "red", alpha = .2)
+  )
+}
+
+plot_frequency_ci <- function(data, y, df_join = NULL) {
+  y_q <- substitute(y)
+  if(is.null(df_join)) {
+    df_freq <- ci.frequency(data, y_q)
+  } else {
+    df_freq <- ci.frequency(data, y_q) %>%
+                 semi_join(df_join, by = deparse(y_q))
+  }
+
+  list(
+    geom_errorbar(aes_string(x = deparse(y_q),
+                             ymin = "low", ymax = "high"),
+                  df_freq, inherit.aes = FALSE,
+                  width = 0.25, color = "red")
   )
 }
 
@@ -204,7 +248,7 @@ plot_y_summary <- function(data, y) {
     },
     # Mean
     geom_hline(yintercept = df_summary$mean, linetype = 1, color = "red"),
-    annotate("rect", 
+    annotate("rect",
              xmin = -Inf,
              xmax = Inf,
              ymin = df_summary$mean.ci.low,
@@ -227,14 +271,14 @@ plot_cumsummary <- function(data, x, y) {
   if(is.null(y)) {
     stop("'y' argument can't be NULL")
   }
-  
+
   #https://stackoverflow.com/a/32833744/8645131
   cummean.ci <- lapply(seq_along(y),
                        function(n) {
                          ci.mean(y[1:n])
                        })
   cummean.ci <- do.call(rbind, cummean.ci)
-  
+
   df_cumsummary <- data %>%
                      # Create cumulative summaries variables
                      mutate(cummean = sapply(seq_along(y),
@@ -254,7 +298,7 @@ plot_cumsummary <- function(data, x, y) {
                             cum3rdqu = sapply(seq_along(y),
                                               function(n) {
                                                 quantile(score[1:n], probs = .75)
-                                              })) %>% 
+                                              })) %>%
                       mutate()
 
   list <- list(
@@ -272,15 +316,15 @@ plot_cumsummary <- function(data, x, y) {
               mapping = aes_string(x = deparse(x_q), y = "cummean"),
               linetype = 1, color = "red", inherit.aes = FALSE),
     geom_ribbon(data = df_cumsummary,
-                aes_string(x = deparse(x_q), 
-                           ymin = "cummean.low", ymax = "cummean.high"), 
+                aes_string(x = deparse(x_q),
+                           ymin = "cummean.low", ymax = "cummean.high"),
                 fill = "red", alpha = .2, inherit.aes = FALSE)
   )
 }
 
 # count_weekend_days = function(start_date, end_date) {
 #   count <- vector("integer", length(start_date))
-# 
+#
 #   for(i in seq_along(start_date)) {
 #     start <- as.Date(start_date[i])
 #     end <- as.Date(end_date[i])
@@ -292,7 +336,7 @@ plot_cumsummary <- function(data, x, y) {
 #       count[i] <- sum(vector_with_days %in% c('Saturday', 'Sunday'))
 #     }
 #   }
-# 
+#
 #   return(count)
 # }
 

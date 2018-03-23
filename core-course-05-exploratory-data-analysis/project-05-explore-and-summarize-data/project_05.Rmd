@@ -379,7 +379,7 @@ plot_score_issue_created_by_wday <- function(df_issue_created_by_wday,
     df_score_issue_created_by_wday %>% 
       ggplot(aes(x = issue_creation_wday, y = score)) +
         geom_col(color = "grey50", alpha = .1) +
-        plot_y_summary(df_issue_created_by_wday, issue_creation_wday) +
+        plot_frequency_ci(df_issue_created_by_wday, issue_creation_wday) +
         scale_y_continuous(breaks = seq(0, 1020, 100),
                            sec.axis = sec_axis(
                              trans = ~. / nrow(df_issue_created_by_wday),
@@ -870,7 +870,7 @@ plot_score_issue_deadline_wday <- function(df_issue_deadline_wday,
     df_score_issue_deadline_wday %>% 
       ggplot(aes(x = issue_deadline_wday, y = score)) +
         geom_col(color = "grey50", alpha = .1) +
-        plot_y_summary(df_issue_deadline_wday, issue_deadline_wday) +
+        plot_frequency_ci(df_issue_deadline_wday, issue_deadline_wday) +
         scale_y_continuous(breaks = seq(0, 500, 50),
                            sec.axis = sec_axis(
                              trans = ~. / nrow(df_issue_deadline_wday),
@@ -1216,7 +1216,7 @@ plot_score_issue_type <- function(df_issue_type,
     df_score_issue_type %>% 
       ggplot(aes(x = reorder(issue_type, -score), y = score)) +
         geom_col(color = "grey50", alpha = .1) +
-        plot_y_summary(df_issue_type, issue_type) +
+        plot_frequency_ci(df_issue_type, issue_type) +
         scale_y_continuous(breaks = seq(0, 3500, 250),
                            sec.axis = sec_axis(
                              trans = ~. / nrow(df_issue_type),
@@ -1275,11 +1275,10 @@ df_score_issue_system <-
 
 plot_score_issue_system <- 
   df_score_issue_system %>% 
-    ggplot(aes(x = reorder(issue_system, -score), y = score/sum(score))) +
+    ggplot(aes(x = reorder(issue_system, -score), y = score)) +
       geom_col(color = "grey50", alpha = .1) +
-      add_label(df_score_issue_system$score) +
-      scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
-                         labels = scales::percent) + 
+      plot_frequency_ci(df_issue_system, issue_system) +
+      #scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1)) + 
       labs(title = "Frequency of Issue System",
            subtitle = subtitle(nrow(df_issue_system)),
            x = "Issue system",
@@ -1295,11 +1294,12 @@ plot_score_issue_system
 df_issue_subsystem <-
   issues %>% 
     filter(!is.na(issue_subsystem)) %>% 
-    distinct(issue_id, issue_system, issue_subsystem)
+    mutate(issue_subsystem = paste0("(", issue_system, ") ", issue_subsystem)) %>% 
+    distinct(issue_id, issue_subsystem)
 
 df_score_top15_issue_subsystem <- 
   df_issue_subsystem %>%
-    group_by(issue_system, issue_subsystem) %>% 
+    group_by(issue_subsystem) %>% 
     summarise(score = n()) %>% 
     arrange(desc(score)) %>% 
     ungroup() %>% 
@@ -1307,13 +1307,11 @@ df_score_top15_issue_subsystem <-
 
 plot_score_top15_issue_subsystem <- 
   df_score_top15_issue_subsystem %>% 
-    ggplot(aes(x = reorder(paste0("(", issue_system, ") ", issue_subsystem), 
-                           -score), 
-               y = score/sum(score))) +
+    ggplot(aes(x = reorder(issue_subsystem, -score), y = score)) +
       geom_col(color = "grey50", alpha = .1) +
-      add_label(df_score_top15_issue_subsystem$score) +
-      scale_y_continuous(limits = c(0, .45), breaks = seq(0, 1, .1), 
-                         labels = scales::percent) + 
+      plot_frequency_ci(df_issue_subsystem, issue_subsystem, df_score_top15_issue_subsystem) +
+      #scale_y_continuous(limits = c(0, .45), breaks = seq(0, 1, .1), 
+      #                   labels = scales::percent) + 
       labs(title = "Frequency (Top 15) of Issue Subsystem",
            subtitle = subtitle(nrow(df_issue_subsystem)),
            x = "Issue subsystem",
@@ -1338,11 +1336,11 @@ df_score_issue_stakeholder <-
 
 plot_score_issue_stakeholder <- 
   df_score_issue_stakeholder %>% 
-    ggplot(aes(x = reorder(issue_stakeholder, -score), y = score/sum(score))) +
+    ggplot(aes(x = reorder(issue_stakeholder, -score), y = score)) +
       geom_col(color = "grey50", alpha = .1) +
-      add_label(df_score_issue_stakeholder$score) +
-      scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
-                         labels = scales::percent) + 
+      plot_frequency_ci(df_issue_stakeholder, issue_stakeholder) +
+      # scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
+      #                    labels = scales::percent) + 
       labs(title = "Frequency of Issue Stakeholder",
            subtitle = subtitle(nrow(df_issue_stakeholder)),
            x = "Issue stakeholder",
@@ -1357,26 +1355,26 @@ plot_score_issue_stakeholder
 df_issue_created_by <-
   issues %>% 
     filter(!is.na(issue_created_by)) %>% 
-    distinct(issue_id, issue_stakeholder, issue_created_by)
+    mutate(issue_created_by = paste0("(", issue_stakeholder, ") ", 
+                                     issue_created_by)) %>% 
+    mutate(issue_created_by = first_last_names(issue_created_by)) %>% 
+    distinct(issue_id, issue_created_by)
 
 df_score_top15_issue_created_by <- 
   df_issue_created_by %>%
-    group_by(issue_stakeholder, issue_created_by) %>% 
+    group_by(issue_created_by) %>% 
     summarise(score = n()) %>% 
     arrange(desc(score)) %>% 
     ungroup() %>% 
-    filter(row_number() <= 15) %>% 
-    mutate(issue_created_by = first_last_names(issue_created_by))
+    filter(row_number() <= 15)
 
 plot_score_top15_issue_created_by <- 
   df_score_top15_issue_created_by %>% 
-    ggplot(aes(x = reorder(paste0("(", issue_stakeholder, ") ", issue_created_by), 
-                           -score), 
-               y = score/sum(score))) +
+    ggplot(aes(x = reorder(issue_created_by, -score), y = score)) +
       geom_col(color = "grey50", alpha = .1) +
-      add_label(df_score_top15_issue_created_by$score) +
-      scale_y_continuous(limits = c(0, .25), breaks = seq(0, 1, .05), 
-                         labels = scales::percent) + 
+      plot_frequency_ci(df_issue_created_by, issue_created_by, df_score_top15_issue_created_by) +
+      # scale_y_continuous(limits = c(0, .25), breaks = seq(0, 1, .05), 
+      #                    labels = scales::percent) + 
       labs(title = "Frequency (Top 15) of Issue Created By",
            subtitle = subtitle(nrow(df_issue_created_by)),
            x = "Issue created by",
