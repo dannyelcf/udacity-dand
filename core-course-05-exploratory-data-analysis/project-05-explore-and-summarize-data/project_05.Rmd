@@ -20,12 +20,14 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
 ```{r results="hide", "Load Packages"}
 source("project_05.R")
 load_packages(c("ggplot2", 
-               "dplyr", 
-               "lubridate", 
-               "grid", 
-               "gridExtra",
-               "boot",
-               "DescTools"))
+                "dplyr", 
+                "lubridate"
+                #, 
+                #"grid", 
+                #"gridExtra",
+                #"boot",
+                #"DescTools"
+                ))
 ```
 
 ```{r "Project Set Up"}
@@ -121,6 +123,7 @@ plot_number_logs_per_issue <- function(df_number_logs_per_issue) {
         geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
                        boundary = summ_number_logs_per_issue$min, 
                        closed = "left") +
+        #geom_density(aes(y = 1 * ..count..)) +
         plot_x_summary(df_number_logs_per_issue, score) +
         scale_x_continuous(breaks = seq(0, 43, 2)) +
         scale_y_continuous(breaks = seq(0, 800, 100)) +
@@ -146,6 +149,7 @@ histogram below.
 ```{r "Distribution of the Number of Logs per Issue"}
 plt_number_logs_per_issue <-
   df_number_logs_per_issue %>% 
+    #mutate(score = sqrt(score)) %>% 
     plot_number_logs_per_issue()
 
 plt_number_logs_per_issue
@@ -382,8 +386,6 @@ plot_score_issue_created_by_wday <- function(df_issue_created_by_wday,
     df_score_issue_created_by_wday %>% 
       ggplot(aes(x = issue_creation_wday, y = score)) +
         geom_col(color = "grey50", alpha = .1) +
-        plot_frequency_ci(df_score_issue_created_by_wday, 
-                          issue_creation_wday, score) +
         scale_y_continuous(breaks = seq(0, 1020, 100),
                            sec.axis = sec_axis(
                              trans = ~. / nrow(df_issue_created_by_wday),
@@ -874,8 +876,6 @@ plot_score_issue_deadline_wday <- function(df_issue_deadline_wday,
     df_score_issue_deadline_wday %>% 
       ggplot(aes(x = issue_deadline_wday, y = score)) +
         geom_col(color = "grey50", alpha = .1) +
-        plot_frequency_ci(df_score_issue_deadline_wday, 
-                          issue_deadline_wday, score) +
         scale_y_continuous(breaks = seq(0, 500, 50),
                            sec.axis = sec_axis(
                              trans = ~. / nrow(df_issue_deadline_wday),
@@ -1221,8 +1221,6 @@ plot_score_issue_type <- function(df_issue_type,
     df_score_issue_type %>% 
       ggplot(aes(x = reorder(issue_type, -score), y = score)) +
         geom_col(color = "grey50", alpha = .1) +
-        plot_frequency_ci(df_score_issue_type, 
-                          issue_type, score) +
         scale_y_continuous(breaks = seq(0, 3500, 250),
                            sec.axis = sec_axis(
                              trans = ~. / nrow(df_issue_type),
@@ -1283,8 +1281,6 @@ plot_score_issue_system <-
   df_score_issue_system %>% 
     ggplot(aes(x = reorder(issue_system, -score), y = score)) +
       geom_col(color = "grey50", alpha = .1) +
-      plot_frequency_ci(df_score_issue_system, 
-                        issue_system, score) +
       #scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1)) + 
       labs(title = "Frequency of Issue System",
            subtitle = subtitle(nrow(df_issue_system)),
@@ -1316,8 +1312,6 @@ plot_score_top15_issue_subsystem <-
   df_score_top15_issue_subsystem %>% 
     ggplot(aes(x = reorder(issue_subsystem, -score), y = score)) +
       geom_col(color = "grey50", alpha = .1) +
-      plot_frequency_ci(df_score_top15_issue_subsystem, 
-                        issue_subsystem, score) +
       #scale_y_continuous(limits = c(0, .45), breaks = seq(0, 1, .1), 
       #                   labels = scales::percent) + 
       labs(title = "Frequency (Top 15) of Issue Subsystem",
@@ -1346,8 +1340,6 @@ plot_score_issue_stakeholder <-
   df_score_issue_stakeholder %>% 
     ggplot(aes(x = reorder(issue_stakeholder, -score), y = score)) +
       geom_col(color = "grey50", alpha = .1) +
-      plot_frequency_ci(df_score_issue_stakeholder, 
-                        issue_stakeholder, score) +
       # scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
       #                    labels = scales::percent) + 
       labs(title = "Frequency of Issue Stakeholder",
@@ -1381,8 +1373,6 @@ plot_score_top15_issue_created_by <-
   df_score_top15_issue_created_by %>% 
     ggplot(aes(x = reorder(issue_created_by, -score), y = score)) +
       geom_col(color = "grey50", alpha = .1) +
-      plot_frequency_ci(df_score_top15_issue_created_by, 
-                        issue_created_by, score) +
       # scale_y_continuous(limits = c(0, .25), breaks = seq(0, 1, .05), 
       #                    labels = scales::percent) + 
       labs(title = "Frequency (Top 15) of Issue Created By",
