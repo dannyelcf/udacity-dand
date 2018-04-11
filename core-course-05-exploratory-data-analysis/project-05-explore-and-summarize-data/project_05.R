@@ -59,70 +59,17 @@ load_dataset <- function(path) {
                      ))
 }
 
-# ci.mean <- function(vec) {
-#   if(length(vec) == 1) {
-#     df_ci <- data.frame(mean = vec[1],
-#                         se = 0,
-#                         low = vec[1],
-#                         high = vec[1])
-#     return(df_ci)
-#   }
-# 
-#   fun.mean <- function(vec, idx) {
-#     mean(vec[idx], na.rm = TRUE)
-#   }
-# 
-#   boot.mean <- boot(vec, fun.mean, R=1000)
-#   boot.ci.mean <- boot.ci(boot.mean, type = "perc")
-#   df_ci <- data.frame(mean = boot.mean$t0,
-#                       se = sd(boot.mean$t[,1]),
-#                       low = boot.ci.mean$percent[4],
-#                       high = boot.ci.mean$percent[5])
-#   return(df_ci)
-# }
-
-# ci.frequency <- function(df, variable) {
-#   var_q <- variable#substitute(variable)
-# 
-#   df_aux <- df %>%
-#               group_by_(var_q) %>%
-#               summarise(score = n()) %>%
-#               select_(var_q)
-# 
-#   fun.freq <- function(df, idx) {
-#     df[idx, ] %>%
-#       group_by_(var_q) %>%
-#       summarise(score = n()) %>%
-#       right_join(df_aux, by = deparse(var_q)) %>%
-#       mutate(score = ifelse(is.na(score), 0, score)) %>%
-#       pull(score)
-#   }
-# 
-#   boot.freq <- boot(df, fun.freq, R=1000)
-# 
-#   df_ci <- data.frame(low = double(), high = double())
-#   for(i in 1:dim(boot.freq$t)[2]) {
-#     df_ci[i, ] <- boot.ci(boot.freq, type = "perc", index = i)$percent[4:5]
-#   }
-# 
-#   return(cbind(df_aux, df_ci))
-# }
-
 df_summary <- function(df, variable) {
   .df_summary(df, substitute(variable))
 }
 
 .df_summary <- function(df, variable) {
   variable_e <- eval(variable, df)
-  # ci.mean <- ci.mean(variable_e)
 
   data.frame(min = min(variable_e),
              qu1 = quantile(variable_e, probs = .25, names = FALSE),
              median = quantile(variable_e, probs = .5, names = FALSE),
              mean = mean(variable_e),
-             # mean.ci.low = ci.mean$low,
-             # mean.ci.high = ci.mean$high,
-             # mean.se = ci.mean$se,
              sd = sd(variable_e),
              qu3 = quantile(variable_e, probs = .75, names = FALSE),
              iqr = (quantile(variable_e, probs = .75, names = FALSE) -
@@ -191,48 +138,8 @@ plot_x_summary <- function(data, x) {
     },
     # Mean
     geom_vline(xintercept = df_summary$mean, linetype = 1, color = "red")
-    # ,
-    # annotate("rect",
-    #          xmin = df_summary$mean.ci.low,
-    #          xmax = df_summary$mean.ci.high,
-    #          ymin = -Inf,
-    #          ymax = Inf,
-    #          fill = "red", alpha = .2)
   )
 }
-
-# plot_frequency_ci <- function(data, x, y) {
-#   x_q <- substitute(x)
-#   y_q <- substitute(y)
-#   y_values <- data[, deparse(y_q), drop=TRUE]
-# 
-#   df_ci <- MultinomCI(y_values, conf.level = 0.95, method = "waldcc") * sum(y_values)
-#   df_ci <- cbind(data, df_ci)
-# 
-#   list(
-#     geom_errorbar(aes_string(x = deparse(x_q),
-#                              ymin = "lwr.ci", ymax = "upr.ci"),
-#                   df_ci, inherit.aes = FALSE,
-#                   width = 0.25, color = "red")
-#   )
-# }
-
-# plot_frequency_ci <- function(data, y, df_join = NULL) {
-#   y_q <- substitute(y)
-#   if(is.null(df_join)) {
-#     df_freq <- ci.frequency(data, y_q)
-#   } else {
-#     df_freq <- ci.frequency(data, y_q) %>%
-#                  semi_join(df_join, by = deparse(y_q))
-#   }
-# 
-#   list(
-#     geom_errorbar(aes_string(x = deparse(y_q),
-#                              ymin = "low", ymax = "high"),
-#                   df_freq, inherit.aes = FALSE,
-#                   width = 0.25, color = "red")
-#   )
-# }
 
 plot_y_summary <- function(data, y) {
   y_q <- substitute(y)
@@ -265,13 +172,6 @@ plot_y_summary <- function(data, y) {
     },
     # Mean
     geom_hline(yintercept = df_summary$mean, linetype = 1, color = "red")
-    # ,
-    # annotate("rect",
-    #          xmin = -Inf,
-    #          xmax = Inf,
-    #          ymin = df_summary$mean.ci.low,
-    #          ymax = df_summary$mean.ci.high,
-    #          fill = "red", alpha = .2)
   )
 }
 
@@ -290,21 +190,12 @@ plot_cumsummary <- function(data, x, y) {
     stop("'y' argument can't be NULL")
   }
 
-  # https://stackoverflow.com/a/32833744/8645131
-  # cummean.ci <- lapply(seq_along(y),
-  #                      function(n) {
-  #                        ci.mean(y[1:n])
-  #                      })
-  # cummean.ci <- do.call(rbind, cummean.ci)
-
   df_cumsummary <- data %>%
                      # Create cumulative summaries variables
                      mutate(cummean = sapply(seq_along(y),
                                              function(n) {
                                                mean(y[1:n])
                                              }),
-                            # cummean.low = cummean.ci$low,
-                            # cummean.high = cummean.ci$high,
                             cummedian = sapply(seq_along(y),
                                                function(n) {
                                                  median(y[1:n])
@@ -333,11 +224,6 @@ plot_cumsummary <- function(data, x, y) {
     geom_line(data = df_cumsummary,
               mapping = aes_string(x = deparse(x_q), y = "cummean"),
               linetype = 1, color = "red", inherit.aes = FALSE)
-    # ,
-    # geom_ribbon(data = df_cumsummary,
-    #             aes_string(x = deparse(x_q),
-    #                        ymin = "cummean.low", ymax = "cummean.high"),
-    #             fill = "red", alpha = .2, inherit.aes = FALSE)
   )
 }
 

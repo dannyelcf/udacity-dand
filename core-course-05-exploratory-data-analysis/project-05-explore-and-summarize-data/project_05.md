@@ -29,42 +29,45 @@ The exported data set, the wrangling process scripts and an example of
 one issue tracking can be find in [data\_wrangling](data_wrangling)
 folder.
 
-# Data Set Summaries
+# Initial Descriptive Analysis
 
-In this section, I perform a univariate exploration in the data set, by
-first examining the structure, followed by analysis of time series
-variables and ending with the analysis categorical and range variables.
+In this section, we perform a univariate exploration of the data set,
+first examining its structure, followed by the analysis of each variable
+starting with issue variables and ending with log variables. In each
+group (issue and log) I begin with exploration of temporal variables and
+end with the analysis of categorical and range variables.
 
 ### Data Set Structure
 
 The issues data set contains 22125 rows and 24 variables. Of these 24
 variables 16 are about issue data and 8 about issue’s logs.
 
-    ## 'data.frame':    22125 obs. of  24 variables:
-    ##  $ issue_id             : int  487247 487247 ...
-    ##  $ issue_number         : int  88374 88374 ...
-    ##  $ issue_title          : chr  "Tarefa 88374 - Alteração de Finan"| __truncated__ ...
-    ##  $ issue_type           : Factor w/ 4 levels "CUSTOMIZATION",..: 1 1 ...
-    ##  $ issue_creation_date  : POSIXct, format: "2016-12-15 15:07:32" ...
-    ##  $ issue_system         : Factor w/ 10 levels "INDEFINIDO","SERVICOS INTEGRADOS",..: 4 4 ...
-    ##  $ issue_start_date     : Date, format: "2016-12-20" ...
-    ##  $ issue_subsystem      : Factor w/ 77 levels "ADMINISTRAÇÃO",..: 34 34 ...
-    ##  $ issue_deadline_date  : Date, format: "2017-01-03" ...
-    ##  $ issue_created_by     : chr  "HELENA CLAUDIA DOS SANTOS TEIXEIRA" ...
-    ##  $ issue_stakeholder    : Factor w/ 2 levels "COMPANY","CUSTOMER": 1 1 ...
-    ##  $ issue_status         : Factor w/ 10 levels "CANCELED","CUSTOMER CLOSING PENDING",..: 3 3 ...
-    ##  $ issue_time_spent     : int  360 360 ...
-    ##  $ issue_priority_number: int  999 999 ...
-    ##  $ issue_progress       : int  100 100 ...
-    ##  $ issue_priority_scale : Factor w/ 6 levels "SUSPENDED","LOW",..: 4 4 ...
-    ##  $ log_build_info       : chr  NA ...
-    ##  $ log_creation_date    : POSIXct, format: "2017-04-10 17:07:00" ...
-    ##  $ log_action           : Factor w/ 14 levels "CHANGE OF RESPONSIBILITY",..: 5 12 ...
-    ##  $ log_status           : Factor w/ 34 levels "AUTHORIZED DEVELOPMENT",..: 7 4 ...
-    ##  $ log_progress         : int  100 100 ...
-    ##  $ log_time_spent       : int  NA NA ...
-    ##  $ log_created_by       : chr  "ROSANGELA DIVINA DE SOUSA SANTANA" ...
-    ##  $ log_svn_revision     : int  NA NA ...
+    ## Observations: 22,125
+    ## Variables: 24
+    ## $ issue_id              <int> 487247, 487247, 487247, 487247, 487247, ...
+    ## $ issue_number          <int> 88374, 88374, 88374, 88374, 88374, 74486...
+    ## $ issue_title           <chr> "Tarefa 88374 - Alteração de Financiamen...
+    ## $ issue_type            <fct> CUSTOMIZATION, CUSTOMIZATION, CUSTOMIZAT...
+    ## $ issue_creation_date   <dttm> 2016-12-15 15:07:32, 2016-12-15 15:07:3...
+    ## $ issue_system          <fct> SIGAA, SIGAA, SIGAA, SIGAA, SIGAA, SIGRH...
+    ## $ issue_start_date      <date> 2016-12-20, 2016-12-20, 2016-12-20, 201...
+    ## $ issue_subsystem       <fct> EXTENSÃO, EXTENSÃO, EXTENSÃO, EXTENSÃO, ...
+    ## $ issue_deadline_date   <date> 2017-01-03, 2017-01-03, 2017-01-03, 201...
+    ## $ issue_created_by      <chr> "HELENA CLAUDIA DOS SANTOS TEIXEIRA", "H...
+    ## $ issue_stakeholder     <fct> COMPANY, COMPANY, COMPANY, COMPANY, COMP...
+    ## $ issue_status          <fct> FINISHED, FINISHED, FINISHED, FINISHED, ...
+    ## $ issue_time_spent      <int> 360, 360, 360, 360, 360, 51120, 51120, 5...
+    ## $ issue_priority_number <int> 999, 999, 999, 999, 999, 999, 999, 999, ...
+    ## $ issue_progress        <int> 100, 100, 100, 100, 100, 100, 100, 100, ...
+    ## $ issue_priority_scale  <fct> HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH...
+    ## $ log_build_info        <chr> NA, NA, "SIGAA-4.1.140.ufg", NA, NA, NA,...
+    ## $ log_creation_date     <dttm> 2017-04-10 17:07:00, 2017-04-04 11:55:0...
+    ## $ log_action            <fct> ISSUE ALTERATION, RESPONSE TO STAKEHOLDE...
+    ## $ log_status            <fct> FINISHED, CUSTOMER CLOSING PENDING, REQU...
+    ## $ log_progress          <int> 100, 100, 90, 90, 0, 100, 100, 100, 100,...
+    ## $ log_time_spent        <int> NA, NA, 60, NA, NA, NA, NA, NA, NA, NA, ...
+    ## $ log_created_by        <chr> "ROSANGELA DIVINA DE SOUSA SANTANA", "RE...
+    ## $ log_svn_revision      <int> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
 
 The number of distinct issues rows and issue’s logs rows are 4503 and
 21978 respectively. That is, the number of issues represents 20% of the
@@ -79,29 +82,21 @@ below.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean, the red shading represents the 95% of
-> mean confidence interval (not visible in this plot because its narrow
-> interval) and the black dotted line represent the upper threshold to
-> the outliers (3rd qu. + 1.5 IQR).
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
 Analysing the plot above, we can note that most of issues have between 1
-and 9 history logs (1 standard deviation from the mean), 75% of them
-have up to 6 history logs and 50% of issues have between 2 and 6 logs, a
-narrow range. Despite the skewed shape of plot, the median and mean are
-very close. This means that the amount of ouliers (after 12 logs per
-issue) is very low, approximately 4% of issues.
+and 9 history logs, approximately 1 standard deviation from the mean.
+Also, 75% of them have up to 6 history logs and 50% of issues have
+between 2 and 6 logs, a narrow range. Despite the skewed shape of plot,
+the median and mean are very close. This means that the amount of
+ouliers, after 12 logs per issue, is very low, approximately 4% of
+issues.
 
 The representative narrow range of logs in an issue makes us think that
 there shoud be an activity flow pattern to resolve an issue. This flow
 pattern migth be observed in a commom sequence of log status. See more
 informations in the [Log Status](#log-status) section.
-
-The next 6 sections show the analisys of the temporal issues variables:
-four originally in the data set (`issue_creation_date`,
-`issue_start_date`, `issue_deadline_date` and `issue_time_spent`) and
-two derived from the calculation (`issue_delay_start` and
-`issue_deadline_size`). In an issue tracking system, temporal variables
-is the fundamental piece for monitoring and control of activities.
 
 ### Issue Creation Date
 
@@ -117,7 +112,7 @@ line.
 <img src="project_05_files/plots/Cumulative Number of Issues Created-1.png" width="86%" />
 
 > **Note:** In the plot above, the blue solid line represents the trend
-> of the data and solid grey vertical lines represent the 1st day of
+> of the data and dotted grey vertical lines represent the 1st day of
 > year.
 
 We note that the first 11 months (from May 2013 to March 2014) of the
@@ -150,31 +145,29 @@ summaries.
 <img src="project_05_files/plots/Distribution of the Number of Issues Created per Month-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
-> and 3rd cumulated quartile, the black and red solid lines represent,
-> respectivaly, cumulated median and mean, the red shading represents
-> the 95% of cumulated mean confidence interval and solid grey vertical
+> and 3rd accumulated quartile, the black and red solid lines represent,
+> respectivaly, accumulated median and mean and dotted grey vertical
 > lines represent the 1st day of year.
 
 Analysing the area plot above, we note that the year 2013 had the lowest
-demand. The cumulated mean variates around 15 issues per month. At the
+demand. The accumulated mean variates around 15 issues per month. At the
 end of 2013 and begin of 2014 there was a drop in activities because of
 the low administrative and academic activities at the university at the
 end of year.
 
 From April of 2014 until February of 2015 there was significant growth
-in activities. The cumulated mean increases from 15 to 50 issues per
-month and it overcame the cumulated median. The distance between
-cumulated 3rd quartile and cumulated median became greater than distance
-between cumulated 1st quartile and cumulated median. The 95% of
-cumulated mean confidence interval also increases indicating an increase
-in the variability in the data history. All this indicates that these
-months had a high number of issues created in relation to the past.
+in activities. The accumulated mean increases from 15 to 50 issues per
+month and it overcame the accumulated median. The distance between
+accumulated 3rd quartile and accumulated median became greater than
+distance between accumulated 1st quartile and accumulated median. All
+this indicates that these months had a high number of issues created in
+relation to the past.
 
 But from August of 2015 the pace of growth dropped. Now, we can note
-that the distance between cumulated 1st quartile and cumulated median
-becomes greater than distance between cumulated 3rd quartile and
-cumulated median. This invertion provocated the overlap between
-cumulated mean and median. The stabilization of the growth also
+that the distance between accumulated 1st quartile and accumulated
+median becomes greater than distance between accumulated 3rd quartile
+and accumulated median. This invertion provocated the overlap between
+accumulated mean and median. The stabilization of the growth also
 contributed to that. The average of growth pass to be only 10 monthly
 issues (from 70 to 80), approximately.
 
@@ -192,8 +185,7 @@ below.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean and the red shading represents the 95%
-> of mean confidence interval.
+> respectivaly, median and mean.
 
 Note that whether we sort business days by the frequency of issue
 creations we have Tue \> Wed \> Thu \> Fri \> Mon. Tuesday is the
@@ -205,22 +197,21 @@ the afternoon.
 
 Issues created on weenkend (18 issues) may be considered outliers. These
 are issues created on weekend shift that was done during the enrollment
-periods. Theses outliers pull the mean and 1st quartile down, increase
-the standard deviation and the 95% of mean confidence interval. Removing
-them, we have a new barplot. See it
+periods. Theses outliers pull the mean and 1st quartile down and
+increase the standard deviationof mean. Removing them, we have a new
+barplot. See it
 below.
 
 <img src="project_05_files/plots/Frequency of Issues Created per Weekday (No Weekend)-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean and the red shading represents the 95%
-> of mean confidence interval.
+> respectivaly, median and mean.
 
 Note that the summaries are now approximated. The median and mean
-overlap, the distance between 1st and 3rd quartile became narrow, the
-standard deviation and the 95% of mean confidence interval descrease.
-These new summaries better reflect the behavior of issue creation.
+overlap, the distance between 1st and 3rd quartile became narrow and the
+standard deviation of mean descrease. These new summaries better reflect
+the behavior of issue creation.
 
 Analysing how was the behaviour of the issue creations per hour of the
 day we have the bimodal distribution
@@ -230,8 +221,7 @@ below.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean, the red shading represents the 95% of
-> mean confidence interval and the black dotted lines represent the
+> respectivaly, median and mean, the black dotted lines represent the
 > lower and upper threshold to the outliers (lower = 1st qu. - 1.5 IQR,
 > upper = 3rd qu. + 1.5 IQR).
 
@@ -250,8 +240,7 @@ below.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean and the red shading represents the 95%
-> of mean confidence interval.
+> respectivaly, median and mean.
 
 This shows us that the high issue creation volume actually comprises
 between 8:00h and 18:00h.
@@ -272,7 +261,7 @@ below.
 <img src="project_05_files/plots/Cumulative Number of Issues Started per Month-1.png" width="86%" />
 
 > **Note:** In the plot above, the blue solid line represents the trend
-> of the data and solid grey vertical lines represent the 1st day of
+> of the data and dotted grey vertical lines represent the 1st day of
 > year.
 
 Pratically it has the same shape and values of the Cumulative Number of
@@ -293,19 +282,13 @@ date.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean, the red shading represents the 95% of
-> mean confidence interval and the black dotted lines represents the
-> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+> respectivaly, median and mean and the black dotted lines represents
+> the upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
 About 80% of 4478 issues, with start date information, have less than or
 equal 5 calendar days of delay to start. These amount of days is very
 short compared to the 30 days of the month (granularity used in the
 plots).
-
-Note also that 95% of the mean confidence interval is very narrow even
-though the standard deviation to be high and the dataset contain
-outliers with high number of calendar days. This indicates that the
-affirmative of the previous paragraph is robust.
 
 ### Issue Deadline Date
 
@@ -325,7 +308,7 @@ below.
 <img src="project_05_files/plots/Cumulative Number of Issues Deadlines per Month-1.png" width="86%" />
 
 > **Note:** In the plot above, the blue solid line represents the trend
-> of the data and solid grey vertical lines represent the 1st day of
+> of the data and dotted grey vertical lines represent the 1st day of
 > year.
 
 Until January of 2017, the growth curve of the cumulative number of
@@ -339,13 +322,12 @@ way.
 <img src="project_05_files/plots/Distribution of the Number of Issue Deadlines per Month-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
-> and 3rd cumulated quartile, the black and red solid lines represent,
-> respectivaly, cumulated median and mean, the red shading represents
-> the 95% of cumulated mean confidence interval and solid grey vertical
+> and 3rd accumulated quartile, the black and red solid lines represent,
+> respectivaly, accumulated median and mean and dotted grey vertical
 > lines represent the 1st day of year.
 
 Note how, after April of 2017, the frequency of issue deadlines
-decreases and does not rise again. The same occur with cumulated
+decreases and does not rise again. The same occur with accumulated
 summaries. This phenomenon did not occur with creation and start date.
 
 The reason for this is lack of data. After April of 2017, the number of
@@ -362,9 +344,8 @@ below.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean, the red shading represents the 95% of
-> mean confidence interval and the black dotted lines represents the
-> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+> respectivaly, median and mean, and the black dotted lines represents
+> the upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
 Issues with deadline to weenkend may be considered outliers. These are
 issues created on weekend shift (during the enrollment periods) with
@@ -375,8 +356,7 @@ below.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean, and the red shading represents the 95%
-> of mean confidence interval.
+> respectivaly, median and mean.
 
 Tuesday is the weekday that has more issue deadlines (mode). Monday and
 Friday are the business days with less issue deadline. The reason for
@@ -387,12 +367,13 @@ two weeks duration. Always starting and ending on Tuesdays. It is worth
 mentioning that not all issues were part of the sprint and not all
 issues in the sprint had deadline of the sprint size.
 
-### Issue Deadline Size
-
-The issue deadline size represents the total planned time to solve and
-deliver an issue, that is, the difference between issue start and
+To analize better this behavior I created a new variable named
+`issue_deadline_size` which represents the total planned time to solve
+and deliver an issue, that is, the difference between issue start and
 deadline date. This variable is interesting because it gives us an idea
 of the planning of the activities.
+
+### Issue Deadline Size
 
 See in the plot below how is the distribution of the deadline
 size.
@@ -425,10 +406,8 @@ hour.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean, the red shading represents the 95% of
-> mean confidence interval (not visible in this plot because its narrow
-> interval) and the black dotted line represent the upper threshold to
-> the outliers (3rd qu. + 1.5 IQR).
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
 Note as the distribution comprises below 5 hours (upper threshold to the
 outliers). The median is 30 minutes (0.5 hour). That is, 50% of time
@@ -443,9 +422,8 @@ below.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean, the red shading represents the 95% of
-> mean confidence interval and the black dotted line represent the upper
-> threshold to the outliers (3rd qu. + 1.5 IQR).
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
 In the plot above, we can see better that time spent on an issue is
 usually less than 1 hour. Thus, in the plot below we will analyze it on
@@ -456,9 +434,8 @@ scale.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean, the red shading represents the 95% of
-> mean confidence interval and the black dotted line represent the upper
-> threshold to the outliers (3rd qu. + 1.5 IQR).
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
 Note that the time spent is spread almost uniformly between 5 and 55
 minutes and is well concentrated below 5 minutes. To better analyze the
@@ -482,8 +459,7 @@ distribution.
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean, and red shading represents the 95% of
-> mean confidence interval.
+> respectivaly, median and mean.
 
 Now, notice that 75% of the issues, with the time spent less than an
 hour, took about 36 minutes to resolve. This time represents about 25%
@@ -493,6 +469,11 @@ that recreates the visualization of the time spent on an issue less than
 hours.
 
 <img src="project_05_files/plots/Distribution of the Number of Time Spent on a Issue (Non 0)-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
 Now, the mean and 75% of issues spend more or less 3 hours and 30
 minutes to be resolved.
