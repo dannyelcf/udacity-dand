@@ -1170,14 +1170,15 @@ resolved.
 
 ### Issue Type
 
-In the issue tracking system, 4 types of issues were used to classify the 
-purpose of a issue. They are:
+In the issue tracking system, 65 issue types were used to classify the purpose 
+of a issue. I grouped them in 4 types (see how in 
+[issues_cleaning.R](data_wrangling/issues_cleaning.R)):
 
 ```{r "Issue Type Values"}
 levels(issues$issue_type)
 ```
 
-The frequency of issues created by each issue type is shown in the graph below.
+The frequency of issues created by each issue type is shown in the plot below.
 
 ```{r}
 plot_score_issue_type <- function(df_issue_type,

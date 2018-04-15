@@ -480,8 +480,9 @@ minutes to be resolved.
 
 ### Issue Type
 
-In the issue tracking system, 4 types of issues were used to classify
-the purpose of a issue. They are:
+In the issue tracking system, 65 issue types were used to classify the
+purpose of a issue. I grouped them in 4 types (see how in
+[issues\_cleaning.R](data_wrangling/issues_cleaning.R)):
 
     ## [1] "CUSTOMIZATION"  "DATA MIGRATION" "MAINTENANCE"    "OTHERS"
 
