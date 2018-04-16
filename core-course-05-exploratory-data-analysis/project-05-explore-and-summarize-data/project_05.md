@@ -486,17 +486,21 @@ purpose of a issue. I grouped them in 4 types (see how in
 
     ## [1] "CUSTOMIZATION"  "DATA MIGRATION" "MAINTENANCE"    "OTHERS"
 
-The frequency of issues created by each issue type is shown in the graph
+The frequency of issues created by each issue type is shown in the plot
 below.
 
 <img src="project_05_files/plots/Frequency of Issue Type-1.png" width="86%" />
 
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean.
+
 Analysing the plot above, we note that most of the issues are of the
 MAINTENANCE type (around 75%). Next comes the issues of the
-CUSTOMIZATION type (around 20%). And, with less than 0.05% comes the
-issues of the types DATA MIGRATION and OTHERS. Thus, we can summarize
-that project management was characterized by corrective maintenance
-activities of existing systems and subsystems.
+CUSTOMIZATION type (around 20%). And, around 5% comes the issues of the
+types DATA MIGRATION and OTHERS. Thus, we may summarize that project
+management was characterized by corrective maintenance activities on
+systems and subsystems.
 
 The demand for adaptation and evolution of the systems was not
 insignificant. Although the amount of CUSTOMIZATION and DATA MIGRATION
@@ -504,8 +508,10 @@ issues are less than MAINTENANCE, they may have indirectly influenced in
 the creation of large volume of MAINTENANCE issues. Maybe, CUSTOMIZATION
 issues had provocated related creation of MAINTENANCE issues. The same
 is true for DATA MIGRATION. An analysis of issue creations timeline by
-system/subsystem may answer that
-assumption.
+system/subsystem and issue types may answer that assumption. See [Issue
+Creation Date X Issue Subsystem X Issue
+Type](#issue-creation-date-x-issue-subsystem-x-issue-type)
+section.
 
 ### Issue System
 
@@ -573,3 +579,10 @@ What is the commom flow of the log states? (Data Set Structure)
 
 What makes the demand low in 2013? What makes the demand grow rapidly in
 2014?
+
+### Association Between Variables
+
+#### Issue Creation Date X Issue Subsystem X Issue Type
+
+An analysis of issue creations timeline by system/subsystem and issue
+types may answer that assumption.
