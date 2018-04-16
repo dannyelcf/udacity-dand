@@ -42,6 +42,9 @@ theme_set(theme_classic() %+replace%
                   plot.subtitle = element_text(size = rel(0.8), 
                                                hjust = 0, vjust = 1, 
                                                margin = margin(b = 5.5 * 0.9))))
+
+DEFAULT_COLOR = "grey50"
+DEFAULT_ALFA = .1
 ```
 
 ```{r "Load Data Set"}
@@ -116,7 +119,7 @@ plot_number_logs_per_issue <- function(df_number_logs_per_issue) {
   plot_number_logs_per_issue <-
     df_number_logs_per_issue %>% 
       ggplot(aes(x = score)) +
-        geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
+        geom_histogram(binwidth = 1, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                        boundary = summ_number_logs_per_issue$min, 
                        closed = "left") +
         plot_x_summary(df_number_logs_per_issue, score) +
@@ -144,7 +147,6 @@ histogram below.
 ```{r "Distribution of the Number of Logs per Issue"}
 plt_number_logs_per_issue <-
   df_number_logs_per_issue %>% 
-    #mutate(score = sqrt(score)) %>% 
     plot_number_logs_per_issue()
 
 plt_number_logs_per_issue
@@ -216,8 +218,8 @@ plot_cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
   plot_cum_score_issue_created_by_month <-
     df_cum_score_issue_created_by_month %>% 
       ggplot(aes(x = issue_creation_date, y = cumscore)) +
-        geom_area(color = "grey50", alpha = .1) +
-        geom_point(color = "grey50") +
+        geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+        geom_point(color = DEFAULT_COLOR) +
         plot_year_vline() +
         geom_smooth(method = "lm", size = .5, fill = "blue", alpha = .2) +
         scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
@@ -289,8 +291,8 @@ plot_score_issue_created_by_month <- function(df_issue_created_by_month) {
   plot_score_issue_created_by_month <-
     df_score_issue_created_by_month %>% 
       ggplot(aes(x = issue_creation_date, y = score)) +
-        geom_area(color = "grey50", alpha = .1) +
-        geom_point(color = "grey50") +
+        geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+        geom_point(color = DEFAULT_COLOR) +
         plot_year_vline() +
         plot_cumsummary(df_score_issue_created_by_month, 
                         x = issue_creation_date,
@@ -368,7 +370,7 @@ plot_score_issue_created_by_wday <- function(df_issue_created_by_wday,
   plot_score_issue_created_by_wday <- 
     df_score_issue_created_by_wday %>% 
       ggplot(aes(x = issue_creation_wday, y = score)) +
-        geom_col(color = "grey50", alpha = .1) +
+        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
         plot_y_summary(df_issue_created_by_wday, issue_creation_wday) +
         scale_y_continuous(breaks = seq(0, 1020, 100),
                            sec.axis = sec_axis(
@@ -454,7 +456,7 @@ plot_issue_created_by_hour <- function(df_issue_created_by_hour,
   plot_issue_created_by_hour <-
     df_issue_created_by_hour %>% 
       ggplot(aes(x = issue_creation_hour)) +
-        geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
+        geom_histogram(binwidth = 1, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                        boundary = summ_number_issue_created_by_hour$min, 
                        closed = "left") +
         plot_x_summary(df_issue_created_by_hour, issue_creation_hour) +
@@ -554,8 +556,8 @@ plot_cum_score_issue_start_date_month <- function(df_issue_start_date_month) {
   plot_cum_score_issue_start_date_month <-
     df_cum_score_issue_start_date_month %>% 
       ggplot(aes(x = issue_start_date, y = cumscore)) +
-        geom_area(color = "grey50", alpha = .1) +
-        geom_point(color = "grey50") +
+        geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+        geom_point(color = DEFAULT_COLOR) +
         plot_year_vline() +
         geom_smooth(method = "lm", size = .5, fill = "blue", alpha = .2) +
         scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
@@ -629,7 +631,7 @@ plot_issue_delay_start <- function(df_issue_delay_start) {
   plot_issue_delay_start <-
     df_issue_delay_start %>% 
       ggplot(aes(x = issue_delay_start)) +
-        geom_histogram(binwidth = 5, color = "grey50", alpha = .1, 
+        geom_histogram(binwidth = 5, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                        boundary = summ_issue_delay_start$min, 
                        closed = "left") +
         plot_x_summary(df_issue_delay_start, issue_delay_start) +
@@ -735,8 +737,8 @@ plot_cum_score_issue_deadline_date_month <- function(df_issue_deadline_date_mont
   plot_cum_score_issue_deadline_date_month <-
     df_cum_score_issue_deadline_date_month %>% 
       ggplot(aes(x = issue_deadline_date, y = cumscore)) +
-        geom_area(color = "grey50", alpha = .1) +
-        geom_point(color = "grey50") +
+        geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+        geom_point(color = DEFAULT_COLOR) +
         plot_year_vline() +
         geom_smooth(method = "lm", size = .5, fill = "blue", alpha = .2) +
         scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
@@ -789,8 +791,8 @@ plot_score_issue_deadline_date_month <- function(df_issue_deadline_date_month) {
   plot_score_issue_deadline_date_month <- 
     df_score_issue_deadline_date_month %>% 
       ggplot(aes(x = issue_deadline_date, y = score)) +
-        geom_area(color = "grey50", alpha = .1) +
-        geom_point(color = "grey50") +
+        geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+        geom_point(color = DEFAULT_COLOR) +
         plot_year_vline() +
         plot_cumsummary(df_score_issue_deadline_date_month, 
                         x = issue_deadline_date,
@@ -849,7 +851,7 @@ plot_score_issue_deadline_wday <- function(df_issue_deadline_wday,
   plot_score_issue_deadline_wday <- 
     df_score_issue_deadline_wday %>% 
       ggplot(aes(x = issue_deadline_wday, y = score)) +
-        geom_col(color = "grey50", alpha = .1) +
+        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
         plot_y_summary(df_issue_deadline_wday, issue_deadline_wday) +
         scale_y_continuous(breaks = seq(0, 500, 50),
                            sec.axis = sec_axis(
@@ -940,7 +942,7 @@ plot_issue_deadline_size <- function(df_issue_deadline_size) {
   plot_issue_deadline_size <-
     df_issue_deadline_size %>% 
       ggplot(aes(x = issue_deadline_size)) +
-        geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
+        geom_histogram(binwidth = 1, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                        boundary = summ_issue_deadline_size$min, 
                        closed = "left") +
         plot_x_summary(df_issue_deadline_size, issue_deadline_size) +
@@ -1004,7 +1006,7 @@ plot_issue_time_spent_hour <- function(df_issue_time_spent_hour,
   plot_issue_time_spent_hour <- 
     df_issue_time_spent_hour %>% 
       ggplot(aes(x = issue_time_spent)) +
-        geom_histogram(binwidth = binwidth, color = "grey50", alpha = .1, 
+        geom_histogram(binwidth = binwidth, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                        boundary = summ_issue_time_spent_hour$min, 
                        closed = "left") +
         plot_x_summary(df_issue_time_spent_hour, issue_time_spent) +
@@ -1198,7 +1200,7 @@ plot_score_issue_type <- function(df_issue_type,
   plot_score_issue_type <- 
     df_score_issue_type %>% 
       ggplot(aes(x = reorder(issue_type, -score), y = score)) +
-        geom_col(color = "grey50", alpha = .1) +
+        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
         plot_y_summary(df_issue_type, issue_type) +
         scale_y_continuous(breaks = seq(0, 3500, 250),
                            sec.axis = sec_axis(
@@ -1264,7 +1266,7 @@ df_score_issue_system <-
 plot_score_issue_system <- 
   df_score_issue_system %>% 
     ggplot(aes(x = reorder(issue_system, -score), y = score)) +
-      geom_col(color = "grey50", alpha = .1) +
+      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
       #scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1)) + 
       labs(title = "Frequency of Issue System",
            subtitle = subtitle(nrow(df_issue_system)),
@@ -1295,7 +1297,7 @@ df_score_top15_issue_subsystem <-
 plot_score_top15_issue_subsystem <- 
   df_score_top15_issue_subsystem %>% 
     ggplot(aes(x = reorder(issue_subsystem, -score), y = score)) +
-      geom_col(color = "grey50", alpha = .1) +
+      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
       #scale_y_continuous(limits = c(0, .45), breaks = seq(0, 1, .1), 
       #                   labels = scales::percent) + 
       labs(title = "Frequency (Top 15) of Issue Subsystem",
@@ -1323,7 +1325,7 @@ df_score_issue_stakeholder <-
 plot_score_issue_stakeholder <- 
   df_score_issue_stakeholder %>% 
     ggplot(aes(x = reorder(issue_stakeholder, -score), y = score)) +
-      geom_col(color = "grey50", alpha = .1) +
+      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
       # scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
       #                    labels = scales::percent) + 
       labs(title = "Frequency of Issue Stakeholder",
@@ -1356,7 +1358,7 @@ df_score_top15_issue_created_by <-
 plot_score_top15_issue_created_by <- 
   df_score_top15_issue_created_by %>% 
     ggplot(aes(x = reorder(issue_created_by, -score), y = score)) +
-      geom_col(color = "grey50", alpha = .1) +
+      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
       # scale_y_continuous(limits = c(0, .25), breaks = seq(0, 1, .05), 
       #                    labels = scales::percent) + 
       labs(title = "Frequency (Top 15) of Issue Created By",
@@ -1384,7 +1386,7 @@ df_score_issue_status <-
 plot_score_issue_status <- 
   df_score_issue_status %>% 
     ggplot(aes(x = reorder(issue_status, -score), y = score/sum(score))) +
-      geom_col(color = "grey50", alpha = .1) +
+      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
       add_label(df_score_issue_status$score) +
       scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, .15), 
                          labels = scales::percent) + 
@@ -1411,7 +1413,7 @@ summ_issue_priority_number <- df_summary(df_issue_priority_number,
 plot_issue_priority_number <- 
   df_issue_priority_number %>% 
     ggplot(aes(x = issue_priority_number)) +
-      geom_histogram(binwidth = 50, color = "grey50", alpha = .1, 
+      geom_histogram(binwidth = 50, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                      boundary = summ_issue_priority_number$min, 
                      closed = "left") +
       plot_x_summary(df_issue_priority_number, issue_priority_number) +
@@ -1448,7 +1450,7 @@ summ_issue_priority_number <- df_summary(df_issue_priority_number,
 plot_issue_priority_number <- 
   df_issue_priority_number %>% 
     ggplot(aes(x = issue_priority_number)) +
-      geom_histogram(binwidth = 10, color = "grey50", alpha = .1, 
+      geom_histogram(binwidth = 10, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                      boundary = summ_issue_priority_number$min, 
                      closed = "left") +
       plot_x_summary(df_issue_priority_number, issue_priority_number) +
@@ -1477,7 +1479,7 @@ summ_issue_priority_number <- df_summary(df_issue_priority_number,
 plot_issue_priority_number <- 
   df_issue_priority_number %>% 
     ggplot(aes(x = issue_priority_number)) +
-      geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
+      geom_histogram(binwidth = 1, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                      boundary = summ_issue_priority_number$min, 
                      closed = "left") +
       plot_x_summary(df_issue_priority_number, issue_priority_number) +
@@ -1509,7 +1511,7 @@ df_score_issue_priority_scale <-
 plot_score_issue_priority_scale <- 
   df_score_issue_priority_scale %>% 
     ggplot(aes(x = issue_priority_scale, y = score/sum(score))) +
-      geom_col(color = "grey50", alpha = .1) +
+      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
       add_label(df_score_issue_priority_scale$score) +
       scale_y_continuous(limits = c(0, .7), breaks = seq(0, 1, .1), 
                          labels = scales::percent) + 
@@ -1535,7 +1537,7 @@ summ_issue_progress <- df_summary(df_issue_progress,
 plot_issue_progress <- 
   df_issue_progress %>% 
     ggplot(aes(x = issue_progress)) +
-      geom_histogram(binwidth = 10, color = "grey50", alpha = .1, 
+      geom_histogram(binwidth = 10, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                      boundary = summ_issue_progress$min, 
                      closed = "left") +
       plot_x_summary(df_issue_progress, issue_progress) +
@@ -1575,7 +1577,7 @@ summ_log_build_info <- df_summary(df_log_build_info, score)
 plot_log_build_info <- 
   df_log_build_info %>% 
     ggplot(aes(x = score)) +
-      geom_histogram(binwidth = 5, color = "grey50", alpha = .1, 
+      geom_histogram(binwidth = 5, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                      boundary = summ_log_build_info$min, 
                      closed = "left") +
       plot_x_summary(df_log_build_info, score) +
@@ -1605,7 +1607,7 @@ summ_log_build_info <- df_summary(df_log_build_info, score)
 plot_log_build_info <- 
   df_log_build_info %>% 
     ggplot(aes(x = score)) +
-      geom_histogram(binwidth = 1, color = "grey50", alpha = .1, 
+      geom_histogram(binwidth = 1, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
                      boundary = summ_log_build_info$min, 
                      closed = "left") +
       plot_x_summary(df_log_build_info, score) +
