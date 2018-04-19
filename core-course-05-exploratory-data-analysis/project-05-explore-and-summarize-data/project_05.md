@@ -481,12 +481,10 @@ minutes to be resolved.
 ### Issue Type
 
 In the issue tracking system, 65 issue types were used to classify the
-purpose of a issue. I grouped them in 4 types (see how in
-[issues\_cleaning.R](data_wrangling/issues_cleaning.R)):
-
-    ## [1] "CUSTOMIZATION"  "DATA MIGRATION" "MAINTENANCE"    "OTHERS"
-
-The frequency of issues created by each issue type is shown in the plot
+purpose of a issue. I grouped them in 4 issue types (see how in
+[issues\_cleaning.R](data_wrangling/issues_cleaning.R), lines 54 to
+126): CUSTOMIZATION, DATA MIGRATION, MAINTENANCE and OTHERS. Their
+frequencies of issues created are shown in the plot
 below.
 
 <img src="project_05_files/plots/Frequency of Issue Type-1.png" width="86%" />
@@ -510,12 +508,34 @@ issues had provocated related creation of MAINTENANCE issues. The same
 is true for DATA MIGRATION. An analysis of issue creations timeline by
 system/subsystem and issue types may answer that assumption. See [Issue
 Creation Date X Issue Subsystem X Issue
-Type](#issue-creation-date-x-issue-subsystem-x-issue-type)
-section.
+Type](#issue-creation-date-x-issue-subsystem-x-issue-type) section.
 
 ### Issue System
 
+On the integrated systems platform ([SIG](https://docs.info.ufrn.br))
+there are 3 main systems: SIGAA (academic), SIPAC (administrative) and
+SIGRH (human resources management). Within these systems, there are many
+subsystems (modules). The other systems have purposes of support for
+these 3 systems or other activities.
+
+In the plot below, we may see the frequencies of issues created to 10
+systems.
+
 <img src="project_05_files/plots/Frequency of Issue System-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+Note that the academic system, SIGAA, surpasses all other systems
+together in number of created issues. It represents about 75% of all
+issues created. Also, note that, its frequency is considered an outlier
+(but in practice it is not). SIPAC (administrative) and SIGRH (human
+resources management) follow as 2nd and 3rd position. Both had roughly
+the same demand. Frequencies of the ohter systems are insignificant and
+we can consider them as
+outliers.
 
 ### Issue Subsystem
 

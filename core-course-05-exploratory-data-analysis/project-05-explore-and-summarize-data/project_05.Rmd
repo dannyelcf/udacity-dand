@@ -1173,14 +1173,10 @@ resolved.
 ### Issue Type
 
 In the issue tracking system, 65 issue types were used to classify the purpose 
-of a issue. I grouped them in 4 types (see how in 
-[issues_cleaning.R](data_wrangling/issues_cleaning.R)):
-
-```{r "Issue Type Values"}
-levels(issues$issue_type)
-```
-
-The frequency of issues created by each issue type is shown in the plot below.
+of a issue. I grouped them in 4 issue types (see how in 
+[issues_cleaning.R](data_wrangling/issues_cleaning.R), lines 54 to 126): 
+CUSTOMIZATION, DATA MIGRATION, MAINTENANCE and OTHERS. Their frequencies of 
+issues created are shown in the plot below.
 
 ```{r}
 plot_score_issue_type <- function(df_issue_type,
@@ -1252,30 +1248,76 @@ section.
 
 ### Issue System
 
-```{r "Frequency of Issue System"}
-df_issue_system <-
+On the integrated systems platform ([SIG](https://docs.info.ufrn.br)) there are 
+3 main systems: SIGAA (academic), SIPAC (administrative) and SIGRH (human 
+resources management). Within these systems, there are many subsystems (modules).
+The other systems have purposes of support for these 3 systems or other 
+activities.
+
+```{r}
+plot_score_issue_system <- function(df_issue_system,
+                                  subtitle_complement = NULL) {
+  
+  summ_issue_system <- 
+    df_issue_system %>% 
+      group_by(issue_system) %>% 
+      summarise(frequency = n()) %>% 
+      df_summary(frequency)
+  
+  df_score_issue_system <- 
+    df_issue_system %>% 
+      group_by(issue_system) %>% 
+      summarise(score = n())
+  
+  plot_score_issue_system <- 
+    df_score_issue_system %>% 
+      ggplot(aes(x = reorder(issue_system, -score), y = score)) +
+        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+        plot_y_summary(df_issue_system, issue_system) +
+        scale_y_continuous(breaks = seq(0, 3500, 250),
+                           sec.axis = sec_axis(
+                             trans = ~. / nrow(df_issue_system),
+                             breaks = seq(0, 1, .1),
+                             labels = scales::percent
+                           )) +
+        labs(title = "Frequency of Issue System",
+             subtitle = subtitle(nrow(df_issue_system),
+                                 subtitle_complement,
+                                 summ_issue_system),
+             x = "Issue system",
+             y = "Frequency") +
+        theme(axis.text.x = element_text(angle = 20, hjust = 1)) 
+  
+  plot_score_issue_system
+}
+
+df_issue_system <- 
   issues %>% 
     filter(!is.na(issue_system)) %>% 
     distinct(issue_id, issue_system)
-
-df_score_issue_system <- 
-  df_issue_system %>% 
-    group_by(issue_system) %>% 
-    summarise(score = n())
-
-plot_score_issue_system <- 
-  df_score_issue_system %>% 
-    ggplot(aes(x = reorder(issue_system, -score), y = score)) +
-      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-      #scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1)) + 
-      labs(title = "Frequency of Issue System",
-           subtitle = subtitle(nrow(df_issue_system)),
-           x = "Issue system",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 20, hjust = 1)) 
-
-plot_score_issue_system
 ```
+
+In the plot below, we may see the frequencies of issues created to 10 systems.
+
+```{r fig.height=4, "Frequency of Issue System"}
+plt_score_issue_system <-
+  df_issue_system %>% 
+    plot_score_issue_system()
+
+plt_score_issue_system
+```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
+
+Note that the academic system, SIGAA, surpasses all other systems together in 
+number of created issues. It represents about 75% of all issues created. Also, 
+note that, its frequency is considered an outlier (but in practice it is not).
+SIPAC (administrative) and SIGRH (human resources management) follow as 2nd and 
+3rd position. Both had roughly the same demand. Frequencies of the ohter systems 
+are insignificant and we can consider them as outliers.
 
 ### Issue Subsystem
 
