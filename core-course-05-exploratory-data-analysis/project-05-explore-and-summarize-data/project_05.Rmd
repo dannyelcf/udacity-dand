@@ -1256,7 +1256,7 @@ activities.
 
 ```{r}
 plot_score_issue_system <- function(df_issue_system,
-                                  subtitle_complement = NULL) {
+                                    subtitle_complement = NULL) {
   
   summ_issue_system <- 
     df_issue_system %>% 
@@ -1321,8 +1321,44 @@ are insignificant and we can consider them as outliers.
 
 ### Issue Subsystem
 
-```{r "Frequency of Issue Subsystem"}
-df_issue_subsystem <-
+```{r}
+plot_score_issue_subsystem <- function(df_issue_subsystem,
+                                       subtitle_complement = NULL) {
+  
+  summ_issue_subsystem <- 
+    df_issue_subsystem %>% 
+      group_by(issue_subsystem) %>% 
+      summarise(frequency = n()) %>% 
+      df_summary(frequency)
+  
+  df_score_issue_subsystem <- 
+    df_issue_subsystem %>% 
+      group_by(issue_subsystem) %>% 
+      summarise(score = n())
+  
+  plot_score_issue_subsystem <- 
+    df_score_issue_subsystem %>% 
+      ggplot(aes(x = reorder(issue_subsystem, -score), y = score)) +
+        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+        plot_y_summary(df_issue_subsystem, issue_subsystem) +
+        scale_y_continuous(breaks = seq(0, 1400, 100),
+                           sec.axis = sec_axis(
+                             trans = ~. / nrow(df_issue_subsystem),
+                             breaks = seq(0, 1, .05),
+                             labels = scales::percent
+                           )) +
+        labs(title = "Frequency (Top 15) of Issue Subsystem",
+             subtitle = subtitle(nrow(df_issue_subsystem),
+                                 subtitle_complement,
+                                 summ_issue_subsystem),
+             x = "Issue subsystem",
+             y = "Frequency") +
+        theme(axis.text.x = element_text(angle = 25, hjust = 1)) 
+  
+  plot_score_issue_subsystem
+}
+
+df_issue_subsystem <- 
   issues %>% 
     filter(!is.na(issue_subsystem)) %>% 
     mutate(issue_subsystem = paste0("(", issue_system, ") ", issue_subsystem)) %>% 
@@ -1335,20 +1371,15 @@ df_score_top15_issue_subsystem <-
     arrange(desc(score)) %>% 
     ungroup() %>% 
     filter(row_number() <= 15)
+```
 
-plot_score_top15_issue_subsystem <- 
-  df_score_top15_issue_subsystem %>% 
-    ggplot(aes(x = reorder(issue_subsystem, -score), y = score)) +
-      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-      #scale_y_continuous(limits = c(0, .45), breaks = seq(0, 1, .1), 
-      #                   labels = scales::percent) + 
-      labs(title = "Frequency (Top 15) of Issue Subsystem",
-           subtitle = subtitle(nrow(df_issue_subsystem)),
-           x = "Issue subsystem",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 25, hjust = 1)) 
+```{r fig.height=4.5, "Frequency of Issue Subsystem"}
+plt_score_issue_subsystem <-
+  df_issue_subsystem %>% 
+    filter(issue_subsystem %in% df_score_top15_issue_subsystem$issue_subsystem) %>% 
+    plot_score_issue_subsystem()
 
-plot_score_top15_issue_subsystem
+plt_score_issue_subsystem
 ```
 
 ### Issue Stakeholder
