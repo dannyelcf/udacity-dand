@@ -1333,7 +1333,8 @@ df_issue_subsystem <-
 There are `r length(unique(df_issue_subsystem$issue_subsystem))` subsystems with 
 at least one task created. These subsystems belong to the 
 `r length(unique(df_issue_system$issue_system))` systems listed in the previous 
-section.
+section. In the plot below is shown the top 15 of the subsystems classified by the 
+highest frequency of issue created.
 
 ```{r}
 plot_score_issue_subsystem <- function(df_issue_subsystem,
@@ -1380,9 +1381,6 @@ df_score_top15_issue_subsystem <-
     ungroup() %>% 
     filter(row_number() <= 15)
 ```
-
-In the plot below is shown the top 15 of the subsystems classified by the 
-highest frequency of issue created.
 
 ```{r fig.height=4.5, "Top 15 Frequency of Issue Subsystem"}
 plt_score_issue_subsystem <-

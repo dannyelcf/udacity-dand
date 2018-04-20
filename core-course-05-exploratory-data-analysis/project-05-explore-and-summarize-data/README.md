@@ -539,10 +539,9 @@ we can consider them as outliers.
 ### Issue Subsystem
 
 There are 83 subsystems with at least one task created. These subsystems
-belong to the 10 systems listed in the previous section.
-
-In the plot below is shown the top 15 of the subsystems classified by
-the highest frequency of issue
+belong to the 10 systems listed in the previous section. In the plot
+below is shown the top 15 of the subsystems classified by the highest
+frequency of issue
 created.
 
 <img src="project_05_files/plots/Top 15 Frequency of Issue Subsystem-1.png" width="86%" />
