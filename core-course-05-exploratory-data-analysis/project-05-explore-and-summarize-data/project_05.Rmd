@@ -1297,7 +1297,8 @@ df_issue_system <-
     distinct(issue_id, issue_system)
 ```
 
-In the plot below, we may see the frequencies of issues created to 10 systems.
+In the plot below, we may see the frequencies of issues created to 
+`r length(unique(df_issue_system$issue_system))` systems.
 
 ```{r fig.height=4, "Frequency of Issue System"}
 plt_score_issue_system <-
@@ -1320,6 +1321,19 @@ SIPAC (administrative) and SIGRH (human resources management) follow as 2nd and
 are insignificant and we can consider them as outliers.
 
 ### Issue Subsystem
+
+```{r}
+df_issue_subsystem <- 
+  issues %>% 
+    filter(!is.na(issue_subsystem)) %>% 
+    mutate(issue_subsystem = paste0("(", issue_system, ") ", issue_subsystem)) %>% 
+    distinct(issue_id, issue_subsystem)
+```
+
+There are `r length(unique(df_issue_subsystem$issue_subsystem))` subsystems with 
+at least one task created. These subsystems belong to the 
+`r length(unique(df_issue_system$issue_system))` systems listed in the previous 
+section.
 
 ```{r}
 plot_score_issue_subsystem <- function(df_issue_subsystem,
@@ -1347,7 +1361,7 @@ plot_score_issue_subsystem <- function(df_issue_subsystem,
                              breaks = seq(0, 1, .05),
                              labels = scales::percent
                            )) +
-        labs(title = "Frequency (Top 15) of Issue Subsystem",
+        labs(title = "Top 15 Frequency of Issue Subsystem",
              subtitle = subtitle(nrow(df_issue_subsystem),
                                  subtitle_complement,
                                  summ_issue_subsystem),
@@ -1358,12 +1372,6 @@ plot_score_issue_subsystem <- function(df_issue_subsystem,
   plot_score_issue_subsystem
 }
 
-df_issue_subsystem <- 
-  issues %>% 
-    filter(!is.na(issue_subsystem)) %>% 
-    mutate(issue_subsystem = paste0("(", issue_system, ") ", issue_subsystem)) %>% 
-    distinct(issue_id, issue_subsystem)
-
 df_score_top15_issue_subsystem <- 
   df_issue_subsystem %>%
     group_by(issue_subsystem) %>% 
@@ -1373,7 +1381,10 @@ df_score_top15_issue_subsystem <-
     filter(row_number() <= 15)
 ```
 
-```{r fig.height=4.5, "Frequency of Issue Subsystem"}
+In the plot below is shown the top 15 of the subsystems classified by the 
+highest frequency of issue created.
+
+```{r fig.height=4.5, "Top 15 Frequency of Issue Subsystem"}
 plt_score_issue_subsystem <-
   df_issue_subsystem %>% 
     filter(issue_subsystem %in% df_score_top15_issue_subsystem$issue_subsystem) %>% 
@@ -1381,6 +1392,22 @@ plt_score_issue_subsystem <-
 
 plt_score_issue_subsystem
 ```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
+
+Above of the mean and out of the pattern are 3 academic subsystems: (SIGAA) 
+GRADUAÇÃO, (SIGAA) STRICTO SENSU and SIGAA (GERAL). The subsystem (SIGAA) 
+GRADUAÇÃO is visibly the most demanding subsystem. Wether the system SIGAA 
+represents 75% of total demand and the subsystem (SIGAA) GRADUAÇÃO represents 
+approximately 35% of it, then, the subsystem (SIGAA) GRADUAÇÃO represents 
+approximately 1/4 of all demand of the project.
+
+Also, note that the top 6 subsystems and 73% of top 15 belongs to academic 
+system (SIGAA). This is natural because the main activity of a university is 
+the academy.
 
 ### Issue Stakeholder
 

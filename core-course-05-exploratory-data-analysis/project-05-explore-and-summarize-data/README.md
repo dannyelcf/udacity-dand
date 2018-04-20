@@ -534,12 +534,36 @@ issues created. Also, note that, its frequency is considered an outlier
 (but in practice it is not). SIPAC (administrative) and SIGRH (human
 resources management) follow as 2nd and 3rd position. Both had roughly
 the same demand. Frequencies of the ohter systems are insignificant and
-we can consider them as
-outliers.
+we can consider them as outliers.
 
 ### Issue Subsystem
 
-<img src="project_05_files/plots/Frequency of Issue Subsystem-1.png" width="86%" />
+There are 83 subsystems with at least one task created. These subsystems
+belong to the 10 systems listed in the previous section.
+
+In the plot below is shown the top 15 of the subsystems classified by
+the highest frequency of issue
+created.
+
+<img src="project_05_files/plots/Top 15 Frequency of Issue Subsystem-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+Above of the mean and out of the pattern are 3 academic subsystems:
+(SIGAA) GRADUAÇÃO, (SIGAA) STRICTO SENSU and SIGAA (GERAL). The
+subsystem (SIGAA) GRADUAÇÃO is visibly the most demanding subsystem.
+Wether the system SIGAA represents 75% of total demand and the subsystem
+(SIGAA) GRADUAÇÃO represents approximately 35% of it, then, the
+subsystem (SIGAA) GRADUAÇÃO represents approximately 1/4 of all demand
+of the project.
+
+Also, note that the top 6 subsystems and 73% of top 15 belongs to
+academic system (SIGAA). This is natural because the main activity of a
+university is the
+academy.
 
 ### Issue Stakeholder
 
