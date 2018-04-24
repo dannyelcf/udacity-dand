@@ -1409,30 +1409,74 @@ the academy.
 
 ### Issue Stakeholder
 
-```{r "Frequency of Issue Stakeholder"}
-df_issue_stakeholder <-
+On the project, there are two stakeholder types that open issues in the issue 
+tracking system ([SIGProject](https://sigproject.esig.com.br)): the IT team of
+Universidade Federal de Goiás ([UFG](https://www.ufg.br)) and the IT team of the 
+company ([ESIG](https://www.esig.com.br)) that was hired to support the systems 
+maintenance and customization. Here, I labeled the IT team of UFG as CUSTOMER 
+and the IT team of the ESIG as COMPANY. The plot below shows how was the 
+frequency of open issues in the facet of stakeholders.
+
+```{r}
+plot_score_issue_stakeholder <- function(df_issue_stakeholder,
+                                         subtitle_complement = NULL) {
+  
+  summ_issue_stakeholder <- 
+    df_issue_stakeholder %>% 
+      group_by(issue_stakeholder) %>% 
+      summarise(frequency = n()) %>% 
+      df_summary(frequency)
+  
+  df_score_issue_stakeholder <- 
+    df_issue_stakeholder %>% 
+      group_by(issue_stakeholder) %>% 
+      summarise(score = n())
+  
+  plot_score_issue_stakeholder <- 
+    df_score_issue_stakeholder %>% 
+      ggplot(aes(x = reorder(issue_stakeholder, -score), y = score)) +
+        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+        plot_y_summary(df_issue_stakeholder, issue_stakeholder) +
+        scale_y_continuous(breaks = seq(0, 3500, 250),
+                           sec.axis = sec_axis(
+                             trans = ~. / nrow(df_issue_stakeholder),
+                             breaks = seq(0, 1, .1),
+                             labels = scales::percent
+                           )) +
+        labs(title = "Frequency of Issue Stakeholder",
+             subtitle = subtitle(nrow(df_issue_stakeholder),
+                                 subtitle_complement,
+                                 summ_issue_stakeholder),
+             x = "Issue stakeholder",
+             y = "Frequency")
+  
+  plot_score_issue_stakeholder
+}
+
+df_issue_stakeholder <- 
   issues %>% 
     filter(!is.na(issue_stakeholder)) %>% 
     distinct(issue_id, issue_stakeholder)
-
-df_score_issue_stakeholder <- 
-  df_issue_stakeholder %>% 
-    group_by(issue_stakeholder) %>% 
-    summarise(score = n())
-
-plot_score_issue_stakeholder <- 
-  df_score_issue_stakeholder %>% 
-    ggplot(aes(x = reorder(issue_stakeholder, -score), y = score)) +
-      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-      # scale_y_continuous(limits = c(0, .85), breaks = seq(0, 1, .1), 
-      #                    labels = scales::percent) + 
-      labs(title = "Frequency of Issue Stakeholder",
-           subtitle = subtitle(nrow(df_issue_stakeholder)),
-           x = "Issue stakeholder",
-           y = "Frequency") 
-
-plot_score_issue_stakeholder
 ```
+
+```{r "Frequency of Issue Stakeholder"}
+plt_score_issue_stakeholder <-
+  df_issue_stakeholder %>% 
+    plot_score_issue_stakeholder()
+
+plt_score_issue_stakeholder
+```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean.
+
+We note that the CUSTOMER created twice more problems than COMPANY. This is make
+sense since it is the customer who has needs and, hence, it opens demands. The 
+COMPANY also created issues, but its is to control internally activities that 
+are need to solution the issue created by CUSTOMER. But seeing the plot we note
+that there is no a relationship 1:1 between the issue created by CUSTOMER and 
+the issue created by COMPANY. This is because many activities of the issues 
+created by CUSTOMER were managed in the issue itself.
 
 ### Issue Created By
 

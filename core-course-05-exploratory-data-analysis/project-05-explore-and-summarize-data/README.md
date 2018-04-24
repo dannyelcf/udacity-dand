@@ -561,12 +561,35 @@ of the project.
 
 Also, note that the top 6 subsystems and 73% of top 15 belongs to
 academic system (SIGAA). This is natural because the main activity of a
-university is the
-academy.
+university is the academy.
 
 ### Issue Stakeholder
 
+On the project, there are two stakeholder types that open issues in the
+issue tracking system ([SIGProject](https://sigproject.esig.com.br)):
+the IT team of Universidade Federal de Goiás ([UFG](https://www.ufg.br))
+and the IT team of the company ([ESIG](https://www.esig.com.br)) that
+was hired to support the systems maintenance and customization. Here, I
+labeled the IT team of UFG as CUSTOMER and the IT team of the ESIG as
+COMPANY. The plot below shows how was the frequency of open issues in
+the facet of
+stakeholders.
+
 <img src="project_05_files/plots/Frequency of Issue Stakeholder-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean.
+
+We note that the CUSTOMER created twice more problems than COMPANY. This
+is make sense since it is the customer who has needs and, hence, it
+opens demands. The COMPANY also created issues, but its is to control
+internally activities that are need to solution the issue created by
+CUSTOMER. But seeing the plot we note that there is no a relationship
+1:1 between the issue created by CUSTOMER and the issue created by
+COMPANY. This is because many activities of the issues created by
+CUSTOMER were managed in the issue
+itself.
 
 ### Issue Created By
 
