@@ -1331,7 +1331,7 @@ df_issue_subsystem <-
 ```
 
 There are `r length(unique(df_issue_subsystem$issue_subsystem))` subsystems with 
-at least one task created. These subsystems belong to the 
+at least one issue created. These subsystems belong to the 
 `r length(unique(df_issue_system$issue_system))` systems listed in the previous 
 section. In the plot below is shown the top 15 of the subsystems classified by the 
 highest frequency of issue created.
@@ -1470,7 +1470,7 @@ plt_score_issue_stakeholder
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
 quartile, the black and red solid lines represent, respectivaly, median and mean.
 
-We note that the CUSTOMER created twice more problems than COMPANY. This is make
+We note that the CUSTOMER created twice more issues than COMPANY. This is make
 sense since it is the customer who has needs and, hence, it opens demands. The 
 COMPANY also created issues, but its is to control internally activities that 
 are need to solution the issue created by CUSTOMER. But seeing the plot we note
@@ -1480,14 +1480,125 @@ created by CUSTOMER were managed in the issue itself.
 
 ### Issue Created By
 
-```{r "Frequency of Issue Created By"}
-df_issue_created_by <-
+```{r}
+plot_score_issue_stakeholder_creator <- function(df_issue_stakeholder_creator,
+                                                 subtitle_complement = NULL) {
+  
+  summ_issue_stakeholder <- 
+    df_issue_stakeholder_creator %>% 
+      group_by(issue_stakeholder) %>% 
+      summarise(frequency = n()) %>% 
+      df_summary(frequency)
+  
+  df_score_issue_stakeholder_creator <- 
+    df_issue_stakeholder_creator %>% 
+      group_by(issue_stakeholder) %>% 
+      summarise(score = n())
+  
+  plot_score_issue_stakeholder_creator <- 
+    df_score_issue_stakeholder_creator %>% 
+      ggplot(aes(x = reorder(issue_stakeholder, -score), y = score)) +
+        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+        plot_y_summary(df_issue_stakeholder_creator, issue_stakeholder) +
+        scale_y_continuous(breaks = seq(0, 150, 10),
+                           sec.axis = sec_axis(
+                             trans = ~. / nrow(df_issue_stakeholder_creator),
+                             breaks = seq(0, 1, .1),
+                             labels = scales::percent
+                           )) +
+        labs(title = "Frequency of Distinct Users by Stakeholder",
+             subtitle = subtitle(nrow(df_issue_stakeholder_creator),
+                                 subtitle_complement,
+                                 summ_issue_stakeholder),
+             x = "Stakeholder",
+             y = "Frequency")
+  
+  plot_score_issue_stakeholder_creator
+}
+
+df_issue_stakeholder_creator <- 
+  issues %>% 
+    filter(!is.na(issue_created_by)) %>% 
+    distinct(issue_stakeholder, issue_created_by)
+```
+
+As discussed in the previous section, CUSTOMER has created twice more issues 
+than COMPANY, but the proportion of people in each team is inversely
+proportional. The plot below shows the number of distinct users by stakeholder 
+who have created at least one issue related to the project.
+
+```{r "Frequency of Distinct Users by Stakeholder"}
+plt_score_issue_stakeholder_creator <-
+  df_issue_stakeholder_creator %>% 
+    plot_score_issue_stakeholder_creator()
+
+plt_score_issue_stakeholder_creator
+```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean.
+
+There are `r nrow(df_issue_stakeholder_creator)` users in
+issue tracking system who have created at least one issue related to the project. 
+These users, 
+`r sum(df_issue_stakeholder_creator$issue_stakeholder == "COMPANY")` 
+belong to the COMPANY part and 
+`r sum(df_issue_stakeholder_creator$issue_stakeholder == "CUSTOMER")` 
+belong to the CUSTOMER part. This proportion makes sense since the CUSTOMER team
+is composed by Business Process Analyst/Designer and Tester roles and the 
+COMPANY team is composed by Product Owner, Requirement Analyst/Designer, 
+Software Architect, Developer and Tester roles. But as the demand comes from the 
+CUSTOMER, the volume of issues opened by it is much more than opened by COMPANY.
+
+```{r}
+df_issue_created_by <- 
   issues %>% 
     filter(!is.na(issue_created_by)) %>% 
     mutate(issue_created_by = paste0("(", issue_stakeholder, ") ", 
-                                     issue_created_by)) %>% 
-    mutate(issue_created_by = first_last_names(issue_created_by)) %>% 
+                                     first_last_names(issue_created_by))) %>% 
     distinct(issue_id, issue_created_by)
+```
+
+Now, analysing the plot below that shows the top 15 frequency of issues opened 
+by user we note that the first top user is from COMPANY following by 7 users 
+from CUSTOMER.
+
+```{r}
+plot_score_issue_created_by <- function(df_issue_created_by,
+                                        subtitle_complement = NULL) {
+  
+  summ_issue_created_by <- 
+    df_issue_created_by %>% 
+      group_by(issue_created_by) %>% 
+      summarise(frequency = n()) %>% 
+      df_summary(frequency)
+  
+  df_score_issue_created_by <- 
+    df_issue_created_by %>% 
+      group_by(issue_created_by) %>% 
+      summarise(score = n())
+  
+  plot_score_issue_created_by <- 
+    df_score_issue_created_by %>% 
+      ggplot(aes(x = reorder(issue_created_by, -score), y = score)) +
+        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+        plot_y_summary(df_issue_created_by, issue_created_by) +
+        scale_y_continuous(breaks = seq(0, 1400, 100),
+                           sec.axis = sec_axis(
+                             trans = ~. / nrow(df_issue_created_by),
+                             breaks = seq(0, 1, .025),
+                             labels = scales::percent
+                           )) +
+        labs(title = "Top 15 Frequency of Issue by Creator",
+             subtitle = subtitle(nrow(df_issue_created_by),
+                                 subtitle_complement,
+                                 summ_issue_created_by),
+             x = "Issue creator",
+             y = "Frequency") +
+        theme(axis.text.x = element_text(angle = 25, hjust = 1)) 
+  
+  plot_score_issue_created_by
+}
 
 df_score_top15_issue_created_by <- 
   df_issue_created_by %>%
@@ -1496,21 +1607,28 @@ df_score_top15_issue_created_by <-
     arrange(desc(score)) %>% 
     ungroup() %>% 
     filter(row_number() <= 15)
-
-plot_score_top15_issue_created_by <- 
-  df_score_top15_issue_created_by %>% 
-    ggplot(aes(x = reorder(issue_created_by, -score), y = score)) +
-      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-      # scale_y_continuous(limits = c(0, .25), breaks = seq(0, 1, .05), 
-      #                    labels = scales::percent) + 
-      labs(title = "Frequency (Top 15) of Issue Created By",
-           subtitle = subtitle(nrow(df_issue_created_by)),
-           x = "Issue created by",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 25, hjust = 1)) 
-
-plot_score_top15_issue_created_by
 ```
+
+```{r fig.height=4.5, "Top 15 Frequency of Issue Created By"}
+plt_score_issue_created_by <-
+  df_issue_created_by %>% 
+    filter(issue_created_by %in% 
+             df_score_top15_issue_created_by$issue_created_by) %>% 
+    plot_score_issue_created_by()
+
+plt_score_issue_created_by
+```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
+
+The first top issue creator is the Product Owner of the COMPANY in the project 
+in question. He was the main contact in the COMPANY. Many issues created by him 
+were reported by CUSTOMER (through Skype) and he created many issues to 
+distribute activities to the COMPANY team. These are the reasons why RAMON 
+RODRIGUES is the top issue creator.
 
 ### Issue Status
 

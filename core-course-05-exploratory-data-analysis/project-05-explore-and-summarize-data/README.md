@@ -538,10 +538,10 @@ we can consider them as outliers.
 
 ### Issue Subsystem
 
-There are 83 subsystems with at least one task created. These subsystems
-belong to the 10 systems listed in the previous section. In the plot
-below is shown the top 15 of the subsystems classified by the highest
-frequency of issue
+There are 83 subsystems with at least one issue created. These
+subsystems belong to the 10 systems listed in the previous section. In
+the plot below is shown the top 15 of the subsystems classified by the
+highest frequency of issue
 created.
 
 <img src="project_05_files/plots/Top 15 Frequency of Issue Subsystem-1.png" width="86%" />
@@ -581,19 +581,56 @@ stakeholders.
 > and 3rd quartile, the black and red solid lines represent,
 > respectivaly, median and mean.
 
-We note that the CUSTOMER created twice more problems than COMPANY. This
+We note that the CUSTOMER created twice more issues than COMPANY. This
 is make sense since it is the customer who has needs and, hence, it
 opens demands. The COMPANY also created issues, but its is to control
 internally activities that are need to solution the issue created by
 CUSTOMER. But seeing the plot we note that there is no a relationship
 1:1 between the issue created by CUSTOMER and the issue created by
 COMPANY. This is because many activities of the issues created by
-CUSTOMER were managed in the issue
-itself.
+CUSTOMER were managed in the issue itself.
 
 ### Issue Created By
 
-<img src="project_05_files/plots/Frequency of Issue Created By-1.png" width="86%" />
+As discussed in the previous section, CUSTOMER has created twice more
+issues than COMPANY, but the proportion of people in each team is
+inversely proportional. The plot below shows the number of distinct
+users by stakeholder who have created at least one issue related to the
+project.
+
+<img src="project_05_files/plots/Frequency of Distinct Users by Stakeholder-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean.
+
+There are 108 users in issue tracking system who have created at least
+one issue related to the project. These users, 68 belong to the COMPANY
+part and 40 belong to the CUSTOMER part. This proportion makes sense
+since the CUSTOMER team is composed by Business Process Analyst/Designer
+and Tester roles and the COMPANY team is composed by Product Owner,
+Requirement Analyst/Designer, Software Architect, Developer and Tester
+roles. But as the demand comes from the CUSTOMER, the volume of issues
+opened by it is much more than opened by COMPANY.
+
+Now, analysing the plot below that shows the top 15 frequency of issues
+opened by user we note that the first top user is from COMPANY following
+by 7 users from
+CUSTOMER.
+
+<img src="project_05_files/plots/Top 15 Frequency of Issue Created By-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+The first top issue creator is the Product Owner of the COMPANY in the
+project in question. He was the main contact in the COMPANY. Many issues
+created by him were reported by CUSTOMER (through Skype) and he created
+many issues to distribute activities to the COMPANY team. These are the
+reasons why RAMON RODRIGUES is the top issue
+creator.
 
 ### Issue Status
 
