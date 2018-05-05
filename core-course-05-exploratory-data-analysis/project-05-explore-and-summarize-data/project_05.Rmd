@@ -42,9 +42,6 @@ theme_set(theme_classic() %+replace%
                   plot.subtitle = element_text(size = rel(0.8), 
                                                hjust = 0, vjust = 1, 
                                                margin = margin(b = 5.5 * 0.9))))
-
-DEFAULT_COLOR = "grey50"
-DEFAULT_ALFA = .1
 ```
 
 ```{r "Load Data Set"}
@@ -353,41 +350,6 @@ activities at the university in this period. Thus, the demand for customization
 and maintenance of the systems decreases.
 
 ```{r}
-plot_score_issue_created_by_wday <- function(df_issue_created_by_wday,
-                                             subtitle_complement = NULL) {
-  
-  summ_issue_created_by_wday <- 
-    df_issue_created_by_wday %>% 
-      group_by(issue_creation_wday) %>% 
-      summarise(frequency = n()) %>% 
-      df_summary(frequency)
-  
-  df_score_issue_created_by_wday <- 
-    df_issue_created_by_wday %>% 
-      group_by(issue_creation_wday) %>% 
-      summarise(score = n())
-  
-  plot_score_issue_created_by_wday <- 
-    df_score_issue_created_by_wday %>% 
-      ggplot(aes(x = issue_creation_wday, y = score)) +
-        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        plot_y_summary(df_issue_created_by_wday, issue_creation_wday) +
-        scale_y_continuous(breaks = seq(0, 1020, 100),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_created_by_wday),
-                             breaks = seq(0, 1, .02),
-                             labels = scales::percent
-                           )) +
-        labs(title = "Frequency of Issues Created per Weekday",
-             subtitle = subtitle(nrow(df_issue_created_by_wday),
-                                 subtitle_complement,
-                                 summ_issue_created_by_wday),
-             x = "Weekday",
-             y = "Frequency") 
-  
-  plot_score_issue_created_by_wday
-}
-
 df_issue_created_by_wday <- 
   issues %>% 
     filter(!is.na(issue_creation_date)) %>% 
@@ -399,11 +361,13 @@ During the week, the demand for new activities were concentrated on business day
 (from Monday to Friday) as we can note in the barplot below.
 
 ```{r "Frequency of Issues Created per Weekday"}
-plt_score_issue_created_by_wday <-
-  df_issue_created_by_wday %>% 
-    plot_score_issue_created_by_wday()
-
-plt_score_issue_created_by_wday
+df_issue_created_by_wday %>% 
+  plot_frequency(issue_creation_wday, 
+                 title = "Frequency of Issues Created per Weekday",
+                 label.x = "Weekday",
+                 reorder.x = FALSE,
+                 breaks.y = seq(0, 1020, 100),
+                 breaks.2nd.y = seq(0, 1, .02))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -429,13 +393,16 @@ down and increase the standard deviationof mean. Removing them, we have a new
 barplot. See it below.
 
 ```{r "Frequency of Issues Created per Weekday (No Weekend)"}
-plt_score_issue_created_by_nowend <- 
-  df_issue_created_by_wday %>% 
-    filter(!(issue_creation_wday %in% 
-               df_issue_created_by_weekend$issue_creation_wday)) %>% 
-    plot_score_issue_created_by_wday("without the weekend")
-
-plt_score_issue_created_by_nowend
+df_issue_created_by_wday %>% 
+  filter(!(issue_creation_wday %in% 
+             df_issue_created_by_weekend$issue_creation_wday)) %>%
+  plot_frequency(issue_creation_wday, 
+                 title = "Frequency of Issues Created per Weekday",
+                 subtitle_complement = "without the weekend",
+                 label.x = "Weekday",
+                 reorder.x = FALSE,
+                 breaks.y = seq(0, 1020, 100),
+                 breaks.2nd.y = seq(0, 1, .02))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -835,40 +802,6 @@ This is interesting information for teams to review in order to improve planning
 and control of activities.
 
 ```{r}
-plot_score_issue_deadline_wday <- function(df_issue_deadline_wday,
-                                           subtitle_complement = NULL) {
-  summ_issue_deadline_wday <- 
-    df_issue_deadline_wday %>% 
-      group_by(issue_deadline_wday) %>% 
-      summarise(frequency = n()) %>% 
-      df_summary(frequency)
-
-  df_score_issue_deadline_wday <- 
-    df_issue_deadline_wday %>% 
-      group_by(issue_deadline_wday) %>% 
-      summarise(score = n())
-
-  plot_score_issue_deadline_wday <- 
-    df_score_issue_deadline_wday %>% 
-      ggplot(aes(x = issue_deadline_wday, y = score)) +
-        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        plot_y_summary(df_issue_deadline_wday, issue_deadline_wday) +
-        scale_y_continuous(breaks = seq(0, 500, 50),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_deadline_wday),
-                             breaks = seq(0, 1, .02),
-                             labels = scales::percent
-                           )) +
-        labs(title = "Frequency of Issues Deadline per Weekday",
-             subtitle = subtitle(nrow(df_issue_deadline_wday),
-                                 subtitle_complement,
-                                 summ_issue_deadline_wday),
-             x = "Weekday",
-             y = "Frequency") 
-  
-  plot_score_issue_deadline_wday
-}
-
 df_issue_deadline_wday <- 
   issues %>% 
     filter(!is.na(issue_deadline_date)) %>% 
@@ -880,11 +813,13 @@ As expected, issue deadlines do not occur on Sundays. The deliver was planned to
 business days (from Monday to Friday) as we can note in the barplot below.
 
 ```{r "Frequency of Issues Deadline per Weekday"}
-plt_score_issue_deadline_wday <-
-  df_issue_deadline_wday %>% 
-    plot_score_issue_deadline_wday()
-
-plt_score_issue_deadline_wday
+df_issue_deadline_wday %>% 
+  plot_frequency(issue_deadline_wday, 
+                 title = "Frequency of Issues Deadline per Weekday",
+                 label.x = "Weekday",
+                 reorder.x = FALSE,
+                 breaks.y = seq(0, 500, 50),
+                 breaks.2nd.y = seq(0, 1, .02))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -897,12 +832,15 @@ created on weekend shift (during the enrollment periods) with deadline size 0
 (day). Removing them, we have a new barplot. See it below.
 
 ```{r "Frequency of Issues Deadline per Weekday (No Weekend)"}
-plt_score_issue_deadline_wday <- 
-  df_issue_deadline_wday %>% 
-    filter(issue_deadline_wday != "Sat") %>% 
-    plot_score_issue_deadline_wday("without the weekend")
-
-plt_score_issue_deadline_wday
+df_issue_deadline_wday %>% 
+  filter(issue_deadline_wday != "Sat") %>%  
+  plot_frequency(issue_deadline_wday, 
+                 title = "Frequency of Issues Deadline per Weekday",
+                 subtitle_complement = "without the weekend",
+                 label.x = "Weekday",
+                 reorder.x = FALSE,
+                 breaks.y = seq(0, 500, 50),
+                 breaks.2nd.y = seq(0, 1, .02))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1179,41 +1117,6 @@ CUSTOMIZATION, DATA MIGRATION, MAINTENANCE and OTHERS. Their frequencies of
 issues created are shown in the plot below.
 
 ```{r}
-plot_score_issue_type <- function(df_issue_type,
-                                  subtitle_complement = NULL) {
-  
-  summ_issue_type <- 
-    df_issue_type %>% 
-      group_by(issue_type) %>% 
-      summarise(frequency = n()) %>% 
-      df_summary(frequency)
-  
-  df_score_issue_type <- 
-    df_issue_type %>% 
-      group_by(issue_type) %>% 
-      summarise(score = n())
-  
-  plot_score_issue_type <- 
-    df_score_issue_type %>% 
-      ggplot(aes(x = reorder(issue_type, -score), y = score)) +
-        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        plot_y_summary(df_issue_type, issue_type) +
-        scale_y_continuous(breaks = seq(0, 3500, 250),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_type),
-                             breaks = seq(0, 1, .1),
-                             labels = scales::percent
-                           )) +
-        labs(title = "Frequency of Issue Type",
-             subtitle = subtitle(nrow(df_issue_type),
-                                 subtitle_complement,
-                                 summ_issue_type),
-             x = "Issue type",
-             y = "Frequency") 
-  
-  plot_score_issue_type
-}
-
 df_issue_type <- 
   issues %>% 
     filter(!is.na(issue_type)) %>% 
@@ -1221,11 +1124,12 @@ df_issue_type <-
 ```
 
 ```{r "Frequency of Issue Type"}
-plt_score_issue_type <-
-  df_issue_type %>% 
-    plot_score_issue_type()
-
-plt_score_issue_type
+df_issue_type %>% 
+  plot_frequency(issue_type, 
+                 title = "Frequency of Issue Type",
+                 label.x = "Issue type",
+                 breaks.y = seq(0, 3500, 250),
+                 breaks.2nd.y = seq(0, 1, .1))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1255,42 +1159,6 @@ The other systems have purposes of support for these 3 systems or other
 activities.
 
 ```{r}
-plot_score_issue_system <- function(df_issue_system,
-                                    subtitle_complement = NULL) {
-  
-  summ_issue_system <- 
-    df_issue_system %>% 
-      group_by(issue_system) %>% 
-      summarise(frequency = n()) %>% 
-      df_summary(frequency)
-  
-  df_score_issue_system <- 
-    df_issue_system %>% 
-      group_by(issue_system) %>% 
-      summarise(score = n())
-  
-  plot_score_issue_system <- 
-    df_score_issue_system %>% 
-      ggplot(aes(x = reorder(issue_system, -score), y = score)) +
-        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        plot_y_summary(df_issue_system, issue_system) +
-        scale_y_continuous(breaks = seq(0, 3500, 250),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_system),
-                             breaks = seq(0, 1, .1),
-                             labels = scales::percent
-                           )) +
-        labs(title = "Frequency of Issue System",
-             subtitle = subtitle(nrow(df_issue_system),
-                                 subtitle_complement,
-                                 summ_issue_system),
-             x = "Issue system",
-             y = "Frequency") +
-        theme(axis.text.x = element_text(angle = 20, hjust = 1)) 
-  
-  plot_score_issue_system
-}
-
 df_issue_system <- 
   issues %>% 
     filter(!is.na(issue_system)) %>% 
@@ -1301,11 +1169,13 @@ In the plot below, we may see the frequencies of issues created to
 `r length(unique(df_issue_system$issue_system))` systems.
 
 ```{r fig.height=4, "Frequency of Issue System"}
-plt_score_issue_system <-
-  df_issue_system %>% 
-    plot_score_issue_system()
-
-plt_score_issue_system
+df_issue_system %>% 
+  plot_frequency(issue_system, 
+                 title = "Frequency of Issue System",
+                 label.x = "Issue system",
+                 breaks.y = seq(0, 3500, 250),
+                 breaks.2nd.y = seq(0, 1, .1),
+                 axis.text.x = element_text(angle = 20, hjust = 1))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1337,42 +1207,6 @@ section. In the plot below is shown the top 15 of the subsystems classified by t
 highest frequency of issue created.
 
 ```{r}
-plot_score_issue_subsystem <- function(df_issue_subsystem,
-                                       subtitle_complement = NULL) {
-  
-  summ_issue_subsystem <- 
-    df_issue_subsystem %>% 
-      group_by(issue_subsystem) %>% 
-      summarise(frequency = n()) %>% 
-      df_summary(frequency)
-  
-  df_score_issue_subsystem <- 
-    df_issue_subsystem %>% 
-      group_by(issue_subsystem) %>% 
-      summarise(score = n())
-  
-  plot_score_issue_subsystem <- 
-    df_score_issue_subsystem %>% 
-      ggplot(aes(x = reorder(issue_subsystem, -score), y = score)) +
-        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        plot_y_summary(df_issue_subsystem, issue_subsystem) +
-        scale_y_continuous(breaks = seq(0, 1400, 100),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_subsystem),
-                             breaks = seq(0, 1, .05),
-                             labels = scales::percent
-                           )) +
-        labs(title = "Top 15 Frequency of Issue Subsystem",
-             subtitle = subtitle(nrow(df_issue_subsystem),
-                                 subtitle_complement,
-                                 summ_issue_subsystem),
-             x = "Issue subsystem",
-             y = "Frequency") +
-        theme(axis.text.x = element_text(angle = 25, hjust = 1)) 
-  
-  plot_score_issue_subsystem
-}
-
 df_score_top15_issue_subsystem <- 
   df_issue_subsystem %>%
     group_by(issue_subsystem) %>% 
@@ -1383,12 +1217,15 @@ df_score_top15_issue_subsystem <-
 ```
 
 ```{r fig.height=4.5, "Top 15 Frequency of Issue Subsystem"}
-plt_score_issue_subsystem <-
-  df_issue_subsystem %>% 
-    filter(issue_subsystem %in% df_score_top15_issue_subsystem$issue_subsystem) %>% 
-    plot_score_issue_subsystem()
-
-plt_score_issue_subsystem
+df_issue_subsystem %>% 
+  filter(issue_subsystem %in% 
+           df_score_top15_issue_subsystem$issue_subsystem) %>% 
+  plot_frequency(issue_subsystem, 
+                 title = "Top 15 Frequency of Issue Subsystem",
+                 label.x = "Issue subsystem",
+                 breaks.y = seq(0, 1400, 100),
+                 breaks.2nd.y = seq(0, 1, .05),
+                 axis.text.x = element_text(angle = 25, hjust = 1))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1418,41 +1255,6 @@ and the IT team of the ESIG as COMPANY. The plot below shows how was the
 frequency of open issues in the facet of stakeholders.
 
 ```{r}
-plot_score_issue_stakeholder <- function(df_issue_stakeholder,
-                                         subtitle_complement = NULL) {
-  
-  summ_issue_stakeholder <- 
-    df_issue_stakeholder %>% 
-      group_by(issue_stakeholder) %>% 
-      summarise(frequency = n()) %>% 
-      df_summary(frequency)
-  
-  df_score_issue_stakeholder <- 
-    df_issue_stakeholder %>% 
-      group_by(issue_stakeholder) %>% 
-      summarise(score = n())
-  
-  plot_score_issue_stakeholder <- 
-    df_score_issue_stakeholder %>% 
-      ggplot(aes(x = reorder(issue_stakeholder, -score), y = score)) +
-        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        plot_y_summary(df_issue_stakeholder, issue_stakeholder) +
-        scale_y_continuous(breaks = seq(0, 3500, 250),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_stakeholder),
-                             breaks = seq(0, 1, .1),
-                             labels = scales::percent
-                           )) +
-        labs(title = "Frequency of Issue Stakeholder",
-             subtitle = subtitle(nrow(df_issue_stakeholder),
-                                 subtitle_complement,
-                                 summ_issue_stakeholder),
-             x = "Issue stakeholder",
-             y = "Frequency")
-  
-  plot_score_issue_stakeholder
-}
-
 df_issue_stakeholder <- 
   issues %>% 
     filter(!is.na(issue_stakeholder)) %>% 
@@ -1460,11 +1262,12 @@ df_issue_stakeholder <-
 ```
 
 ```{r "Frequency of Issue Stakeholder"}
-plt_score_issue_stakeholder <-
-  df_issue_stakeholder %>% 
-    plot_score_issue_stakeholder()
-
-plt_score_issue_stakeholder
+df_issue_stakeholder %>% 
+  plot_frequency(issue_stakeholder, 
+                 title = "Frequency of Issue Stakeholder",
+                 label.x = "Issue stakeholder",
+                 breaks.y = seq(0, 3500, 250),
+                 breaks.2nd.y = seq(0, 1, .1))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1481,41 +1284,6 @@ created by CUSTOMER were managed in the issue itself.
 ### Issue Created By
 
 ```{r}
-plot_score_issue_stakeholder_creator <- function(df_issue_stakeholder_creator,
-                                                 subtitle_complement = NULL) {
-  
-  summ_issue_stakeholder <- 
-    df_issue_stakeholder_creator %>% 
-      group_by(issue_stakeholder) %>% 
-      summarise(frequency = n()) %>% 
-      df_summary(frequency)
-  
-  df_score_issue_stakeholder_creator <- 
-    df_issue_stakeholder_creator %>% 
-      group_by(issue_stakeholder) %>% 
-      summarise(score = n())
-  
-  plot_score_issue_stakeholder_creator <- 
-    df_score_issue_stakeholder_creator %>% 
-      ggplot(aes(x = reorder(issue_stakeholder, -score), y = score)) +
-        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        plot_y_summary(df_issue_stakeholder_creator, issue_stakeholder) +
-        scale_y_continuous(breaks = seq(0, 150, 10),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_stakeholder_creator),
-                             breaks = seq(0, 1, .1),
-                             labels = scales::percent
-                           )) +
-        labs(title = "Frequency of Distinct Users by Stakeholder",
-             subtitle = subtitle(nrow(df_issue_stakeholder_creator),
-                                 subtitle_complement,
-                                 summ_issue_stakeholder),
-             x = "Stakeholder",
-             y = "Frequency")
-  
-  plot_score_issue_stakeholder_creator
-}
-
 df_issue_stakeholder_creator <- 
   issues %>% 
     filter(!is.na(issue_created_by)) %>% 
@@ -1531,11 +1299,12 @@ The plot below shows the number of distinct users by stakeholder who have
 created at least one issue related to the project.
 
 ```{r "Frequency of Distinct Users by Stakeholder"}
-plt_score_issue_stakeholder_creator <-
-  df_issue_stakeholder_creator %>% 
-    plot_score_issue_stakeholder_creator()
-
-plt_score_issue_stakeholder_creator
+df_issue_stakeholder_creator %>% 
+  plot_frequency(issue_stakeholder, 
+                 title = "Frequency of Distinct Users by Stakeholder",
+                 label.x = "Stakeholder",
+                 breaks.y = seq(0, 150, 10),
+                 breaks.2nd.y = seq(0, 1, .1))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1567,42 +1336,6 @@ by user we note that the 1st top user is from COMPANY following by 7 users
 from CUSTOMER.
 
 ```{r}
-plot_score_issue_created_by <- function(df_issue_created_by,
-                                        subtitle_complement = NULL) {
-  
-  summ_issue_created_by <- 
-    df_issue_created_by %>% 
-      group_by(issue_created_by) %>% 
-      summarise(frequency = n()) %>% 
-      df_summary(frequency)
-  
-  df_score_issue_created_by <- 
-    df_issue_created_by %>% 
-      group_by(issue_created_by) %>% 
-      summarise(score = n())
-  
-  plot_score_issue_created_by <- 
-    df_score_issue_created_by %>% 
-      ggplot(aes(x = reorder(issue_created_by, -score), y = score)) +
-        geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        plot_y_summary(df_issue_created_by, issue_created_by) +
-        scale_y_continuous(breaks = seq(0, 1400, 100),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_created_by),
-                             breaks = seq(0, 1, .025),
-                             labels = scales::percent
-                           )) +
-        labs(title = "Top 15 Frequency of Issue by Creator",
-             subtitle = subtitle(nrow(df_issue_created_by),
-                                 subtitle_complement,
-                                 summ_issue_created_by),
-             x = "Issue creator",
-             y = "Frequency") +
-        theme(axis.text.x = element_text(angle = 25, hjust = 1)) 
-  
-  plot_score_issue_created_by
-}
-
 df_score_top15_issue_created_by <- 
   df_issue_created_by %>%
     group_by(issue_created_by) %>% 
@@ -1613,13 +1346,15 @@ df_score_top15_issue_created_by <-
 ```
 
 ```{r fig.height=4.5, "Top 15 Frequency of Issue Created By"}
-plt_score_issue_created_by <-
-  df_issue_created_by %>% 
-    filter(issue_created_by %in% 
-             df_score_top15_issue_created_by$issue_created_by) %>% 
-    plot_score_issue_created_by()
-
-plt_score_issue_created_by
+df_issue_created_by %>% 
+  filter(issue_created_by %in% 
+           df_score_top15_issue_created_by$issue_created_by) %>%
+  plot_frequency(issue_created_by, 
+                 title = "Top 15 Frequency of Issue by Creator",
+                 label.x = "Issue creator",
+                 breaks.y = seq(0, 1400, 100),
+                 breaks.2nd.y = seq(0, 1, .025),
+                 axis.text.x = element_text(angle = 20, hjust = 1))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1641,31 +1376,24 @@ systems.
 
 ### Issue Status
 
-```{r "Frequency of Issue Status"}
-df_issue_status <-
+```{r}
+df_issue_status <- 
   issues %>% 
-    filter(!is.na(issue_status)) %>%
+    filter(!is.na(issue_status)) %>% 
     distinct(issue_id, issue_status)
+```
 
-df_score_issue_status <- 
-  df_issue_status %>% 
-    group_by(issue_status) %>% 
-    summarise(score = n())
+In the plot below, we may see the frequencies of issues created to 
+`r length(unique(df_issue_status$issue_status))` systems.
 
-plot_score_issue_status <- 
-  df_score_issue_status %>% 
-    ggplot(aes(x = reorder(issue_status, -score), y = score/sum(score))) +
-      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-      add_label(df_score_issue_status$score) +
-      scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, .15), 
-                         labels = scales::percent) + 
-      labs(title = "Frequency of Issue Stakeholder",
-           subtitle = subtitle(nrow(df_issue_status)),
-           x = "Issue stakeholder",
-           y = "Frequency") +
-      theme(axis.text.x = element_text(angle = 20, hjust = 1)) 
-
-plot_score_issue_status
+```{r fig.height=4, "Frequency of Issue Status"}
+df_issue_status %>% 
+  plot_frequency(issue_status, 
+                 title = "Frequency of Issue Status",
+                 label.x = "Issue status",
+                 breaks.y = seq(0, 4500, 500),
+                 breaks.2nd.y = seq(0, 1, .1),
+                 axis.text.x = element_text(angle = 20, hjust = 1))
 ```
 
 ### Issue Priority Number
@@ -1765,31 +1493,21 @@ plot_issue_priority_number
 
 ### Issue Priority Scale
 
-```{r "Frequency of Issue Priority Scale"}
+```{r}
 df_issue_priority_scale <-
   issues %>% 
     filter(!is.na(issue_priority_scale)) %>%
     distinct(issue_id, issue_priority_scale)
+```
 
-df_score_issue_priority_scale <- 
-  df_issue_priority_scale %>% 
-    group_by(issue_priority_scale) %>% 
-    summarise(score = n()) %>% 
-    arrange(desc(score))
-
-plot_score_issue_priority_scale <- 
-  df_score_issue_priority_scale %>% 
-    ggplot(aes(x = issue_priority_scale, y = score/sum(score))) +
-      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-      add_label(df_score_issue_priority_scale$score) +
-      scale_y_continuous(limits = c(0, .7), breaks = seq(0, 1, .1), 
-                         labels = scales::percent) + 
-      labs(title = "Frequency of Issue Priority Scale",
-           subtitle = subtitle(nrow(df_issue_priority_scale)),
-           x = "Issue priority scale",
-           y = "Frequency") 
-
-plot_score_issue_priority_scale
+```{r "Frequency of Issue Priority Scale"}
+df_issue_priority_scale %>% 
+  plot_frequency(issue_priority_scale, 
+                 title = "Frequency of Issue Priority Scale",
+                 label.x = "Issue priority scale",
+                 reorder.x = FALSE,
+                 breaks.y = seq(0, 4500, 300),
+                 breaks.2nd.y = seq(0, 1, .1))
 ```
 
 ### Issue Progress

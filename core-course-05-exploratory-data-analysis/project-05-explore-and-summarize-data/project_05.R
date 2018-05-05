@@ -1,3 +1,6 @@
+DEFAULT_COLOR = "grey50"
+DEFAULT_ALFA = .1
+
 load_packages <- function(packages) {
   sapply(packages,
          function(pkg) {
@@ -63,8 +66,8 @@ df_summary <- function(df, variable) {
   .df_summary(df, substitute(variable))
 }
 
-.df_summary <- function(df, variable) {
-  variable_e <- eval(variable, df)
+.df_summary <- function(df, variable_q) {
+  variable_e <- eval(variable_q, df)
 
   data.frame(min = min(variable_e),
              qu1 = quantile(variable_e, probs = .25, names = FALSE),
@@ -142,7 +145,11 @@ plot_x_summary <- function(data, x) {
 }
 
 plot_y_summary <- function(data, y) {
-  y_q <- substitute(y)
+  .plot_y_summary(data, substitute(y))
+}
+
+.plot_y_summary <- function(data, y_q) {
+  #y_q <- substitute(y)
   df_summary <- data %>%
                   group_by_(y_q) %>%
                   summarise(frequency = n()) %>%
@@ -227,23 +234,62 @@ plot_cumsummary <- function(data, x, y) {
   )
 }
 
-# count_weekend_days = function(start_date, end_date) {
-#   count <- vector("integer", length(start_date))
-#
-#   for(i in seq_along(start_date)) {
-#     start <- as.Date(start_date[i])
-#     end <- as.Date(end_date[i])
-#     if (start < end) {
-#       vector_with_days = strftime(seq(start, end, by = 1), '%A')
-#       count[i] <- -sum(vector_with_days %in% c('Saturday', 'Sunday'))
-#     } else {
-#       vector_with_days = strftime(seq(end, start, by = 1), '%A')
-#       count[i] <- sum(vector_with_days %in% c('Saturday', 'Sunday'))
-#     }
-#   }
-#
-#   return(count)
-# }
+plot_frequency <- function(data,
+                           x,
+                           title,
+                           label.x,
+                           reorder.x = TRUE,
+                           label.y = "Frequency",
+                           axis.text.x = NULL,
+                           subtitle_complement = NULL,
+                           breaks.y = waiver(),
+                           breaks.2nd.y = waiver()) {
+  x_q <- substitute(x)
+  
+  summ <- 
+    data %>% 
+      group_by_(x_q) %>% 
+      summarise(frequency = n()) %>% 
+      df_summary(frequency)
+ 
+  df_score <- 
+    data %>% 
+      group_by_(x_q) %>% 
+      summarise(score = n())
+  
+  percent_axis <- function() {
+    ggplot2::sec_axis(trans = ~./nrow(data),
+             breaks = breaks.2nd.y,
+             labels = scales::percent)
+  }
+  
+  if(reorder.x == TRUE) {
+    aes_x <- paste0("reorder(", deparse(x_q), ", -score)")
+  } else {
+    aes_x <- deparse(x_q) 
+  }
+  
+  plot_score <- 
+    df_score %>% 
+      ggplot(aes_string(x = aes_x, 
+                        y = "score")) +
+      geom_col(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+      .plot_y_summary(data, x_q) +
+      scale_y_continuous(breaks = breaks.y,
+                         sec.axis = percent_axis()) +
+      labs(title = title,
+           subtitle = subtitle(nrow(data),
+                               subtitle_complement,
+                               summ),
+           x = label.x,
+           y = label.y)
+  
+  if(!is.null(axis.text.x)) {
+    plot_score <- plot_score + theme(axis.text.x = axis.text.x)
+  } 
+  
+  return(plot_score)
+}
 
 add_label <- function(y) {
   geom_text(aes_string(label = deparse(y)),
