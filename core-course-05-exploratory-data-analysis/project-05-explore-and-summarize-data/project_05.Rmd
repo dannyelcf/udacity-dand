@@ -110,27 +110,6 @@ number of logs represents `r round(nrow(logs)*100/nrow(dataset))`% of it. The
 logs. 
 
 ```{r}
-plot_number_logs_per_issue <- function(df_number_logs_per_issue) {
-  summ_number_logs_per_issue <- df_summary(df_number_logs_per_issue, score)
-  
-  plot_number_logs_per_issue <-
-    df_number_logs_per_issue %>% 
-      ggplot(aes(x = score)) +
-        geom_histogram(binwidth = 1, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                       boundary = summ_number_logs_per_issue$min, 
-                       closed = "left") +
-        plot_x_summary(df_number_logs_per_issue, score) +
-        scale_x_continuous(breaks = seq(0, 43, 2)) +
-        scale_y_continuous(breaks = seq(0, 800, 100)) +
-        labs(title = "Distribution of the Number of Logs per Issue",
-             subtitle = subtitle(observations = nrow(df_number_logs_per_issue),
-                                 df_summary = summ_number_logs_per_issue),
-             x = "Number of logs per issue",
-             y = "Frequency") 
-  
-  plot_number_logs_per_issue
-}
-
 df_number_logs_per_issue <- 
   dataset %>%
     select(issue_id, log_creation_date) %>%
@@ -142,11 +121,13 @@ The distribution and the summaries of number of logs per issue are ploted in the
 histogram below.
 
 ```{r "Distribution of the Number of Logs per Issue"}
-plt_number_logs_per_issue <-
-  df_number_logs_per_issue %>% 
-    plot_number_logs_per_issue()
-
-plt_number_logs_per_issue
+df_number_logs_per_issue %>% 
+  plot_distribution(score,
+                    binwidth = 1,
+                    title = "Distribution of the Number of Logs per Issue",
+                    label.x = "Number of logs per issue",
+                    breaks.x = seq(0, 43, 2),
+                    breaks.y = seq(0, 800, 100))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -414,31 +395,6 @@ of mean descrease. These new summaries better reflect the behavior of issue
 creation.
 
 ```{r}
-plot_issue_created_by_hour <- function(df_issue_created_by_hour,
-                                       subtitle_complement = NULL) {
-  
-  summ_number_issue_created_by_hour <- df_summary(df_issue_created_by_hour, 
-                                                  issue_creation_hour)
-  
-  plot_issue_created_by_hour <-
-    df_issue_created_by_hour %>% 
-      ggplot(aes(x = issue_creation_hour)) +
-        geom_histogram(binwidth = 1, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                       boundary = summ_number_issue_created_by_hour$min, 
-                       closed = "left") +
-        plot_x_summary(df_issue_created_by_hour, issue_creation_hour) +
-        scale_x_continuous(breaks = seq(0, 23, 1)) +
-        scale_y_continuous(limits = c(0, 700), breaks = seq(0, 700, 100)) +
-        labs(title = "Distribution of the Number of Issues Created per Hour of the Day",
-             subtitle = subtitle(nrow(df_issue_created_by_hour),
-                                 subtitle_complement,
-                                 summ_number_issue_created_by_hour),
-             x = "Hour of the day",
-             y = "Frequency") 
-  
-  plot_issue_created_by_hour
-}
-
 df_issue_created_by_hour <- 
   issues %>% 
     filter(!is.na(issue_creation_date)) %>%
@@ -450,11 +406,14 @@ Analysing how was the behaviour of the issue creations per hour of the day we
 have the bimodal distribution below.
 
 ```{r "Distribution of the Number of Issues Created per Hour of the Day"}
-plt_issue_created_by_hour <-
-  df_issue_created_by_hour %>% 
-    plot_issue_created_by_hour()
-
-plt_issue_created_by_hour
+df_issue_created_by_hour %>% 
+  plot_distribution(issue_creation_hour,
+                    binwidth = 1,
+                    title = "Distribution of the Number of Issues Created per Hour of the Day",
+                    label.x = "Hour of the day",
+                    breaks.x = seq(0, 23, 1),
+                    breaks.y = seq(0, 700, 100),
+                    limits.y = c(0, 700))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -472,12 +431,16 @@ Ploting this distribution again but with only office hours (from 8:00h to 18:00h
 we have the same summaries of the distribution before. See the plot below.
 
 ```{r "Distribution of the Number of Issues Created per Hour of the Day (Only Office Hours)"}
-plt_issue_created_by_office_hour <-
-  df_issue_created_by_hour %>%
-    filter(issue_creation_hour >= 8 & issue_creation_hour <= 18) %>% 
-    plot_issue_created_by_hour("with only office hours")
-
-plt_issue_created_by_office_hour
+df_issue_created_by_hour %>%
+  filter(issue_creation_hour >= 8 & issue_creation_hour <= 18) %>% 
+  plot_distribution(issue_creation_hour,
+                    binwidth = 1,
+                    title = "Distribution of the Number of Issues Created per Hour of the Day",
+                    subtitle_complement = "with only office hours",
+                    label.x = "Hour of the day",
+                    breaks.x = seq(0, 23, 1),
+                    breaks.y = seq(0, 700, 100),
+                    limits.y = c(0, 700))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -591,46 +554,26 @@ issues$issue_delay_start <-
 ### Issue Delay Start
 
 ```{r}
-plot_issue_delay_start <- function(df_issue_delay_start) {
-  summ_issue_delay_start <- df_summary(df_issue_delay_start, 
-                                       issue_delay_start)
-  
-  plot_issue_delay_start <-
-    df_issue_delay_start %>% 
-      ggplot(aes(x = issue_delay_start)) +
-        geom_histogram(binwidth = 5, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                       boundary = summ_issue_delay_start$min, 
-                       closed = "left") +
-        plot_x_summary(df_issue_delay_start, issue_delay_start) +
-        scale_x_continuous(breaks = seq(0, 500, 5)) +
-        scale_y_continuous(limits = c(0, 4000), breaks = seq(0, 4000, 300)) +
-        coord_cartesian(xlim = c(0, 70)) +
-        labs(title = "Distribution of the Delay Between Creation and Start Date",
-             subtitle = subtitle(nrow(df_issue_delay_start),
-                                 df_summary = summ_issue_delay_start),
-             x = "Number of calendar days",
-             y = "Frequency") 
-  
-  plot_issue_delay_start
-}
-
 df_issue_delay_start <-
   issues %>% 
     select(issue_id, issue_delay_start) %>% 
     filter(!is.na(issue_delay_start)) %>% 
     filter(issue_delay_start >= 0)
-
 ```
 
 See in the plot below the distribution of the delay between creation and start 
 date.
 
 ```{r "Distribution of the Delay Between Creation and Start Date"}
-plt_issue_delay_start <-
-  df_issue_delay_start %>% 
-    plot_issue_delay_start()
-
-plt_issue_delay_start
+df_issue_delay_start %>%
+  plot_distribution(issue_delay_start,
+                    binwidth = 5,
+                    title = "Distribution of the Delay Between Creation and Start Date",
+                    label.x = "Number of calendar days",
+                    breaks.x = seq(0, 500, 5),
+                    coord.xlim = c(0, 70),
+                    breaks.y = seq(0, 4000, 300),
+                    limits.y = c(0, 4000))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -873,29 +816,6 @@ issues$issue_deadline_size <-
 ### Issue Deadline Size
 
 ```{r}
-plot_issue_deadline_size <- function(df_issue_deadline_size) {
-  summ_issue_deadline_size <- df_summary(df_issue_deadline_size, 
-                                         issue_deadline_size)
-  
-  plot_issue_deadline_size <-
-    df_issue_deadline_size %>% 
-      ggplot(aes(x = issue_deadline_size)) +
-        geom_histogram(binwidth = 1, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                       boundary = summ_issue_deadline_size$min, 
-                       closed = "left") +
-        plot_x_summary(df_issue_deadline_size, issue_deadline_size) +
-        scale_x_continuous(breaks = seq(0, 45, 2)) +
-        scale_y_continuous(limits = c(0, 400), breaks = seq(0, 400, 30)) +
-        coord_cartesian(xlim = c(0, 45)) +
-        labs(title = "Distribution of the Deadline Size",
-             subtitle = subtitle(nrow(df_issue_deadline_size),
-                                 df_summary = summ_issue_deadline_size),
-             x = "Number of calendar days",
-             y = "Frequency") 
-  
-  plot_issue_deadline_size
-}
-
 df_issue_deadline_size <-
   issues %>% 
     select(issue_id, issue_deadline_size) %>% 
@@ -906,11 +826,15 @@ df_issue_deadline_size <-
 See in the plot below how is the distribution of the deadline size.
 
 ```{r "Distribution of the Deadline Size"}
-plt_issue_deadline_size <- 
-  df_issue_deadline_size %>% 
-    plot_issue_deadline_size()
-
-plt_issue_deadline_size
+df_issue_deadline_size %>%
+  plot_distribution(issue_deadline_size,
+                    binwidth = 1,
+                    title = "Distribution of the Deadline Size",
+                    label.x = "Number of calendar days",
+                    breaks.x = seq(0, 45, 2),
+                    coord.xlim = c(0, 45),
+                    breaks.y = seq(0, 400, 30),
+                    limits.y = c(0, 400))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -929,39 +853,6 @@ changed to one week sprints.
 ### Issue Time Spent
 
 ```{r}
-plot_issue_time_spent_hour <- function(df_issue_time_spent_hour,
-                                       binwidth = 1,
-                                       complement = NULL,
-                                       x.breaks = waiver(),
-                                       y.breaks = waiver(),
-                                       xlim = NULL,
-                                       ylim = NULL,
-                                       x.label = NULL) {
-
-  summ_issue_time_spent_hour <- df_summary(df_issue_time_spent_hour, 
-                                           issue_time_spent)
-  
-  plot_issue_time_spent_hour <- 
-    df_issue_time_spent_hour %>% 
-      ggplot(aes(x = issue_time_spent)) +
-        geom_histogram(binwidth = binwidth, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                       boundary = summ_issue_time_spent_hour$min, 
-                       closed = "left") +
-        plot_x_summary(df_issue_time_spent_hour, issue_time_spent) +
-        scale_x_continuous(breaks = x.breaks) +
-        scale_y_continuous(breaks = y.breaks) +
-        coord_cartesian(xlim = xlim, ylim = ylim) +
-        labs(title = "Distribution of the Number of Time Spent on a Issue per Hour",
-             subtitle = subtitle(nrow(df_issue_time_spent_hour),
-                                 complement,
-                                 summ_issue_time_spent_hour),
-             x = x.label,
-             y = "Frequency") 
-  
-  plot_issue_time_spent_hour
-
-}
-
 df_issue_time_spent_hour <- 
   issues %>% 
     filter(!is.na(issue_time_spent)) %>%
@@ -974,13 +865,13 @@ of the sum of `log_time_spent`. In the dataset, issue time spent is represented
 in seconds. The plot below shows its distribution per hour.
 
 ```{r "Distribution of the Number of Time Spent on a Issue per Hour"}
-plt_issue_time_spent_hour <-
-  df_issue_time_spent_hour %>% 
-    plot_issue_time_spent_hour(x.breaks = seq(0, 110, 5),
-                               y.breaks = seq(0, 3000, 250),
-                               x.label = "Hours spent")
-
-plt_issue_time_spent_hour
+df_issue_time_spent_hour %>%
+  plot_distribution(issue_time_spent,
+                    binwidth = 1,
+                    title = "Distribution of the Number of Time Spent on a Issue per Hour",
+                    label.x = "Hours spent",
+                    breaks.x = seq(0, 110, 5),
+                    breaks.y = seq(0, 3000, 250))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -996,14 +887,15 @@ insignicant in relation to the data mass less than 2 hours. Thus, lets zoom in
 this plot to first 24 hours. See the result in the plot below.
 
 ```{r "Distribution of the Number of Time Spent on a Issue per Hour (Zoomed In)"}
-plt_issue_time_spent_24h <-
-  df_issue_time_spent_hour %>% 
-    plot_issue_time_spent_hour(complement = "zoomed in to the first 24 hours",
-                               x.breaks = seq(0, 24, 1),
-                               y.breaks = seq(0, 2700, 200),
-                               xlim = c(0, 24),
-                               x.label = "Hours spent")
-plt_issue_time_spent_24h
+df_issue_time_spent_hour %>%
+  plot_distribution(issue_time_spent,
+                    binwidth = 1,
+                    title = "Distribution of the Number of Time Spent on a Issue per Hour",
+                    subtitle_complement = "zoomed in to the first 24 hours",
+                    label.x = "Hours spent",
+                    breaks.x = seq(0, 24, 1),
+                    coord.xlim = c(0, 24),
+                    breaks.y = seq(0, 2700, 200))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1021,14 +913,14 @@ df_issue_time_spent_1h <-
     distinct(issue_id, issue_time_spent = (issue_time_spent / 60)) %>% 
     filter(issue_time_spent < 60)
 
-plt_issue_time_spent_1h <-
-  df_issue_time_spent_1h %>% 
-    plot_issue_time_spent_hour(binwidth = 5,
-                               complement = "less than 1 hour",
-                               x.breaks = seq(0, 60, 5),
-                               y.breaks = seq(0, 1500, 150),
-                               x.label = "Minutes spent")
-plt_issue_time_spent_1h
+df_issue_time_spent_1h %>%
+  plot_distribution(issue_time_spent,
+                    binwidth = 5,
+                    title = "Distribution of the Number of Time Spent on a Issue per Hour",
+                    subtitle_complement = "less than 1 hour",
+                    label.x = "Minutes spent",
+                    breaks.x = seq(0, 60, 5),
+                    breaks.y = seq(0, 1500, 150))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1062,15 +954,14 @@ df_issue_time_spent_1h_non_0s <-
     distinct(issue_id, issue_time_spent = (issue_time_spent / 60)) %>% 
     filter(issue_time_spent != 0 & issue_time_spent < 60)
 
-plt_issue_time_spent_1h_non_0s <-
-  df_issue_time_spent_1h_non_0s %>% 
-    plot_issue_time_spent_hour(binwidth = 6,
-                               complement = "less than 1 hour and non 0 seconds",
-                               x.breaks = seq(6, 60, 6),
-                               y.breaks = seq(0, 500, 50),
-                               x.label = "Minutes spent")
-
-plt_issue_time_spent_1h_non_0s
+df_issue_time_spent_1h_non_0s %>%
+  plot_distribution(issue_time_spent,
+                    binwidth = 6,
+                    title = "Distribution of the Number of Time Spent on a Issue per Hour",
+                    subtitle_complement = "less than 1 hour and non 0 seconds",
+                    label.x = "Minutes spent",
+                    breaks.x = seq(6, 60, 6),
+                    breaks.y = seq(0, 500, 50))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1088,16 +979,15 @@ df_issue_time_spent_non_0s <-
     distinct(issue_id, issue_time_spent = (issue_time_spent / 3600)) %>% 
     filter(issue_time_spent != 0)
 
-plt_issue_time_spent_non_0s <-
-  df_issue_time_spent_non_0s %>% 
-    plot_issue_time_spent_hour(binwidth = 1,
-                               complement = "non 0 seconds and zoomed in to the first 24 hours",
-                               x.breaks = seq(0, 24, 1),
-                               y.breaks = seq(0, 1400, 150),
-                               xlim = c(0, 24),
-                               x.label = "Hours spent")
-
-plt_issue_time_spent_non_0s
+df_issue_time_spent_non_0s %>%
+  plot_distribution(issue_time_spent,
+                    binwidth = 1,
+                    title = "Distribution of the Number of Time Spent on a Issue per Hour",
+                    subtitle_complement = "non 0 seconds and zoomed in to the first 24 hours",
+                    label.x = "Hours spent",
+                    breaks.x = seq(0, 24, 1),
+                    coord.xlim = c(0, 24),
+                    breaks.y = seq(0, 1400, 150))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -1398,31 +1288,21 @@ df_issue_status %>%
 
 ### Issue Priority Number
 
-```{r "Distribution of the Priority Number per Issue"}
+```{r}
 df_issue_priority_number <- 
   issues %>% 
     filter(!is.na(issue_priority_number)) %>%
     distinct(issue_id, issue_priority_number)
+```
 
-summ_issue_priority_number <- df_summary(df_issue_priority_number, 
-                                         issue_priority_number)
-
-plot_issue_priority_number <- 
-  df_issue_priority_number %>% 
-    ggplot(aes(x = issue_priority_number)) +
-      geom_histogram(binwidth = 50, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                     boundary = summ_issue_priority_number$min, 
-                     closed = "left") +
-      plot_x_summary(df_issue_priority_number, issue_priority_number) +
-      scale_x_continuous(breaks = seq(0, 999, 50)) +
-      scale_y_continuous(breaks = seq(0, 2700, 200)) +
-      labs(title = "Distribution of the Priority Number per Issue",
-           subtitle = subtitle(nrow(df_issue_priority_number),
-                               df_summary = summ_issue_priority_number),
-           x = "Issue priority number",
-           y = "Frequency")
-
-plot_issue_priority_number
+```{r "Distribution of the Priority Number per Issue"}
+df_issue_priority_number %>%
+  plot_distribution(issue_priority_number,
+                    binwidth = 50,
+                    title = "Distribution of the Priority Number per Issue",
+                    label.x = "Issue priority number",
+                    breaks.x = seq(0, 999, 50),
+                    breaks.y = seq(0, 2700, 200))
 ```
 
 ```{r "Head Issue Priority Number"}
@@ -1441,26 +1321,15 @@ df_issue_priority_number <-
     distinct(issue_id, issue_priority_number) %>% 
     filter(issue_priority_number != 999)
 
-summ_issue_priority_number <- df_summary(df_issue_priority_number, 
-                                         issue_priority_number)
-
-plot_issue_priority_number <- 
-  df_issue_priority_number %>% 
-    ggplot(aes(x = issue_priority_number)) +
-      geom_histogram(binwidth = 10, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                     boundary = summ_issue_priority_number$min, 
-                     closed = "left") +
-      plot_x_summary(df_issue_priority_number, issue_priority_number) +
-      scale_x_continuous(breaks = seq(0, 280, 10)) +
-      scale_y_continuous(breaks = seq(0, 1600, 150)) +
-      coord_cartesian(xlim = c(0, 100)) +
-      labs(title = "Distribution of the Priority Number per Issue (Dropped 999)",
-           subtitle = subtitle(nrow(df_issue_priority_number),
-                               df_summary = summ_issue_priority_number),
-           x = "Issue priority number",
-           y = "Frequency") 
-
-plot_issue_priority_number
+df_issue_priority_number %>%
+  plot_distribution(issue_priority_number,
+                    binwidth = 10,
+                    title = "Distribution of the Priority Number per Issue",
+                    subtitle_complement = "after dropped 999s",
+                    label.x = "Issue priority number",
+                    breaks.x = seq(0, 280, 10),
+                    coord.xlim = c(0, 100),
+                    breaks.y = seq(0, 1600, 150))
 ```
 
 ```{r "Distribution of the Priority Number per Issue (Less than or Equal to 20)"}
@@ -1470,25 +1339,14 @@ df_issue_priority_number <-
     distinct(issue_id, issue_priority_number) %>% 
     filter(issue_priority_number <= 20)
 
-summ_issue_priority_number <- df_summary(df_issue_priority_number, 
-                                         issue_priority_number)
-
-plot_issue_priority_number <- 
-  df_issue_priority_number %>% 
-    ggplot(aes(x = issue_priority_number)) +
-      geom_histogram(binwidth = 1, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                     boundary = summ_issue_priority_number$min, 
-                     closed = "left") +
-      plot_x_summary(df_issue_priority_number, issue_priority_number) +
-      scale_x_continuous(breaks = seq(0, 20, 1)) +
-      scale_y_continuous(breaks = seq(0, 450, 50)) +
-      labs(title = "Distribution of the Priority Number per Issue (Less Than or Equal to 20)",
-           subtitle = subtitle(nrow(df_issue_priority_number),
-                               df_summary = summ_issue_priority_number),
-           x = "Issue priority number",
-           y = "Frequency") 
-
-plot_issue_priority_number
+df_issue_priority_number %>%
+  plot_distribution(issue_priority_number,
+                    binwidth = 1,
+                    title = "Distribution of the Priority Number per Issue",
+                    subtitle_complement = "less than or equal to 20",
+                    label.x = "Issue priority number",
+                    breaks.x = seq(0, 20, 1),
+                    breaks.y = seq(0, 450, 50))
 ```
 
 ### Issue Priority Scale
@@ -1512,31 +1370,21 @@ df_issue_priority_scale %>%
 
 ### Issue Progress
 
-```{r "Distribution of the Progress per Issue"}
+```{r}
 df_issue_progress <- 
   issues %>% 
     filter(!is.na(issue_progress)) %>% 
     distinct(issue_id, issue_progress)
+```
 
-summ_issue_progress <- df_summary(df_issue_progress, 
-                                  issue_progress)
-
-plot_issue_progress <- 
-  df_issue_progress %>% 
-    ggplot(aes(x = issue_progress)) +
-      geom_histogram(binwidth = 10, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                     boundary = summ_issue_progress$min, 
-                     closed = "left") +
-      plot_x_summary(df_issue_progress, issue_progress) +
-      scale_x_continuous(breaks = seq(0, 100, 10)) +
-      scale_y_continuous(breaks = seq(0, 4600, 500)) +
-      labs(title = "Distribution of the Progress per Issue",
-           subtitle = subtitle(nrow(df_issue_progress),
-                               df_summary = summ_issue_progress),
-           x = "Issue progress",
-           y = "Frequency") 
-
-plot_issue_progress
+```{r "Distribution of the Progress per Issue"}
+df_issue_progress %>%
+  plot_distribution(issue_progress,
+                    binwidth = 10,
+                    title = "Distribution of the Progress per Issue",
+                    label.x = "Issue progress",
+                    breaks.x = seq(0, 100, 10),
+                    breaks.y = seq(0, 4600, 500))
 ```
 
 ```{r "Head Issue Progress"}
@@ -1550,7 +1398,7 @@ df_issue_progress %>%
 
 ### Log Build Info
 
-```{r "Distribution of the Number of the Issues per System's Version"}
+```{r}
 df_log_build_info <-
   logs %>% 
     filter(!is.na(log_build_info)) %>% 
@@ -1558,25 +1406,16 @@ df_log_build_info <-
     group_by(log_build_info) %>% 
     summarise(score = n()) %>% 
     arrange(desc(score)) 
+```
 
-summ_log_build_info <- df_summary(df_log_build_info, score)
-
-plot_log_build_info <- 
-  df_log_build_info %>% 
-    ggplot(aes(x = score)) +
-      geom_histogram(binwidth = 5, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                     boundary = summ_log_build_info$min, 
-                     closed = "left") +
-      plot_x_summary(df_log_build_info, score) +
-      scale_x_continuous(breaks = seq(1, 125, 5)) +
-      scale_y_continuous(breaks = seq(0, 320, 30)) +
-      labs(title = "Distribution of the Number of the Issues per System's Version",
-           subtitle = subtitle(nrow(df_log_build_info),
-                               df_summary = summ_log_build_info),
-           x = "Number of issues",
-           y = "Frequency") 
-
-plot_log_build_info
+```{r "Distribution of the Number of the Issues per System's Version"}
+df_log_build_info %>%
+  plot_distribution(score,
+                    binwidth = 5,
+                    title = "Distribution of the Number of the Issues per System's Version",
+                    label.x = "Number of issues",
+                    breaks.x = seq(1, 125, 5),
+                    breaks.y = seq(0, 320, 30))
 ```
 
 ```{r "Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)"}
@@ -1589,24 +1428,14 @@ df_log_build_info <-
     arrange(desc(score)) %>% 
     filter(score < 6)
 
-summ_log_build_info <- df_summary(df_log_build_info, score)
-
-plot_log_build_info <- 
-  df_log_build_info %>% 
-    ggplot(aes(x = score)) +
-      geom_histogram(binwidth = 1, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
-                     boundary = summ_log_build_info$min, 
-                     closed = "left") +
-      plot_x_summary(df_log_build_info, score) +
-      scale_x_continuous(breaks = seq(1, 5, 1)) +
-      scale_y_continuous(breaks = seq(0, 90, 10)) +
-      labs(title = "Distribution of the Number of the Issues per System's Version",
-           subtitle = subtitle(nrow(df_log_build_info),
-                               df_summary = summ_log_build_info),
-           x = "Number of issues",
-           y = "Frequency") 
-
-plot_log_build_info
+df_log_build_info %>%
+  plot_distribution(score,
+                    binwidth = 1,
+                    title = "Distribution of the Number of the Issues per System's Version",
+                    subtitle_complement = "less than 6 issues",
+                    label.x = "Number of issues",
+                    breaks.x = seq(1, 5, 1),
+                    breaks.y = seq(0, 90, 10))
 ```
 
 ### Log Status

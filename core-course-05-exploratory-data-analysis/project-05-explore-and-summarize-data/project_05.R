@@ -114,7 +114,11 @@ plot_year_vline <- function() {
 }
 
 plot_x_summary <- function(data, x) {
-  x_q <- substitute(x)
+  .plot_x_summary(data, substitute(x))
+}
+
+.plot_x_summary <- function(data, x_q) {
+  #x_q <- substitute(x)
   df_summary <- .df_summary(data, x_q)
 
   list(
@@ -289,6 +293,40 @@ plot_frequency <- function(data,
   } 
   
   return(plot_score)
+}
+
+plot_distribution <- function(data,
+                              x,
+                              binwidth,
+                              title,
+                              label.x,
+                              label.y = "Frequency",
+                              subtitle_complement = NULL,
+                              breaks.x = waiver(),
+                              coord.xlim = NULL,
+                              breaks.y = waiver(),
+                              limits.y = NULL) {
+  x_q <- substitute(x)
+  summ <- .df_summary(data, x_q)
+  
+  plot_distribution <-
+    data %>% 
+    ggplot(aes_string(x = deparse(x_q))) +
+    geom_histogram(binwidth = binwidth, color = DEFAULT_COLOR, alpha = DEFAULT_ALFA, 
+                   boundary = summ$min, 
+                   closed = "left") +
+    .plot_x_summary(data, x_q) +
+    scale_x_continuous(breaks = breaks.x) +
+    scale_y_continuous(limits = limits.y, breaks = breaks.y) +
+    coord_cartesian(xlim = coord.xlim) +
+    labs(title = title,
+         subtitle = subtitle(nrow(data),
+                             subtitle_complement,
+                             summ),
+         x = label.x,
+         y = label.y) 
+  
+  return(plot_distribution)
 }
 
 add_label <- function(y) {
