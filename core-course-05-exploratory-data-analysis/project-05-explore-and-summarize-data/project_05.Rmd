@@ -1126,6 +1126,10 @@ df_issue_priority_number <-
     distinct(issue_id, issue_priority_number)
 ```
 
+When creating an issue, it is given a priority number between 0 (highest) and 
+999 (default value, equivalent to null). The plot below shows the distribution 
+of the priority number among issues.
+
 ```{r "Distribution of the Priority Number per Issue"}
 df_issue_priority_number %>%
   plot_distribution(issue_priority_number,
@@ -1136,23 +1140,35 @@ df_issue_priority_number %>%
                     breaks.y = seq(0, 2700, 200))
 ```
 
-```{r "Head Issue Priority Number"}
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean.
+
+Note that the issues are distributed into two ends: one between 0-50 and one 
+between 950-999. Also note that the 1st quartile is very close to the lowest 
+priority number (0) and the median and 3rd quartile is equal to the highest 
+priority number (999). This scenario means either priority numbers are next to 
+1st quartile threshold or 999 are assigned to priority numbers. See this in 
+another way in the table below that list the 6 highest issue priority numbers.
+
+```{r "Top 6 Issue Priority Number"}
 df_issue_priority_number %>% 
   group_by(issue_priority_number) %>% 
   summarise(score = sum(!is.na(issue_priority_number))) %>% 
   arrange(desc(score)) %>% 
-  head(5) %>% 
+  head() %>% 
   as.data.frame()
 ```
 
+As 999 is the default value in the tool and is equivalent to null, I removed it
+from the data set and I generated another plot showing the distribution of 
+priority number less than 100. See it below.
+
 ```{r "Distribution of the Priority Number per Issue (Dropped 999 and Zoomed In to 100)"}
-df_issue_priority_number <- 
-  issues %>% 
-    filter(!is.na(issue_priority_number)) %>%
-    distinct(issue_id, issue_priority_number) %>% 
+df_issue_priority_number_dropped_999 <- 
+  df_issue_priority_number %>% 
     filter(issue_priority_number != 999)
 
-df_issue_priority_number %>%
+df_issue_priority_number_dropped_999 %>%
   plot_distribution(issue_priority_number,
                     binwidth = 10,
                     title = "Distribution of the Priority Number per Issue",
@@ -1163,22 +1179,38 @@ df_issue_priority_number %>%
                     breaks.y = seq(0, 1600, 150))
 ```
 
-```{r "Distribution of the Priority Number per Issue (Less than or Equal to 20)"}
-df_issue_priority_number <- 
-  issues %>% 
-    filter(!is.na(issue_priority_number)) %>%
-    distinct(issue_id, issue_priority_number) %>% 
-    filter(issue_priority_number <= 20)
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
 
-df_issue_priority_number %>%
+Now, we can see the median with 4 value and the 3rd quartile with 12. Also, note
+that priority numbers greather than 28 are outliers. Thus, to analyse better the
+behaviour of priority numbers I have generated another plot zooming into 
+priority numbers less than or equal to 30.
+
+```{r "Distribution of the Priority Number per Issue (Less than or Equal to 30)"}
+df_issue_priority_number_dropped_999 %>%
   plot_distribution(issue_priority_number,
                     binwidth = 1,
                     title = "Distribution of the Priority Number per Issue",
-                    subtitle_complement = "less than or equal to 20",
+                    subtitle_complement = "less than or equal to 30",
                     label.x = "Issue priority number",
-                    breaks.x = seq(0, 20, 1),
-                    breaks.y = seq(0, 450, 50))
+                    breaks.x = seq(0, 30, 1),
+                    coord.xlim = c(0, 30),
+                    breaks.y = seq(0, 450, 50),
+                    coord.ylim = c(0, 450))
 ```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
+
+Analysing the plot above, we can realize that 50% of priority numbers assingned
+follow the [Likert scale](https://en.wikipedia.org/wiki/Likert_scale): 0 
+(highest) to 4 (lowest). The scale 0 (highest) to 9 (lowest) are commonly used
+too.
 
 ### Issue Priority Scale
 

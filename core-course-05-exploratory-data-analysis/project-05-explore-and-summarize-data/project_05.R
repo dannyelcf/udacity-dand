@@ -320,7 +320,8 @@ plot_distribution <- function(data,
                               breaks.x = waiver(),
                               coord.xlim = NULL,
                               breaks.y = waiver(),
-                              limits.y = NULL) {
+                              limits.y = NULL,
+                              coord.ylim = NULL) {
   x_q <- substitute(x)
   summ <- .df_summary(data, x_q)
   
@@ -333,7 +334,7 @@ plot_distribution <- function(data,
     .plot_x_summary(data, x_q) +
     scale_x_continuous(breaks = breaks.x) +
     scale_y_continuous(limits = limits.y, breaks = breaks.y) +
-    coord_cartesian(xlim = coord.xlim) +
+    coord_cartesian(xlim = coord.xlim, ylim = coord.ylim) +
     labs(title = title,
          subtitle = subtitle(nrow(data),
                              subtitle_complement,
@@ -393,6 +394,7 @@ plot_cumulative_ts <- function(data,
                                date_labels.x = waiver(),
                                date_expand.x = c(0.02, 0),
                                axis.text.x = NULL,
+                               coord.xlim = NULL,
                                breaks.y = waiver(),
                                limits.y = NULL,
                                coord.ylim = NULL,
@@ -425,7 +427,7 @@ plot_cumulative_ts <- function(data,
                  expand = date_expand.x) +
     scale_y_continuous(breaks = breaks.y,
                        sec.axis = percent_axis()) +
-    coord_cartesian(ylim = coord.ylim) +
+    coord_cartesian(xlim = coord.xlim, ylim = coord.ylim) +
     labs(title = title,
          subtitle = subtitle(nrow(data)),
          x = label.x,

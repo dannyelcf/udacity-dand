@@ -656,12 +656,28 @@ issues.
 
 As we can notice, 97.5% of issues are with FINISHED status. This is
 makes sense because this data set comprises 5 years of project
-management and it is obvious that the most issues are
-FINISHED.
+management and it is obvious that the most issues are FINISHED.
 
 ### Issue Priority Number
 
+When creating an issue, it is given a priority number between 0
+(highest) and 999 (default value, equivalent to null). The plot below
+shows the distribution of the priority number among
+issues.
+
 <img src="project_05_files/plots/Distribution of the Priority Number per Issue-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean.
+
+Note that the issues are distributed into two ends: one between 0-50 and
+one between 950-999. Also note that the 1st quartile is very close to
+the lowest priority number (0) and the median and 3rd quartile is equal
+to the highest priority number (999). This scenario means either
+priority numbers are next to 1st quartile threshold or 999 are assigned
+to priority numbers. See this in another way in the table below that
+list the 6 highest issue priority numbers.
 
     ##   issue_priority_number score
     ## 1                   999  2272
@@ -669,10 +685,38 @@ FINISHED.
     ## 3                     1   243
     ## 4                     2   192
     ## 5                     3   148
+    ## 6                     4   142
+
+As 999 is the default value in the tool and is equivalent to null, I
+removed it from the data set and I generated another plot showing the
+distribution of priority number less than 100. See it
+below.
 
 <img src="project_05_files/plots/Distribution of the Priority Number per Issue (Dropped 999 and Zoomed In to 100)-1.png" width="86%" />
 
-<img src="project_05_files/plots/Distribution of the Priority Number per Issue (Less than or Equal to 20)-1.png" width="86%" />
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+Now, we can see the median with 4 value and the 3rd quartile with 12.
+Also, note that priority numbers greather than 28 are outliers. Thus, to
+analyse better the behaviour of priority numbers I have generated
+another plot zooming into priority numbers less than or equal to
+30.
+
+<img src="project_05_files/plots/Distribution of the Priority Number per Issue (Less than or Equal to 30)-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+Analysing the plot above, we can realize that 50% of priority numbers
+assingned follow the [Likert
+scale](https://en.wikipedia.org/wiki/Likert_scale): 0 (highest) to 4
+(lowest). The scale 0 (highest) to 9 (lowest) are commonly used
+too.
 
 ### Issue Priority Scale
 
