@@ -1093,8 +1093,8 @@ df_issue_status <-
     distinct(issue_id, issue_status)
 ```
 
-In the plot below, we may see the frequencies of issues created to 
-`r length(unique(df_issue_status$issue_status))` systems.
+Issue status represents the current status of an issue. See in the plot below 
+the current status of all issues.
 
 ```{r fig.height=4, "Frequency of Issue Status"}
 df_issue_status %>% 
@@ -1105,6 +1105,17 @@ df_issue_status %>%
                  breaks.2nd.y = seq(0, 1, .1),
                  axis.text.x = element_text(angle = 20, hjust = 1))
 ```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
+
+As we can notice, 
+`r round(sum(df_issue_status$issue_status == "FINISHED")*100/nrow(df_issue_status), 1)`% 
+of issues are with FINISHED status. This is makes sense because this data set 
+comprises 5 years of project management and it is obvious that the most issues 
+are FINISHED. 
 
 ### Issue Priority Number
 

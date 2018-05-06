@@ -643,10 +643,21 @@ academic systems.
 
 ### Issue Status
 
-In the plot below, we may see the frequencies of issues created to 10
-systems.
+Issue status represents the current status of an issue. See in the plot
+below the current status of all
+issues.
 
 <img src="project_05_files/plots/Frequency of Issue Status-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+As we can notice, 97.5% of issues are with FINISHED status. This is
+makes sense because this data set comprises 5 years of project
+management and it is obvious that the most issues are
+FINISHED.
 
 ### Issue Priority Number
 
