@@ -62,6 +62,17 @@ load_dataset <- function(path) {
                      ))
 }
 
+first_last_names <- function(names) {
+  sapply(names, function(name) {
+    name_splited <- unlist(strsplit(name, " "))
+    if (length(name_splited) > 1) {
+      paste(name_splited[1], name_splited[length(name_splited)])
+    } else {
+      name_splited[1]
+    }
+  })
+}
+
 df_summary <- function(df, variable) {
   .df_summary(df, substitute(variable))
 }
@@ -187,14 +198,18 @@ plot_y_summary <- function(data, y) {
 }
 
 plot_cumsummary <- function(data, x, y) {
-  x_q <- substitute(x)
+  .plot_cumsummary(data, substitute(x), substitute(y))
+}
+
+.plot_cumsummary <- function(data, x_q, y_q) {
+  #x_q <- substitute(x)
   x <- eval(x_q, data)
 
   if(is.null(x)) {
     stop("'x' argument can't be NULL")
   }
 
-  y_q <- substitute(y)
+  #y_q <- substitute(y)
   y <- eval(y_q, data)
 
   if(is.null(y)) {
@@ -329,18 +344,93 @@ plot_distribution <- function(data,
   return(plot_distribution)
 }
 
-add_label <- function(y) {
-  geom_text(aes_string(label = deparse(y)),
-            vjust = -1, size = 3)
+plot_ts <- function(data,
+                    x,
+                    title,
+                    label.x,
+                    label.y,
+                    subtitle_complement = NULL,
+                    date_breaks.x = waiver(),
+                    date_labels.x = waiver(),
+                    date_expand.x = c(0.01, 0),
+                    axis.text.x = NULL,
+                    breaks.y = waiver()) {
+  x_q <- substitute(x)
+  
+  df_score <- 
+    data %>% 
+    group_by_(x_q) %>% 
+    summarise(score = n())
+  
+  plot_ts <-
+    df_score %>% 
+    ggplot(aes_string(x = deparse(x_q), y = "score")) +
+    geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+    geom_point(color = DEFAULT_COLOR) +
+    plot_year_vline() +
+    .plot_cumsummary(df_score, 
+                     x_q = x_q,
+                     y_q = substitute(score)) +
+    scale_x_date(date_breaks = date_breaks.x, date_labels = date_labels.x,
+                 expand = date_expand.x) +
+    scale_y_continuous(breaks = breaks.y) +
+    labs(title = title,
+         subtitle = subtitle(nrow(data)),
+         x = label.x,
+         y = label.y) +
+    theme(axis.text.x = axis.text.x) 
+  
+  plot_ts
 }
 
-first_last_names <- function(names) {
-  sapply(names, function(name) {
-    name_splited <- unlist(strsplit(name, " "))
-    if (length(name_splited) > 1) {
-      paste(name_splited[1], name_splited[length(name_splited)])
-    } else {
-      name_splited[1]
-    }
-  })
+plot_cumulative_ts <- function(data,
+                               x,
+                               title,
+                               label.x,
+                               label.y,
+                               subtitle_complement = NULL,
+                               date_breaks.x = waiver(),
+                               date_labels.x = waiver(),
+                               date_expand.x = c(0.02, 0),
+                               axis.text.x = NULL,
+                               breaks.y = waiver(),
+                               limits.y = NULL,
+                               coord.ylim = NULL,
+                               breaks.2nd.y = waiver()) {
+  x_q <- substitute(x)
+  
+  df_score <- 
+    data %>% 
+    group_by_(x_q) %>% 
+    summarise(score = n())
+    
+  df_cum_score <- 
+    df_score %>%
+    mutate(cumscore = cumsum(score))
+  
+  percent_axis <- function() {
+    ggplot2::sec_axis(trans = ~./nrow(data),
+                      breaks = breaks.2nd.y,
+                      labels = scales::percent)
+  }
+  
+  plot_cumulative_ts <-
+    df_cum_score %>% 
+    ggplot(aes_string(x = deparse(x_q), y = "cumscore")) +
+    geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+    geom_point(color = DEFAULT_COLOR) +
+    plot_year_vline() +
+    geom_smooth(method = "lm", size = .5, fill = "blue", alpha = .2) +
+    scale_x_date(date_breaks = date_breaks.x, date_labels = date_labels.x,
+                 expand = date_expand.x) +
+    scale_y_continuous(breaks = breaks.y,
+                       sec.axis = percent_axis()) +
+    coord_cartesian(ylim = coord.ylim) +
+    labs(title = title,
+         subtitle = subtitle(nrow(data)),
+         x = label.x,
+         y = label.y) +
+    theme(axis.text.x = axis.text.x) 
+  
+  return(plot_cumulative_ts)
 }

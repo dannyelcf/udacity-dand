@@ -167,57 +167,6 @@ The data set analyzed comprises issues created in the period between
 `r format(max(issues$issue_creation_date), "%m/%d/%Y")`. 
 
 ```{r}
-score_issue_created_by_month <- function(df_issue_created_by_month) {
-  df_score_issue_created_by_month <- 
-    df_issue_created_by_month %>% 
-      group_by(issue_creation_date) %>% 
-      summarise(score = n())
-  
-  df_score_issue_created_by_month
-}
-
-cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
-  df_score_issue_created_by_month <- 
-    score_issue_created_by_month(df_issue_created_by_month)
-  
-  df_cum_score_issue_created_by_month <- 
-    df_score_issue_created_by_month %>%
-      mutate(cumscore = cumsum(score))
-  
-  df_cum_score_issue_created_by_month
-}
-```
-
-```{r}
-plot_cum_score_issue_created_by_month <- function(df_issue_created_by_month) {
-  df_cum_score_issue_created_by_month <- 
-    cum_score_issue_created_by_month(df_issue_created_by_month)
-  
-  plot_cum_score_issue_created_by_month <-
-    df_cum_score_issue_created_by_month %>% 
-      ggplot(aes(x = issue_creation_date, y = cumscore)) +
-        geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        geom_point(color = DEFAULT_COLOR) +
-        plot_year_vline() +
-        geom_smooth(method = "lm", size = .5, fill = "blue", alpha = .2) +
-        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                     expand = c(0.02, 0)) +
-        scale_y_continuous(breaks = seq(0, 4600, 500),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_created_by_month),
-                             breaks = seq(0, 1, .1),
-                             labels = scales::percent
-                           )) +
-        coord_cartesian(ylim = c(0, 4600)) +
-        labs(title = "Cumulative Number of Issues Created per Month",
-             subtitle = subtitle(nrow(df_issue_created_by_month)),
-             x = "Issue creation date (month)",
-             y = "Number of issues") +
-        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
-  
-  plot_cum_score_issue_created_by_month
-}
-
 df_issue_created_by_month <- 
   issues %>% 
     filter(!is.na(issue_creation_date)) %>% 
@@ -231,11 +180,17 @@ below that shows the cumulative number of issues created per month along the
 project and its trend line.
 
 ```{r "Cumulative Number of Issues Created"}
-plt_cum_score_issue_created_by_month <-
-  df_issue_created_by_month %>% 
-    plot_cum_score_issue_created_by_month()
-
-plt_cum_score_issue_created_by_month
+df_issue_created_by_month %>% 
+  plot_cumulative_ts(issue_creation_date,
+                     title = "Cumulative Number of Issues Created per Month",
+                     label.x = "Issue creation date (month)",
+                     label.y = "Number of issues",
+                     date_breaks.x = "3 month",
+                     date_labels.x = "%b %Y",
+                     breaks.y = seq(0, 4600, 500),
+                     breaks.2nd.y = seq(0, 1, .1),
+                     coord.ylim = c(0, 4600),
+                     axis.text.x = element_text(angle = 40, hjust = 1))
 ```
 
 > **Note:** In the plot above, the blue solid line represents the trend of the 
@@ -261,43 +216,20 @@ approximately 65% of project activities. Besides, the trend line fitted with
 growth curve demonstrating that the project began to have a standardized 
 behavior.
 
-```{r}
-plot_score_issue_created_by_month <- function(df_issue_created_by_month) {
-  df_score_issue_created_by_month <- 
-    score_issue_created_by_month(df_issue_created_by_month)
-
-  plot_score_issue_created_by_month <-
-    df_score_issue_created_by_month %>% 
-      ggplot(aes(x = issue_creation_date, y = score)) +
-        geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        geom_point(color = DEFAULT_COLOR) +
-        plot_year_vline() +
-        plot_cumsummary(df_score_issue_created_by_month, 
-                        x = issue_creation_date,
-                        y = score) +
-        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                     expand = c(0.01, 0)) +
-        scale_y_continuous(breaks = seq(0, 195, 15)) +
-        labs(title = "Distribution of the Number of Issues Created per Month",
-             subtitle = subtitle(nrow(df_issue_created_by_month)),
-             x = "Issue creation date (month)",
-             y = "Frequency") +
-        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
-  
-  plot_score_issue_created_by_month
-}
-```
-
 In the area plot below, we can see the project's behavior in another way. This
 plot shows the distribution of the number of issues created per month and
 their cumulative summaries.
 
 ```{r "Distribution of the Number of Issues Created per Month"}
-plt_score_issue_created_by_month <- 
-  df_issue_created_by_month %>% 
-    plot_score_issue_created_by_month()
-
-plt_score_issue_created_by_month
+df_issue_created_by_month %>% 
+  plot_ts(issue_creation_date,
+          title = "Distribution of the Number of Issues Created per Month",
+          label.x = "Issue creation date (month)",
+          label.y = "Frequency",
+          date_breaks.x = "3 month",
+          date_labels.x = "%b %Y",
+          breaks.y = seq(0, 195, 15),
+          axis.text.x = element_text(angle = 40, hjust = 1))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
@@ -457,57 +389,6 @@ creation date has time information while start date does not have and there are
 more observation of creation date than start date.
 
 ```{r}
-score_issue_start_date_month <- function(df_issue_start_date_month) {
-  df_score_issue_start_date_month <- 
-    df_issue_start_date_month %>% 
-      group_by(issue_start_date) %>% 
-      summarise(score = n())
-  
-  df_score_issue_start_date_month
-}
-
-cum_score_issue_start_date_month <- function(df_issue_start_date_month) {
-  df_score_issue_start_date_month <- 
-    score_issue_start_date_month(df_issue_start_date_month)
-  
-  df_cum_score_issue_start_date_month <- 
-    df_score_issue_start_date_month %>%
-      mutate(cumscore = cumsum(score))
-  
-  df_cum_score_issue_start_date_month
-}
-```
-
-```{r}
-plot_cum_score_issue_start_date_month <- function(df_issue_start_date_month) {
-  df_cum_score_issue_start_date_month <- 
-    cum_score_issue_start_date_month(df_issue_start_date_month)
-  
-  plot_cum_score_issue_start_date_month <-
-    df_cum_score_issue_start_date_month %>% 
-      ggplot(aes(x = issue_start_date, y = cumscore)) +
-        geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        geom_point(color = DEFAULT_COLOR) +
-        plot_year_vline() +
-        geom_smooth(method = "lm", size = .5, fill = "blue", alpha = .2) +
-        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                     expand = c(0.02, 0)) +
-        scale_y_continuous(breaks = seq(0, 4600, 500),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_start_date_month),
-                             breaks = seq(0, 1, .1),
-                             labels = scales::percent
-                           )) +
-        coord_cartesian(ylim = c(0, 4600)) +
-        labs(title = "Cumulative Number of Issues Started per Month",
-             subtitle = subtitle(nrow(df_issue_start_date_month)),
-             x = "Issue start date (month)",
-             y = "Number of issues") +
-        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
-  
-  plot_cum_score_issue_start_date_month
-}
-
 df_issue_start_date_month <- 
   issues %>% 
     filter(!is.na(issue_start_date)) %>% 
@@ -521,11 +402,17 @@ the cumulative number of issues started along the project and its trend line in
 the plot below.
 
 ```{r "Cumulative Number of Issues Started per Month"} 
-plt_cum_score_issue_start_date_month <-
-  df_issue_start_date_month %>% 
-    plot_cum_score_issue_start_date_month()
-
-plt_cum_score_issue_start_date_month
+df_issue_start_date_month %>% 
+  plot_cumulative_ts(issue_start_date,
+                     title = "Cumulative Number of Issues Started per Month",
+                     label.x = "Issue start date (month)",
+                     label.y = "Number of issues",
+                     date_breaks.x = "3 month",
+                     date_labels.x = "%b %Y",
+                     breaks.y = seq(0, 4600, 500),
+                     breaks.2nd.y = seq(0, 1, .1),
+                     coord.ylim = c(0, 4600),
+                     axis.text.x = element_text(angle = 40, hjust = 1))
 ```
 
 > **Note:** In the plot above, the blue solid line represents the trend of the 
@@ -618,57 +505,6 @@ number of issues.
 Its cumulative plot is also a bit different from the others. See the plot below.
 
 ```{r}
-score_issue_deadline_date_month <- function(df_issue_deadline_date_month) {
-  df_score_issue_deadline_date_month <- 
-    df_issue_deadline_date_month %>% 
-      group_by(issue_deadline_date) %>% 
-      summarise(score = n())
-  
-  df_score_issue_deadline_date_month
-}
-
-cum_score_issue_deadline_date_month <- function(df_issue_deadline_date_month) {
-  df_score_issue_deadline_date_month <- 
-    score_issue_deadline_date_month(df_issue_deadline_date_month)
-  
-  df_cum_score_issue_deadline_date_month <- 
-    df_score_issue_deadline_date_month %>%
-      mutate(cumscore = cumsum(score))
-  
-  df_cum_score_issue_deadline_date_month
-}
-```
-
-```{r}
-plot_cum_score_issue_deadline_date_month <- function(df_issue_deadline_date_month) {
-  df_cum_score_issue_deadline_date_month <- 
-    cum_score_issue_deadline_date_month(df_issue_deadline_date_month)
-  
-  plot_cum_score_issue_deadline_date_month <-
-    df_cum_score_issue_deadline_date_month %>% 
-      ggplot(aes(x = issue_deadline_date, y = cumscore)) +
-        geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        geom_point(color = DEFAULT_COLOR) +
-        plot_year_vline() +
-        geom_smooth(method = "lm", size = .5, fill = "blue", alpha = .2) +
-        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                     expand = c(0.02, 0)) +
-        scale_y_continuous(breaks = seq(0, 1600, 200),
-                           sec.axis = sec_axis(
-                             trans = ~. / nrow(df_issue_deadline_date_month),
-                             breaks = seq(0, 1, .1),
-                             labels = scales::percent
-                           )) +
-        coord_cartesian(ylim = c(0, 1600)) +
-        labs(title = "Cumulative Number of Issues Deadlines per Month",
-             subtitle = subtitle(nrow(df_issue_deadline_date_month)),
-             x = "Issue deadline date (month)",
-             y = "Number of issues") +
-        theme(axis.text.x = element_text(angle = 40, hjust = 1)) 
-  
-  plot_cum_score_issue_deadline_date_month
-}
-
 df_issue_deadline_date_month <- 
   issues %>% 
     filter(!is.na(issue_deadline_date)) %>% 
@@ -678,11 +514,17 @@ df_issue_deadline_date_month <-
 ```
 
 ```{r "Cumulative Number of Issues Deadlines per Month"}
-plt_cum_score_issue_deadline_date_month <- 
-  df_issue_deadline_date_month %>% 
-    plot_cum_score_issue_deadline_date_month()
-
-plt_cum_score_issue_deadline_date_month
+df_issue_deadline_date_month %>% 
+  plot_cumulative_ts(issue_deadline_date,
+                     title = "Cumulative Number of Issues Deadlines per Month",
+                     label.x = "Issue deadline date (month)",
+                     label.y = "Number of issues",
+                     date_breaks.x = "3 month",
+                     date_labels.x = "%b %Y",
+                     breaks.y = seq(0, 1600, 200),
+                     breaks.2nd.y = seq(0, 1, .1),
+                     coord.ylim = c(0, 1600),
+                     axis.text.x = element_text(angle = 40, hjust = 1))
 ```
 
 > **Note:** In the plot above, the blue solid line represents the trend of the 
@@ -693,41 +535,19 @@ deadlines per month is similiar to the creation and start growth curve. After
 that, a fall happens. Because that, the trend line does not fit well with growth 
 curve.
 
-```{r}
-plot_score_issue_deadline_date_month <- function(df_issue_deadline_date_month) {
-  df_score_issue_deadline_date_month <- 
-    score_issue_deadline_date_month(df_issue_deadline_date_month)
-    
-  plot_score_issue_deadline_date_month <- 
-    df_score_issue_deadline_date_month %>% 
-      ggplot(aes(x = issue_deadline_date, y = score)) +
-        geom_area(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
-        geom_point(color = DEFAULT_COLOR) +
-        plot_year_vline() +
-        plot_cumsummary(df_score_issue_deadline_date_month, 
-                        x = issue_deadline_date,
-                        y = score) +
-        scale_x_date(date_breaks = "3 month", date_labels = "%b %Y",
-                     expand = c(0.02, 0)) +
-        scale_y_continuous(breaks = seq(0, 80, 5)) +
-        labs(title = "Distribution of the Number of Issue Deadlines per Month",
-             subtitle = subtitle(nrow(df_issue_deadline_date_month)),
-             x = "Issue deadline date (per month)",
-             y = "Frequency") +
-        theme(axis.text.x = element_text(angle = 40, hjust = 1))
-  
-  plot_score_issue_deadline_date_month
-}
-```
-
 In the plot below, we can see this behavior in another way.
 
 ```{r "Distribution of the Number of Issue Deadlines per Month"}
-plt_score_issue_deadline_date_month <- 
-  df_issue_deadline_date_month %>% 
-    plot_score_issue_deadline_date_month()
-
-plt_score_issue_deadline_date_month
+df_issue_deadline_date_month %>% 
+  plot_ts(issue_deadline_date,
+          title = "Distribution of the Number of Issue Deadlines per Month",
+          label.x = "Issue deadline date (month)",
+          label.y = "Frequency",
+          date_breaks.x = "3 month",
+          date_labels.x = "%b %Y",
+          date_expand.x = c(0.02, 0),
+          breaks.y = seq(0, 80, 5),
+          axis.text.x = element_text(angle = 40, hjust = 1))
 ```
 
 > **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
