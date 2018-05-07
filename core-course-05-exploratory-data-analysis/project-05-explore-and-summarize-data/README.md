@@ -713,14 +713,35 @@ another plot zooming into priority numbers less than or equal to
 > upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
 Analysing the plot above, we can realize that 50% of priority numbers
-assingned follow the [Likert
+assigned follow the [Likert
 scale](https://en.wikipedia.org/wiki/Likert_scale): 0 (highest) to 4
-(lowest). The scale 0 (highest) to 9 (lowest) are commonly used
-too.
+(lowest). The scale 0 (highest) to 9 (lowest) are commonly used too.
 
 ### Issue Priority Scale
 
+The issue priority scale is another way to assign a priority. But
+instead of assign numbers it is assigned ordinal categories. The issue
+tracking system define 6 priority scale from lowest to highest:
+SUSPENDED, LOW, MEDIUM, HIGH, URGENT, BLOCKING. The priority scale HIGH
+is the default.
+
+The plot below shows the frequency of each priority
+scale.
+
 <img src="project_05_files/plots/Frequency of Issue Priority Scale-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+The HIGH priority is the most assigned. This is occur because it is the
+default priority and was defined between teams (CUSTOMER and COMPANY)
+that priority scale change only would occur if necessary. LOW and MEDIUM
+priority would be assigned to CUSTOMIZATION issues, not MAINTENANCE. And
+to MAINTENANCE issues HIGH (default), URGENT and BLOCKING priorities
+would be
+assigned.
 
 ### Issue Progress
 
