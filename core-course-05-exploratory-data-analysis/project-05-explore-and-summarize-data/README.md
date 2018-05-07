@@ -654,9 +654,9 @@ issues.
 > respectivaly, median and mean and the black dotted line represent the
 > upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
-As we can notice, 97.5% of issues are with FINISHED status. This is
-makes sense because this data set comprises 5 years of project
-management and it is obvious that the most issues are FINISHED.
+As we can notice, 97.5% of issues are with FINISHED status. This makes
+sense because this data set comprises 5 years of project management and
+it is obvious that the most issues are FINISHED.
 
 ### Issue Priority Number
 
@@ -740,19 +740,24 @@ default priority and was defined between teams (CUSTOMER and COMPANY)
 that priority scale change only would occur if necessary. LOW and MEDIUM
 priority would be assigned to CUSTOMIZATION issues, not MAINTENANCE. And
 to MAINTENANCE issues HIGH (default), URGENT and BLOCKING priorities
-would be
-assigned.
+would be assigned.
 
 ### Issue Progress
 
+Issue progress represents the current progress of an issue. As in [Issue
+Status](#issue-status) the most of issues are with FINISHED, that is,
+100% of progress. See this in the plot
+below.
+
 <img src="project_05_files/plots/Distribution of the Progress per Issue-1.png" width="86%" />
 
-    ##   issue_progress score
-    ## 1            100  4492
-    ## 2              0     8
-    ## 3             50     1
-    ## 4             60     1
-    ## 5             90     1
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+From here, I start the analysis of issue
+logs.
 
 ### Log Build Info
 

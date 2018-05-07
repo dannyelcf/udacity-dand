@@ -1113,7 +1113,7 @@ and the black dotted line represent the upper threshold to the outliers
 
 As we can notice, 
 `r round(sum(df_issue_status$issue_status == "FINISHED")*100/nrow(df_issue_status), 1)`% 
-of issues are with FINISHED status. This is makes sense because this data set 
+of issues are with FINISHED status. This makes sense because this data set 
 comprises 5 years of project management and it is obvious that the most issues 
 are FINISHED. 
 
@@ -1258,6 +1258,10 @@ df_issue_progress <-
     distinct(issue_id, issue_progress)
 ```
 
+Issue progress represents the current progress of an issue. As in 
+[Issue Status](#issue-status) the most of issues are with FINISHED, that is, 
+100% of progress. See this in the plot below.
+
 ```{r "Distribution of the Progress per Issue"}
 df_issue_progress %>%
   plot_distribution(issue_progress,
@@ -1268,14 +1272,12 @@ df_issue_progress %>%
                     breaks.y = seq(0, 4600, 500))
 ```
 
-```{r "Head Issue Progress"}
-df_issue_progress %>% 
-  group_by(issue_progress) %>% 
-  summarise(score = sum(!is.na(issue_progress))) %>% 
-  arrange(desc(score)) %>% 
-  head(5) %>% 
-  as.data.frame()
-```
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
+
+From here, I start the analysis of issue logs.
 
 ### Log Build Info
 
