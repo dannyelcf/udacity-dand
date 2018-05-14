@@ -44,3 +44,9 @@ vignettes/*.pdf
 #
 
 *.pyc
+
+#
+# Jupyter Notebook
+#
+
+.ipynb_checkpoints
