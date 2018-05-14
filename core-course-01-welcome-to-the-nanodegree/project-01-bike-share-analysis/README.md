@@ -14,13 +14,13 @@ each. Prefixing each set is one of three datestamps, showing the end month for
 each data collection period (201402, 201408, 201508). Suffixes for each file
 indicate contents:
 
-** \*\_README.txt ** - Information about contents of data files.
+__\*\_README.txt__ - Information about contents of data files.
 
-** \*\_station\_data.csv ** - Basic information about station locations and
+__\*\_station\_data.csv__ - Basic information about station locations and
 capacities.
 
-** \*\_trip\_data.csv ** - Information about each trip taken using the bike share
+__\*\_trip\_data.csv__ - Information about each trip taken using the bike share
 system.
 
-** \*\_weather\_data.csv ** - Weather information by day for one station in each
+__\*\_weather\_data.csv__ - Weather information by day for one station in each
 city in the bike share program.
