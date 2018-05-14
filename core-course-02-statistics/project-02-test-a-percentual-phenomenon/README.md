@@ -18,7 +18,7 @@ __data__/
 
 __code_graph__/
   * plot_boxplot.py: code used in jupyter notebook to generate the image image/boxplot.png
-  * plot_histogram.py: : code used in jupyter notebook to generate the image image/histogram.png
+  * plot_histogram.py: code used in jupyter notebook to generate the image image/histogram.png
 
 __calc__/
   * Link_Spreadsheet_Google_Drive.txt: link to Google Drive Spreadsheet used to perform descriptive and inferential statistic.  
