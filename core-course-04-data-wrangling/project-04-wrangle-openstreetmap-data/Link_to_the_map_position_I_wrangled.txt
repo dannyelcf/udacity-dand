@@ -1,0 +1,6 @@
+# In this project I used data munging techniques over a region of Brazil that includes the Goiás state (http://www.openstreetmap.org/
+# relation/334443). The state of Goiás is located in the Center-West region of the country and has the Goiânia city (where I live) as its capital. 
+# To know more about the Goiás state, go to Wikipedia (https://en.wikipedia.org/wiki/Goi%C3%A1s).
+# I used Overpass API to download the dataset of custom square area:
+
+http://overpass-api.de/api/map?bbox=-53.394,-19.518,-45.923,-12.254 

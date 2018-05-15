@@ -1,0 +1,45 @@
+# Goiás state relation:
+http://www.openstreetmap.org/relation/334443
+
+# Goiás Wikipedia:
+https://en.wikipedia.org/wiki/Goi%C3%A1s
+
+# OpenStreetMap tag documentation:
+http://wiki.openstreetmap.org/wiki/Tags
+
+# Most used tags in OpenStreetMap:
+https://taginfo.openstreetmap.org/keys
+
+# Map features:
+http://wiki.openstreetmap.org/wiki/Map_Features
+
+# Tag name conventions:
+http://wiki.openstreetmap.org/wiki/Any_tags_you_like
+http://wiki.openstreetmap.org/wiki/User:Joto/How_to_invent_tags
+
+# Especific tag documentation
+http://wiki.openstreetmap.org/wiki/Key:addr
+http://wiki.openstreetmap.org/wiki/Tag:amenity%3Drestaurant
+https://wiki.openstreetmap.org/wiki/Key%3Alit
+
+# Record linkage
+https://en.wikipedia.org/wiki/Record_linkage
+
+# Entity linking
+https://en.wikipedia.org/wiki/Entity_linking
+
+# Controlled vocabulary
+https://en.wikipedia.org/wiki/Controlled_vocabulary
+
+# Ontology
+https://en.wikipedia.org/wiki/Ontology_(information_science)
+
+# W3C
+https://www.w3.org/
+
+# Password Strength Meter Design Pattern
+http://ui-patterns.com/patterns/PasswordStrengthMeter
+
+# Reference codes
+https://stackoverflow.com/a/39988702/8645131
+https://matplotlib.org/examples/pylab_examples/subplots_demo.html
