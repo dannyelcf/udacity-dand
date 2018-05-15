@@ -4,7 +4,7 @@ This folder contains files for Wrangle OpenStreetMap Data project.
 
 [Wrangle\_OpenStreetMap\_Data.ipynb](Wrangle\_OpenStreetMap\_Data.ipynb): Main project file.
 
-__case_study_openstreetmap_data_code/__ and __aditional_code__: Python code used in auditing and cleaning dataset for the final project. These folders also include the original Case Study scripts.
+__case_study_openstreetmap_data_code__ and __aditional_code__: Python codes used in auditing and cleaning dataset for the final project. These folders also include the original Case Study scripts.
 
 [Link\_to\_the\_map\_position\_I\_wrangled.txt](Link\_to\_the\_map\_position\_I\_wrangled.txt): Text file containing a link to the map position used in this project.
 
