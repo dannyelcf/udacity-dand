@@ -1258,9 +1258,8 @@ df_issue_progress <-
     distinct(issue_id, issue_progress)
 ```
 
-Issue progress represents the current progress of an issue. As in 
-[Issue Status](#issue-status) the most of issues are with FINISHED, that is, 
-100% of progress. See this in the plot below.
+Issue progress represents the current progress of an issue. The plot below shows 
+its distribution among issues.
 
 ```{r "Distribution of the Progress per Issue"}
 df_issue_progress %>%
@@ -1277,7 +1276,10 @@ quartile, the black and red solid lines represent, respectivaly, median and mean
 and the black dotted line represent the upper threshold to the outliers 
 (3rd qu. + 1.5 IQR).
 
-From here, I start the analysis of issue logs.
+Pratically, all issues 
+(`r round(sum(df_issue_progress$issue_progress == 100)*100/nrow(df_issue_progress), 2)`
+%) have 100% of progress. This makes sense since the most issues have FINISHED 
+status.
 
 ### Log Build Info
 
