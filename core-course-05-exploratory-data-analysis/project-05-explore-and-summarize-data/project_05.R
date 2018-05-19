@@ -318,12 +318,18 @@ plot_distribution <- function(data,
                               label.y = "Frequency",
                               subtitle_complement = NULL,
                               breaks.x = waiver(),
+                              limits.x = NULL,
                               coord.xlim = NULL,
                               breaks.y = waiver(),
                               limits.y = NULL,
                               coord.ylim = NULL) {
   x_q <- substitute(x)
   summ <- .df_summary(data, x_q)
+  
+  # padding at the end
+  if(!is.null(breaks.x) & is.null(limits.x) & is.null(coord.xlim)) {
+    limits.x <- c(min(breaks.x), max(breaks.x) + binwidth)
+  }
   
   plot_distribution <-
     data %>% 
@@ -332,7 +338,7 @@ plot_distribution <- function(data,
                    boundary = summ$min, 
                    closed = "left") +
     .plot_x_summary(data, x_q) +
-    scale_x_continuous(breaks = breaks.x) +
+    scale_x_continuous(limits = limits.x, breaks = breaks.x) +
     scale_y_continuous(limits = limits.y, breaks = breaks.y) +
     coord_cartesian(xlim = coord.xlim, ylim = coord.ylim) +
     labs(title = title,

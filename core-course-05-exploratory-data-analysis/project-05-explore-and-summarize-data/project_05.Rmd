@@ -126,7 +126,7 @@ df_number_logs_per_issue %>%
                     binwidth = 1,
                     title = "Distribution of the Number of Logs per Issue",
                     label.x = "Number of logs per issue",
-                    breaks.x = seq(0, 43, 2),
+                    breaks.x = seq(0, 44, 2),
                     breaks.y = seq(0, 800, 100))
 ```
 
@@ -371,6 +371,7 @@ df_issue_created_by_hour %>%
                     subtitle_complement = "with only office hours",
                     label.x = "Hour of the day",
                     breaks.x = seq(0, 23, 1),
+                    limits.x = c(8, 19),
                     breaks.y = seq(0, 700, 100),
                     limits.y = c(0, 700))
 ```
@@ -739,7 +740,7 @@ df_issue_time_spent_1h %>%
                     title = "Distribution of the Number of Time Spent on a Issue per Hour",
                     subtitle_complement = "less than 1 hour",
                     label.x = "Minutes spent",
-                    breaks.x = seq(0, 60, 5),
+                    breaks.x = seq(0, 55, 5),
                     breaks.y = seq(0, 1500, 150))
 ```
 
@@ -1136,7 +1137,7 @@ df_issue_priority_number %>%
                     binwidth = 50,
                     title = "Distribution of the Priority Number per Issue",
                     label.x = "Issue priority number",
-                    breaks.x = seq(0, 999, 50),
+                    breaks.x = seq(0, 1000, 50),
                     breaks.y = seq(0, 2700, 200))
 ```
 
@@ -1267,7 +1268,7 @@ df_issue_progress %>%
                     binwidth = 10,
                     title = "Distribution of the Progress per Issue",
                     label.x = "Issue progress",
-                    breaks.x = seq(0, 100, 10),
+                    breaks.x = seq(0, 110, 10),
                     breaks.y = seq(0, 4600, 500))
 ```
 
@@ -1293,35 +1294,59 @@ df_log_build_info <-
     arrange(desc(score)) 
 ```
 
-```{r "Distribution of the Number of the Issues per System's Version"}
+From here, I analyse issue logs. I start by log build info which is an attribute
+of a log and represents the system's version of a future build. A log with this 
+attribute indicates that there is a solution code for the issue and this code 
+will be deployed on the version X of the system.
+
+Usually, a system's version has more than one issue associated and not every 
+issue is associated with a version. The plot below shows the distribution of 
+the number of issues per system's version.
+
+```{r "Distribution of the Number of Issues per System's Version"}
 df_log_build_info %>%
   plot_distribution(score,
                     binwidth = 5,
-                    title = "Distribution of the Number of the Issues per System's Version",
+                    title = "Distribution of the Number of Issues per System's Version",
                     label.x = "Number of issues",
                     breaks.x = seq(1, 125, 5),
                     breaks.y = seq(0, 320, 30))
 ```
 
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
+
+Note that it is common a system's version to have between 1 and 5 issues 
+associated. From 13 issues it is considered an atypical situation. But a 
+bizarre situation in this context was to have a version with more than 116 
+issues associated.
+
+In the plot below we can see better how is the distribution between 1 and 5 
+issues.
+
 ```{r "Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)"}
-df_log_build_info <- 
-  logs %>% 
-    filter(!is.na(log_build_info)) %>% 
-    distinct(issue_id, log_build_info) %>% 
-    group_by(log_build_info) %>% 
-    summarise(score = n()) %>% 
-    arrange(desc(score)) %>% 
+df_log_build_info_lt_6_issues <- 
+  df_log_build_info %>% 
     filter(score < 6)
 
-df_log_build_info %>%
+df_log_build_info_lt_6_issues %>%
   plot_distribution(score,
                     binwidth = 1,
                     title = "Distribution of the Number of the Issues per System's Version",
                     subtitle_complement = "less than 6 issues",
                     label.x = "Number of issues",
-                    breaks.x = seq(1, 5, 1),
+                    breaks.x = seq(1, 6, 1),
                     breaks.y = seq(0, 90, 10))
 ```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
+
+
 
 ### Log Status
 

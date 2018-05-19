@@ -744,10 +744,9 @@ would be assigned.
 
 ### Issue Progress
 
-Issue progress represents the current progress of an issue. As in [Issue
-Status](#issue-status) the most of issues are with FINISHED, that is,
-100% of progress. See this in the plot
-below.
+Issue progress represents the current progress of an issue. The plot
+below shows its distribution among
+issues.
 
 <img src="project_05_files/plots/Distribution of the Progress per Issue-1.png" width="86%" />
 
@@ -756,14 +755,44 @@ below.
 > respectivaly, median and mean and the black dotted line represent the
 > upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
-From here, I start the analysis of issue
-logs.
+Pratically, all issues (99.76 %) have 100% of progress. This makes sense
+since the most issues have FINISHED status.
 
 ### Log Build Info
 
-<img src="project_05_files/plots/Distribution of the Number of the Issues per System's Version-1.png" width="86%" />
+From here, I analyse issue logs. I start by log build info which is an
+attribute of a log and represents the system’s version of a future
+build. A log with this attribute indicates that there is a solution code
+for the issue and this code will be deployed on the version X of the
+system.
+
+Usually, a system’s version has more than one issue associated and not
+every issue is associated with a version. The plot below shows the
+distribution of the number of issues per system’s
+version.
+
+<img src="project_05_files/plots/Distribution of the Number of Issues per System's Version-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+Note that it is common a system’s version to have between 1 and 5 issues
+associated. From 13 issues it is considered an atypical situation. But a
+bizarre situation in this context was to have a version with more than
+116 issues associated.
+
+In the plot below we can see better how is the distribution between 1
+and 5
+issues.
 
 <img src="project_05_files/plots/Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
 
 ### Log Status
 
