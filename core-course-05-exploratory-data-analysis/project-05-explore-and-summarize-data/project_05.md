@@ -73,30 +73,8 @@ The number of distinct issues rows and issue’s logs rows are 4503 and
 21978 respectively. That is, the number of issues represents 20% of the
 data set and the number of logs represents 99% of it. The 1% of logs
 remaining (147 rows) represents issues that do not have history logs.
-
-The distribution and the summaries of number of logs per issue are
-ploted in the histogram
-below.
-
-<img src="project_05_files/plots/Distribution of the Number of Logs per Issue-1.png" width="86%" />
-
-> **Note:** In the plot above, the black dashed lines represent the 1st
-> and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean and the black dotted line represent the
-> upper threshold to the outliers (3rd qu. + 1.5 IQR).
-
-Analysing the plot above, we can note that most of issues have between 1
-and 9 history logs, approximately 1 standard deviation from the mean.
-Also, 75% of them have up to 6 history logs and 50% of issues have
-between 2 and 6 logs, a narrow range. Despite the skewed shape of plot,
-the median and mean are very close. This means that the amount of
-ouliers, after 12 logs per issue, is very low, approximately 4% of
-issues.
-
-The representative narrow range of logs in an issue makes us think that
-there shoud be an activity flow pattern to resolve an issue. This flow
-pattern migth be observed in a commom sequence of log status. See more
-informations in the [Log Status](#log-status) section.
+More about the relationship between issues and logs is detailed in
+[Issue Logs](#issue-logs) section.
 
 ### Issue Creation Date
 
@@ -758,13 +736,39 @@ issues.
 Pratically, all issues (99.76 %) have 100% of progress. This makes sense
 since the most issues have FINISHED status.
 
+### Issue Logs
+
+From here, it is started the analysis of issue logs. The distribution
+and the summaries of number of logs per issue are ploted in the
+histogram
+below.
+
+<img src="project_05_files/plots/Distribution of the Number of Logs per Issue-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+Analysing the plot above, we can note that most of issues have between 1
+and 9 history logs, approximately 1 standard deviation from the mean.
+Also, 75% of them have up to 6 history logs and 50% of issues have
+between 2 and 6 logs, a narrow range. Despite the skewed shape of plot,
+the median and mean are very close. This means that the amount of
+ouliers, after 12 logs per issue, is very low, approximately 4% of
+issues.
+
+The representative narrow range of logs in an issue makes us think that
+there shoud be an activity flow pattern to resolve an issue. This flow
+pattern migth be observed in a commom sequence of log status. See more
+informations in the [Log Status](#log-status) section.
+
 ### Log Build Info
 
-From here, I analyse issue logs. I start by log build info which is an
-attribute of a log and represents the system’s version of a future
-build. A log with this attribute indicates that there is a solution code
-for the issue and this code will be deployed on the version X of the
-system.
+Log build info is an attribute of a log and represents the system’s
+version of a future build. A log with this attribute indicates that
+there is a solution code for the issue and this code will be deployed on
+the version X of the system.
 
 Usually, a system’s version has more than one issue associated and not
 every issue is associated with a version. The plot below shows the

@@ -107,54 +107,8 @@ represents `r round(nrow(issues)*100/nrow(dataset))`% of the data set and the
 number of logs represents `r round(nrow(logs)*100/nrow(dataset))`% of it. The 
 `r round((nrow(dataset)-nrow(logs))*100/nrow(dataset))`% of logs remaining 
 (`r nrow(dataset)-nrow(logs)` rows) represents issues that do not have history 
-logs. 
-
-```{r}
-df_number_logs_per_issue <- 
-  dataset %>%
-    select(issue_id, log_creation_date) %>%
-    group_by(issue_id) %>% 
-    summarise(score = sum(!is.na(log_creation_date)))
-```
-
-The distribution and the summaries of number of logs per issue are ploted in the
-histogram below.
-
-```{r "Distribution of the Number of Logs per Issue"}
-df_number_logs_per_issue %>% 
-  plot_distribution(score,
-                    binwidth = 1,
-                    title = "Distribution of the Number of Logs per Issue",
-                    label.x = "Number of logs per issue",
-                    breaks.x = seq(0, 44, 2),
-                    breaks.y = seq(0, 800, 100))
-```
-
-> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
-quartile, the black and red solid lines represent, respectivaly, median and mean
-and the black dotted line represent the upper threshold to the outliers 
-(3rd qu. + 1.5 IQR).
-
-``` {r}
-amount_upper_outiler <- 
-  round(
-    nrow(subset(df_number_logs_per_issue, score > 12)) * 100
-    / 
-    nrow(df_number_logs_per_issue)
-  )
-```
-
-Analysing the plot above, we can note that most of issues have between 1 and 9 
-history logs, approximately 1 standard deviation from the mean. Also, 75% of 
-them have up to 6 history logs and 50% of issues have between 2 and 6 logs, a 
-narrow range. Despite the skewed shape of plot, the median and mean are very 
-close. This means that the amount of ouliers, after 12 logs per issue, is very 
-low, approximately `r amount_upper_outiler`% of issues.
-
-The representative narrow range of logs in an issue makes us think that there 
-shoud be an activity flow pattern to resolve an issue. This flow pattern migth 
-be observed in a commom sequence of log status. See more informations in the 
-[Log Status](#log-status) section.
+logs. More about the relationship between issues and logs is detailed in 
+[Issue Logs](#issue-logs) section.
 
 ### Issue Creation Date
 
@@ -1282,6 +1236,55 @@ Pratically, all issues
 %) have 100% of progress. This makes sense since the most issues have FINISHED 
 status.
 
+### Issue Logs
+
+```{r}
+df_number_logs_per_issue <- 
+  dataset %>%
+    select(issue_id, log_creation_date) %>%
+    group_by(issue_id) %>% 
+    summarise(score = sum(!is.na(log_creation_date)))
+```
+
+From here, it is started the analysis of issue logs. The distribution and the 
+summaries of number of logs per issue are ploted in the histogram below.
+
+```{r "Distribution of the Number of Logs per Issue"}
+df_number_logs_per_issue %>% 
+  plot_distribution(score,
+                    binwidth = 1,
+                    title = "Distribution of the Number of Logs per Issue",
+                    label.x = "Number of logs per issue",
+                    breaks.x = seq(0, 44, 2),
+                    breaks.y = seq(0, 800, 100))
+```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
+
+``` {r}
+amount_upper_outiler <- 
+  round(
+    nrow(subset(df_number_logs_per_issue, score > 12)) * 100
+    / 
+    nrow(df_number_logs_per_issue)
+  )
+```
+
+Analysing the plot above, we can note that most of issues have between 1 and 9 
+history logs, approximately 1 standard deviation from the mean. Also, 75% of 
+them have up to 6 history logs and 50% of issues have between 2 and 6 logs, a 
+narrow range. Despite the skewed shape of plot, the median and mean are very 
+close. This means that the amount of ouliers, after 12 logs per issue, is very 
+low, approximately `r amount_upper_outiler`% of issues.
+
+The representative narrow range of logs in an issue makes us think that there 
+shoud be an activity flow pattern to resolve an issue. This flow pattern migth 
+be observed in a commom sequence of log status. See more informations in the 
+[Log Status](#log-status) section.
+
 ### Log Build Info
 
 ```{r}
@@ -1294,10 +1297,9 @@ df_log_build_info <-
     arrange(desc(score)) 
 ```
 
-From here, I analyse issue logs. I start by log build info which is an attribute
-of a log and represents the system's version of a future build. A log with this 
-attribute indicates that there is a solution code for the issue and this code 
-will be deployed on the version X of the system.
+Log build info is an attribute of a log and represents the system's version of a 
+future build. A log with this attribute indicates that there is a solution code 
+for the issue and this code will be deployed on the version X of the system.
 
 Usually, a system's version has more than one issue associated and not every 
 issue is associated with a version. The plot below shows the distribution of 
@@ -1352,6 +1354,16 @@ Now, we may realize that the most common situation is a system's version to have
 system's versions).
 
 ### Log Status
+
+```{r}
+df_log_build_info <-
+  logs %>% 
+    filter(!is.na(log_status)) %>% 
+    distinct(issue_id, log_status) %>% 
+    group_by(log_status) %>% 
+    summarise(score = n()) %>% 
+    arrange(desc(score)) 
+```
 
 > **Go back:** [Data Set Structure](#data-set-structure) 
 
