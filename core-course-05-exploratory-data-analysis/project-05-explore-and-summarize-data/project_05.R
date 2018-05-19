@@ -328,7 +328,7 @@ plot_distribution <- function(data,
   
   # padding at the end
   if(!is.null(breaks.x) & is.null(limits.x) & is.null(coord.xlim)) {
-    limits.x <- c(min(breaks.x), max(breaks.x) + binwidth)
+    limits.x <- c(min(breaks.x), max(breaks.x))
   }
   
   plot_distribution <-

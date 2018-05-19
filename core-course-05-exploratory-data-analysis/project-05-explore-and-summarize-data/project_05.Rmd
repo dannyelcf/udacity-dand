@@ -343,7 +343,7 @@ df_issue_created_by_hour %>%
                     binwidth = 1,
                     title = "Distribution of the Number of Issues Created per Hour of the Day",
                     label.x = "Hour of the day",
-                    breaks.x = seq(0, 23, 1),
+                    breaks.x = seq(0, 24, 1),
                     breaks.y = seq(0, 700, 100),
                     limits.y = c(0, 700))
 ```
@@ -1309,7 +1309,7 @@ df_log_build_info %>%
                     binwidth = 5,
                     title = "Distribution of the Number of Issues per System's Version",
                     label.x = "Number of issues",
-                    breaks.x = seq(1, 125, 5),
+                    breaks.x = seq(1, 126, 5),
                     breaks.y = seq(0, 320, 30))
 ```
 
