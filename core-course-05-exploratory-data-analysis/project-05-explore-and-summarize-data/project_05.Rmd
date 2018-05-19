@@ -1320,24 +1320,25 @@ and the black dotted line represent the upper threshold to the outliers
 
 Note that it is common a system's version to have between 1 and 5 issues 
 associated. From 13 issues it is considered an atypical situation. But a 
-bizarre situation in this context was to have a version with more than 116 
-issues associated.
+bizarre situation in this context was to have a version with 121 issues 
+associated.
 
-In the plot below we can see better how is the distribution between 1 and 5 
-issues.
+To inspect better the distribution when the number of issues is less than 13, 
+the plot below reduced the bin size and zoomed in.
 
-```{r "Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)"}
-df_log_build_info_lt_6_issues <- 
+```{r "Distribution of the Number of the Issues per System's Version (Less Than 13 Issues)"}
+df_log_build_info_lt_13_issues <- 
   df_log_build_info %>% 
-    filter(score < 6)
+    filter(score < 13)
 
-df_log_build_info_lt_6_issues %>%
+df_log_build_info %>%
   plot_distribution(score,
                     binwidth = 1,
                     title = "Distribution of the Number of the Issues per System's Version",
-                    subtitle_complement = "less than 6 issues",
+                    subtitle_complement = "less than 13 issues",
                     label.x = "Number of issues",
-                    breaks.x = seq(1, 6, 1),
+                    breaks.x = seq(1, 13, 1),
+                    coord.xlim = c(1, 13),
                     breaks.y = seq(0, 90, 10))
 ```
 
@@ -1346,7 +1347,9 @@ quartile, the black and red solid lines represent, respectivaly, median and mean
 and the black dotted line represent the upper threshold to the outliers 
 (3rd qu. + 1.5 IQR).
 
-
+Now, we may realize that the most common situation is a system's version to have
+1 issue, after between 2 and 5 issues and then greater than 6 issues (25% of all
+system's versions).
 
 ### Log Status
 

@@ -780,19 +780,23 @@ version.
 
 Note that it is common a system’s version to have between 1 and 5 issues
 associated. From 13 issues it is considered an atypical situation. But a
-bizarre situation in this context was to have a version with more than
-116 issues associated.
+bizarre situation in this context was to have a version with 121 issues
+associated.
 
-In the plot below we can see better how is the distribution between 1
-and 5
-issues.
+To inspect better the distribution when the number of issues is less
+than 13, the plot below reduced the bin size and zoomed
+in.
 
-<img src="project_05_files/plots/Distribution of the Number of the Issues per System's Version (Less Than 6 Issues)-1.png" width="86%" />
+<img src="project_05_files/plots/Distribution of the Number of the Issues per System's Version (Less Than 13 Issues)-1.png" width="86%" />
 
 > **Note:** In the plot above, the black dashed lines represent the 1st
 > and 3rd quartile, the black and red solid lines represent,
 > respectivaly, median and mean and the black dotted line represent the
 > upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+Now, we may realize that the most common situation is a system’s version
+to have 1 issue, after between 2 and 5 issues and then greater than 6
+issues (25% of all system’s versions).
 
 ### Log Status
 
