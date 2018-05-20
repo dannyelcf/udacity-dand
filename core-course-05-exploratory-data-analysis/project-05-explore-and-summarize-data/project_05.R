@@ -454,7 +454,7 @@ plot_sankey <- function(data,
                       label = deparse(stratum_q))) +
       scale_x_discrete(expand = c(.05, .05)) +
       scale_y_continuous(breaks = breaks.y) +
-      geom_flow() +
+      geom_flow(knot.pos = 0) +
       geom_stratum(alpha = .5, color = DEFAULT_COLOR) +
       guides(fill = guide_legend(title.position="top", legend, nrow = 3, byrow = TRUE)) + 
       labs(title = title,

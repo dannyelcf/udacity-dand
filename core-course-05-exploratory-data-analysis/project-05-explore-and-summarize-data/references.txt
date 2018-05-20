@@ -49,3 +49,10 @@ The code:
 
 Reorder categorical variables was adapted from https://stackoverflow.com/a/
 9231857/8645131
+
+--------------------------------------------------------------------------------
+
+The code of 'plot_sankey' was based on the source of the "student curricula 
+across several semesters" plot found here: http://corybrunson.github.io/
+ggalluvial/articles/ggalluvial.html#alluvial-data
+

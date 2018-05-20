@@ -738,10 +738,13 @@ since the most issues have FINISHED status.
 
 ### Issue Logs
 
-From here, it is started the analysis of issue logs. The distribution
-and the summaries of number of logs per issue are ploted in the
-histogram
-below.
+From here, it is started the analysis of issue logs. Lets start by
+analysing the distribution and the summaries of number of logs per issue
+in the histogram below.
+
+> **Note:** Not all the logs of an issue were visible to my user
+> (CUSTOMER) when I ran the web scraping script. This may affect some
+> analyzes.
 
 <img src="project_05_files/plots/Distribution of the Number of Logs per Issue-1.png" width="86%" />
 
@@ -762,6 +765,81 @@ The representative narrow range of logs in an issue makes us think that
 there shoud be an activity flow pattern to resolve an issue. This flow
 pattern migth be observed in a commom sequence of log status. See more
 informations in the [Log Status](#log-status) section.
+
+### Log Status
+
+Log status is the status of an issue after an activity to be performed.
+There are many possible status to an issue. The plot below shows the top
+15 log status used in the
+project.
+
+<img src="project_05_files/plots/Top 15 Frequency of Log Status-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean.
+
+FINISHED is the most used status. It represents the last status of an
+issue and, usually, it is the CUSTOMER who sets it. For the CUSTOMER to
+do it, the current issue status (and obviously the last status log) must
+be CUSTOMER CLOSING PENDING, the second most used status.
+
+When the CUSTOMER create an issue, the issue tracking system, usually,
+sets it status to UNDER DEVELOPMENT (3rd most used). Rarely the first
+status was OPEN (10th most used) or PENDIND START (13th most used).
+
+To see better what is the most common flow of the log status I created
+the plot below showing the top 6 log status of the first 6 log of all
+issues.
+
+<img src="project_05_files/plots/Recurring Log Status Flow-1.png" width="86%" />
+
+Analyzing the plot above (proportion size of output and proportion size
+of input) I extracted the top 10 common flows:
+
+1.  UNDER DEVELOPMENT \> REQUEST PRODUCTION UPDATE \> CUSTOMER CLOSING
+    PENDING \> FINISHED
+2.  UNDER DEVELOPMENT \> REQUEST PRODUCTION UPDATE \> CUSTOMER
+    VALIDATION PENDING \> VALIDATED BY CUSTOMER \> REQUEST PRODUCTION
+    UPDATE \> CUSTOMER CLOSING PENDING \> FINISHED
+3.  UNDER DEVELOPMENT \> REQUEST PRODUCTION UPDATE \> CUSTOMER
+    VALIDATION PENDING \> VALIDATED BY CUSTOMER \> CUSTOMER CLOSING
+    PENDING \> FINISHED
+4.  UNDER DEVELOPMENT \> REQUEST PRODUCTION UPDATE \> CUSTOMER
+    VALIDATION PENDING \> VALIDATION ERROR \> VALIDATED BY CUSTOMER \>
+    REQUEST PRODUCTION UPDATE \> CUSTOMER CLOSING PENDING \> FINISHED
+5.  UNDER DEVELOPMENT \> REQUEST PRODUCTION UPDATE \> CUSTOMER
+    VALIDATION PENDING \> VALIDATION ERROR \> VALIDATED BY CUSTOMER \>
+    CUSTOMER CLOSING PENDING \> FINISHED
+6.  UNDER DEVELOPMENT \> CUSTOMER CLOSING PENDING \> FINISHED
+7.  UNDER DEVELOPMENT \> CUSTOMER VALIDATION PENDING \> VALIDATED BY
+    CUSTOMER \> REQUEST PRODUCTION UPDATE \> CUSTOMER CLOSING PENDING \>
+    FINISHED
+8.  UNDER DEVELOPMENT \> CUSTOMER VALIDATION PENDING \> VALIDATED BY
+    CUSTOMER \> CUSTOMER CLOSING PENDING \> FINISHED
+9.  UNDER DEVELOPMENT \> CUSTOMER VALIDATION PENDING \> VALIDATION ERROR
+    \> VALIDATED BY CUSTOMER \> REQUEST PRODUCTION UPDATE \> CUSTOMER
+    CLOSING PENDING \> FINISHED
+10. UNDER DEVELOPMENT \> CUSTOMER VALIDATION PENDING \> VALIDATION ERROR
+    \> VALIDATED BY CUSTOMER \> CUSTOMER CLOSING PENDING \> FINISHED
+
+Flows 2 and 4 are the most completed. The others are a simplification of
+these or because not all the logs of an issue were visible to my user
+(as CUSTOMER) when I ran the web scraping script. Both flows are used in
+the solution of an SUSTENTATION type issue. In practice what happen is:
+
+1.  CUSTOMER open the issue;
+2.  COMPANY to develop the solution and deploy it in test environment;
+3.  CUSTOMER validate the solution in test environment;
+4.  COMPANY perform a build with the solution and deploy it in stage
+    environment;
+5.  CUSTOMER validate the solution in stage environment and deploy it in
+    production environment.
+
+The diference between flows 2 and 4 is that in flow 2 do not occur
+validation error in test environment. Note that a flow with validation
+error in stage environment do not exist in top 10 flows. This is because
+error in stage environment were rare.
 
 ### Log Build Info
 
@@ -801,10 +879,6 @@ in.
 Now, we may realize that the most common situation is a system’s version
 to have 1 issue, after between 2 and 5 issues and then greater than 6
 issues (25% of all system’s versions).
-
-### Log Status
-
-> **Go back:** [Data Set Structure](#data-set-structure)
 
 ### Reflections on Data Set Summaries
 
