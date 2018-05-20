@@ -1405,10 +1405,10 @@ VALIDATED BY CUSTOMER > CUSTOMER CLOSING PENDING > FINISHED
 Flows 2 and 4 are the most completed. The others are a simplification of these 
 or because not all the logs of an issue were visible to my user (as CUSTOMER) 
 when I ran the web scraping script. Both flows are used in the solution of an 
-SUSTENTATION type issue. In practice what happen is:
+SUSTENTATION type issue. In practice what happens is:
 
-1. CUSTOMER open the issue; 
-2. COMPANY to develop the solution and deploy it in test environment;
+1. CUSTOMER open an issue; 
+2. COMPANY to develop a solution and deploy it in test environment;
 3. CUSTOMER validate the solution in test environment;
 4. COMPANY perform a build with the solution and deploy it in stage environment; 
 5. CUSTOMER validate the solution in stage environment and deploy it in 
