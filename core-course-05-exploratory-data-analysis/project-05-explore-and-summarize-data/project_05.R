@@ -1,17 +1,6 @@
 DEFAULT_COLOR = "grey50"
 DEFAULT_ALFA = .1
 
-load_packages <- function(packages) {
-  sapply(packages,
-         function(pkg) {
-           tryCatch(library(pkg, character.only = TRUE, warn.conflicts = FALSE),
-                    error = function(err) {
-                      utils::install.packages(pkg, quiet = TRUE)
-                      library(pkg, character.only = TRUE, warn.conflicts = FALSE)
-                    })
-         })
-}
-
 load_dataset <- function(path) {
   # Load the Issues Tracking Data Set
   setClass('date_ymd_hms')
@@ -441,4 +430,42 @@ plot_cumulative_ts <- function(data,
     theme(axis.text.x = axis.text.x) 
   
   return(plot_cumulative_ts)
+}
+
+plot_sankey <- function(data,
+                        x,
+                        stratum, 
+                        alluvium,
+                        title,
+                        legend,
+                        label.x,
+                        label.y = "Frequency",
+                        axis.text.x = NULL,
+                        subtitle_complement = NULL,
+                        breaks.y = waiver()) {
+  x_q <- substitute(x)
+  stratum_q <- substitute(stratum)
+  alluvium_q <- substitute(alluvium)
+  
+  plot_sankey <-
+    ggplot(data,
+           aes_string(x = deparse(x_q), stratum = deparse(stratum_q), 
+                      alluvium = deparse(alluvium_q), fill = deparse(stratum_q), 
+                      label = deparse(stratum_q))) +
+      scale_x_discrete(expand = c(.05, .05)) +
+      scale_y_continuous(breaks = breaks.y) +
+      geom_flow() +
+      geom_stratum(alpha = .5, color = DEFAULT_COLOR) +
+      guides(fill = guide_legend(title.position="top", legend, nrow = 3, byrow = TRUE)) + 
+      labs(title = title,
+           subtitle = subtitle(nrow(data), complement = subtitle_complement),
+           x = label.x,
+           y = label.y) +
+      theme(legend.position = "bottom", legend.key.size = unit(.5, "line"))
+  
+  if(!is.null(axis.text.x)) {
+    plot_sankey <- plot_sankey + theme(axis.text.x = axis.text.x)
+  } 
+  
+  return(plot_sankey)
 }
