@@ -439,6 +439,7 @@ plot_sankey <- function(data,
                         title,
                         legend,
                         label.x,
+                        weight = NULL,
                         label.y = "Frequency",
                         axis.text.x = NULL,
                         subtitle_complement = NULL,
@@ -446,17 +447,19 @@ plot_sankey <- function(data,
   x_q <- substitute(x)
   stratum_q <- substitute(stratum)
   alluvium_q <- substitute(alluvium)
+  weight_q <- substitute(weight)
   
   plot_sankey <-
     ggplot(data,
            aes_string(x = deparse(x_q), stratum = deparse(stratum_q), 
+                      weight = deparse(weight_q),
                       alluvium = deparse(alluvium_q), fill = deparse(stratum_q), 
                       label = deparse(stratum_q))) +
       scale_x_discrete(expand = c(.05, .05)) +
       scale_y_continuous(breaks = breaks.y) +
-      geom_flow(knot.pos = 0) +
+      geom_flow(alpha = .35, knot.pos = .04) +
       geom_stratum(alpha = .5, color = DEFAULT_COLOR) +
-      guides(fill = guide_legend(title.position="top", legend, nrow = 3, byrow = TRUE)) + 
+      guides(fill = guide_legend(title.position="top", legend, nrow = 2, byrow = TRUE)) + 
       labs(title = title,
            subtitle = subtitle(nrow(data), complement = subtitle_complement),
            x = label.x,

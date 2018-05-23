@@ -768,9 +768,9 @@ informations in the [Log Status](#log-status) section.
 
 ### Log Status
 
-Log status is the status of an issue after an activity to be performed.
-There are many possible status to an issue. The plot below shows the top
-15 log status used in the
+Log status is the status of an issue after an activity (see [Log
+Action](#log-action)) to be performed. There are many possible status to
+an issue. The plot below shows the top 15 log status used in the
 project.
 
 <img src="project_05_files/plots/Top 15 Frequency of Log Status-1.png" width="86%" />
@@ -788,58 +788,54 @@ When the CUSTOMER create an issue, the issue tracking system, usually,
 sets it status to UNDER DEVELOPMENT (3rd most used). Rarely the first
 status was OPEN (10th most used) or PENDIND START (13th most used).
 
-To see better what is the most common flow of the log status I created
-the plot below showing the top 6 log status of the first 6 log of all
-issues.
+To see better which is the most common flow of the log status I created
+the plot below showing the top 10 log status
+flow.
 
-<img src="project_05_files/plots/Recurring Log Status Flow-1.png" width="86%" />
+<img src="project_05_files/plots/Top 10 Log Status Flow-1.png" width="86%" />
 
-Analyzing the plot above (proportion size of output and proportion size
-of input) I extracted the top 10 common flows:
+At first, we note that the top 10 log status flow contain the top 6 log
+status and have 6 steps. Also, it is noted that UNDER DEVELOPMENT status
+occur only in the first step.
 
-1.  UNDER DEVELOPMENT \> REQUEST PRODUCTION UPDATE \> CUSTOMER CLOSING
-    PENDING \> FINISHED
-2.  UNDER DEVELOPMENT \> REQUEST PRODUCTION UPDATE \> CUSTOMER
-    VALIDATION PENDING \> VALIDATED BY CUSTOMER \> REQUEST PRODUCTION
-    UPDATE \> CUSTOMER CLOSING PENDING \> FINISHED
-3.  UNDER DEVELOPMENT \> REQUEST PRODUCTION UPDATE \> CUSTOMER
-    VALIDATION PENDING \> VALIDATED BY CUSTOMER \> CUSTOMER CLOSING
-    PENDING \> FINISHED
-4.  UNDER DEVELOPMENT \> REQUEST PRODUCTION UPDATE \> CUSTOMER
-    VALIDATION PENDING \> VALIDATION ERROR \> VALIDATED BY CUSTOMER \>
-    REQUEST PRODUCTION UPDATE \> CUSTOMER CLOSING PENDING \> FINISHED
-5.  UNDER DEVELOPMENT \> REQUEST PRODUCTION UPDATE \> CUSTOMER
-    VALIDATION PENDING \> VALIDATION ERROR \> VALIDATED BY CUSTOMER \>
-    CUSTOMER CLOSING PENDING \> FINISHED
-6.  UNDER DEVELOPMENT \> CUSTOMER CLOSING PENDING \> FINISHED
-7.  UNDER DEVELOPMENT \> CUSTOMER VALIDATION PENDING \> VALIDATED BY
-    CUSTOMER \> REQUEST PRODUCTION UPDATE \> CUSTOMER CLOSING PENDING \>
-    FINISHED
-8.  UNDER DEVELOPMENT \> CUSTOMER VALIDATION PENDING \> VALIDATED BY
-    CUSTOMER \> CUSTOMER CLOSING PENDING \> FINISHED
-9.  UNDER DEVELOPMENT \> CUSTOMER VALIDATION PENDING \> VALIDATION ERROR
-    \> VALIDATED BY CUSTOMER \> REQUEST PRODUCTION UPDATE \> CUSTOMER
-    CLOSING PENDING \> FINISHED
-10. UNDER DEVELOPMENT \> CUSTOMER VALIDATION PENDING \> VALIDATION ERROR
-    \> VALIDATED BY CUSTOMER \> CUSTOMER CLOSING PENDING \> FINISHED
+It is a bit strange status like CUSTOMER CLOSING PENDING, FINISHED and
+REQUEST PRODUCTION UPDATE occur in the first step. I think the reasons
+why this occur is that not all the logs of an issue were visible to my
+user (as CUSTOMER) when I ran the web scraping script. Thus, I generated
+another plot showing only flows that start with UNDER DEVELOPMENT
+status.
 
-Flows 2 and 4 are the most completed. The others are a simplification of
-these or because not all the logs of an issue were visible to my user
-(as CUSTOMER) when I ran the web scraping script. Both flows are used in
-the solution of an SUSTENTATION type issue. In practice what happen is:
+<img src="project_05_files/plots/Top 10 Log Status Flow (UNDER DEVELOPMENT)-1.png" width="86%" />
 
-1.  CUSTOMER open the issue;
-2.  COMPANY to develop the solution and deploy it in test environment;
+Now, note that FINISHED and VALIDATED BY CUSTOMER status vanished from
+step 2. To complement the visualization of the plot above I put in the
+table below flow paths in descending order of
+scores.
+
+|   | flow                                                                                                                                             | score |
+| - | :----------------------------------------------------------------------------------------------------------------------------------------------- | ----: |
+| 1 | UNDER DEVELOPMENT \> CUSTOMER CLOSING PENDING \> FINISHED                                                                                        |   483 |
+| 2 | UNDER DEVELOPMENT \> REQUESTED PRODUCTION UPDATE \> CUSTOMER CLOSING PENDING \> FINISHED                                                         |   237 |
+| 3 | UNDER DEVELOPMENT \> REQUESTED PRODUCTION UPDATE \> CUSTOMER VALIDATION PENDING \> VALIDATED BY CUSTOMER \> CUSTOMER CLOSING PENDING \> FINISHED |   115 |
+| 4 | UNDER DEVELOPMENT \> CUSTOMER VALIDATION PENDING \> VALIDATED BY CUSTOMER \> REQUESTED PRODUCTION UPDATE \> CUSTOMER CLOSING PENDING \> FINISHED |    84 |
+| 5 | UNDER DEVELOPMENT \> REQUESTED PRODUCTION UPDATE \> VALIDATED BY CUSTOMER \> CUSTOMER CLOSING PENDING \> FINISHED                                |    76 |
+
+From the table above, it is observed that there are 2 flow groups: \[1,
+2\] and \[3, 4, 5\]. The flow of first group belongs to the flow of
+second group. Maybe, because of a consequence of not all the logs of an
+issue were visible to my user when I ran the web scraping script. I said
+this because in the day-to-day project the workflow was basically:
+
+1.  CUSTOMER open an issue;
+2.  COMPANY to develop a solution and deploy it in test environment;
 3.  CUSTOMER validate the solution in test environment;
 4.  COMPANY perform a build with the solution and deploy it in stage
     environment;
 5.  CUSTOMER validate the solution in stage environment and deploy it in
     production environment.
 
-The diference between flows 2 and 4 is that in flow 2 do not occur
-validation error in test environment. Note that a flow with validation
-error in stage environment do not exist in top 10 flows. This is because
-error in stage environment were rare.
+Note that a flow with validation error in stage environment do not exist
+in top 10 flows. This is because error in stage environment were rare.
 
 ### Log Build Info
 

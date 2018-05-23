@@ -22,6 +22,7 @@ library(ggplot2)
 library(ggalluvial)
 library(dplyr) 
 library(lubridate)
+library(knitr)
 source("project_05.R")
 ```
 
@@ -1307,9 +1308,9 @@ df_score_top15_log_status <-
     filter(row_number() <= 15)
 ```
 
-Log status is the status of an issue after an activity to be performed. There 
-are many possible status to an issue. The plot below shows the top 15 log status
-used in the project.
+Log status is the status of an issue after an activity (see 
+[Log Action](#log-action)) to be performed. There are many possible status to 
+an issue. The plot below shows the top 15 log status used in the project.
 
 ```{r fig.height=4.5, "Top 15 Frequency of Log Status"}
 df_log_status %>% 
@@ -1335,77 +1336,79 @@ status to UNDER DEVELOPMENT (3rd most used). Rarely the first status was OPEN
 (10th most used) or PENDIND START (13th most used).
 
 ```{r}
-df_top6_log_status_top_6_step <-
+df_log_status_flow <-
   df_log_status %>%
-    group_by(issue_id) %>% 
-    mutate(step = row_number()) %>%
-    ungroup() %>%
-    group_by(log_status, step) %>%
-    summarise(total = n()) %>% 
-    arrange(step, desc(total)) %>%
-    ungroup() %>%
-    group_by(step) %>%
-    mutate(score = row_number()) %>%
-    ungroup() %>%
-    filter(score <= 6 & step <= 6) %>% 
-    mutate(log_status_step = paste(log_status, step, sep = "-")) %>%
-    select(log_status_step)
+  group_by(issue_id) %>% 
+  mutate(step = row_number(),
+         flow = paste(log_status, collapse = " > "),
+         flow_size = n()) %>%
+  ungroup() %>%
+  group_by(flow) %>%
+  mutate(flow_score = n()/flow_size) %>%
+  ungroup() %>%
+  group_by() %>%
+  mutate(flow_rank = dense_rank(desc(flow_score))) %>% 
+  ungroup() %>%
+  arrange(flow_score, flow, issue_id, step) %>% 
+  mutate(step = as.factor(paste0(step, "°")))
 
-df_log_status_pipeline <-
-  df_log_status %>%
-    group_by(issue_id) %>% 
-    mutate(step = row_number()) %>% 
-    mutate(next_step = lead(step)) %>%
-    mutate(log_status_step = paste(log_status, step, sep = "-")) %>%
-    ungroup() %>%
-    filter(!is.na(next_step | step > 1)) %>% 
-    filter(log_status_step %in% df_top6_log_status_top_6_step$log_status_step) %>% 
-    select(issue_id, log_status, step) %>% 
-    mutate(step = as.factor(paste0(step, "°")))
+df_log_status_flow_top_10 <-
+  df_log_status_flow %>% 
+    filter(flow_rank <= 10)
 ```
 
-To see better what is the most common flow of the log status I created the plot 
-below showing the top 6 log status of the first 6 log of all issues.
+To see better which is the most common flow of the log status I created the plot 
+below showing the top 10 log status flow.
 
-```{r fig.height=4, "Recurring Log Status Flow"}
-df_log_status_pipeline %>%     
+```{r fig.height=4.5, "Top 10 Log Status Flow"}
+df_log_status_flow_top_10 %>% 
   plot_sankey(x = step, stratum = log_status, alluvium = issue_id,
-              title = "Recurring Log Status Flow",
+              title = "Top 10 Log Status Flow",
+              legend = "Log status",
+              label.x = "Log ordering",
+              breaks.y = seq(0, 3000, 200))
+```
+
+At first, we note that the top 10 log status flow contain the top 6 log status
+and have 6 steps. Also, it is noted that UNDER DEVELOPMENT status occur only in 
+the first step. 
+
+It is a bit strange status like  CUSTOMER CLOSING PENDING, FINISHED and REQUEST 
+PRODUCTION UPDATE occur in the first step. I think the reasons why this occur is
+that not all the logs of an issue were visible to my user (as CUSTOMER) when I 
+ran the web scraping script. Thus, I generated another plot showing only flows 
+that start with UNDER DEVELOPMENT status.
+
+```{r fig.height=4.5, "Top 10 Log Status Flow (UNDER DEVELOPMENT)"}
+df_log_status_flow_top_10 %>% 
+  filter(startsWith(flow, "UNDER DEVELOPMENT")) %>% 
+  plot_sankey(x = step, stratum = log_status, alluvium = issue_id,
+              title = "Top 10 Log Status Flow",
               legend = "Log status",
               label.x = "Log order",
-              breaks.y = seq(0, 3900, 300))
+              breaks.y = seq(0, 1000, 100))
 ```
 
-Analyzing the plot above (proportion size of output and proportion size of input) 
-I extracted the top 10 common flows:
+Now, note that FINISHED and VALIDATED BY CUSTOMER status vanished from step 2.
+To complement the visualization of the plot above I put in the table below flow 
+paths in descending order of scores.
 
-1. UNDER DEVELOPMENT > REQUEST PRODUCTION UPDATE > CUSTOMER CLOSING PENDING > 
-FINISHED
-2. UNDER DEVELOPMENT > REQUEST PRODUCTION UPDATE >
-CUSTOMER VALIDATION PENDING > VALIDATED BY CUSTOMER >
-REQUEST PRODUCTION UPDATE > CUSTOMER CLOSING PENDING > FINISHED
-3. UNDER DEVELOPMENT > REQUEST PRODUCTION UPDATE > CUSTOMER VALIDATION PENDING > 
-VALIDATED BY CUSTOMER > CUSTOMER CLOSING PENDING > FINISHED
-4. UNDER DEVELOPMENT > REQUEST PRODUCTION UPDATE > CUSTOMER VALIDATION PENDING > 
-VALIDATION ERROR > VALIDATED BY CUSTOMER > REQUEST PRODUCTION UPDATE > 
-CUSTOMER CLOSING PENDING > FINISHED
-5. UNDER DEVELOPMENT > REQUEST PRODUCTION UPDATE > CUSTOMER VALIDATION PENDING > 
-VALIDATION ERROR > VALIDATED BY CUSTOMER > CUSTOMER CLOSING PENDING > FINISHED
-6. UNDER DEVELOPMENT > CUSTOMER CLOSING PENDING > FINISHED
-7. UNDER DEVELOPMENT > CUSTOMER VALIDATION PENDING > VALIDATED BY CUSTOMER > 
-REQUEST PRODUCTION UPDATE > CUSTOMER CLOSING PENDING > FINISHED
-8. UNDER DEVELOPMENT > CUSTOMER VALIDATION PENDING > VALIDATED BY CUSTOMER > 
-CUSTOMER CLOSING PENDING > FINISHED
-9. UNDER DEVELOPMENT > CUSTOMER VALIDATION PENDING > VALIDATION ERROR > 
-VALIDATED BY CUSTOMER > REQUEST PRODUCTION UPDATE > CUSTOMER CLOSING PENDING >
-FINISHED
-10. UNDER DEVELOPMENT > CUSTOMER VALIDATION PENDING > VALIDATION ERROR > 
-VALIDATED BY CUSTOMER > CUSTOMER CLOSING PENDING > FINISHED
+```{r}
+df_log_status_flow_top_10 %>%
+  filter(startsWith(flow, "UNDER DEVELOPMENT")) %>% 
+  distinct(flow, flow_score) %>%
+  arrange(desc(flow_score)) %>% 
+  mutate(" " = row_number()) %>% 
+  select(" ", flow, score = flow_score) %>% 
+  as.data.frame() %>% 
+  kable()
+```
 
-Flows 2 and 4 are the most completed. The others are a simplification of these 
-or because not all the logs of an issue were visible to my user (as CUSTOMER) 
-when I ran the web scraping script. Both flows are used in the solution of an 
-SUSTENTATION type issue. In practice what happens is:
+From the table above, it is observed that there are 2 flow groups: [1, 2] and 
+[3, 4, 5]. The flow of first group belongs to the flow of second group. Maybe, 
+because of a consequence of not all the logs of an issue were visible to my user 
+when I ran the web scraping script. I said this because in the day-to-day 
+project the workflow was basically:
 
 1. CUSTOMER open an issue; 
 2. COMPANY to develop a solution and deploy it in test environment;
@@ -1414,10 +1417,8 @@ SUSTENTATION type issue. In practice what happens is:
 5. CUSTOMER validate the solution in stage environment and deploy it in 
 production environment.
 
-The diference between flows 2 and 4 is that in flow 2 do not occur validation 
-error in test environment. Note that a flow with validation error in stage 
-environment do not exist in top 10 flows. This is because error in stage 
-environment were rare.
+Note that a flow with validation error in stage environment do not exist in top 
+10 flows. This is because error in stage environment were rare.
 
 ### Log Build Info
 
