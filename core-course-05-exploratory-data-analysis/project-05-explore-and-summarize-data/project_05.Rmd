@@ -82,14 +82,14 @@ respectively, in these links:
 - [Issues Data Set Documentation](issues_tracking.Rdoc.txt)
 
 The exported data set, the wrangling process scripts and an example of one issue 
-tracking can be find in [data_wrangling](data_wrangling) folder. 
+tracking can be find in [Issues Data Wrangling](data_wrangling). 
 
 # Initial Descriptive Analysis
 
-In this section, we perform a univariate exploration of the data set, first 
+In this section, I perform a univariate exploration of the data set, first 
 examining its structure, followed by the analysis of each variable starting with 
-issue variables and ending with log variables. In each group (issue and log) I 
-begin with exploration of temporal variables and end with the analysis of 
+issue variables and ending with log variables. In each variable group (issue and 
+log) I begin with exploration of temporal variables and end with the analysis of 
 categorical and range variables.
 
 ### Data Set Structure
@@ -1251,8 +1251,8 @@ df_number_logs_per_issue <-
 From here, it is started the analysis of issue logs. Lets start by analysing the 
 distribution and the summaries of number of logs per issue in the histogram below.
 
-> **Note:** Not all the logs of an issue were visible to my user (CUSTOMER) when 
-I ran the web scraping script. This may affect some analyzes.
+> **Note:** Not all the logs of an issue were visible to my system user when I 
+ran the web scraping script. This may affect some analyzes.
 
 ```{r "Distribution of the Number of Logs per Issue"}
 df_number_logs_per_issue %>% 
@@ -1290,6 +1290,44 @@ shoud be an activity flow pattern to resolve an issue. This flow pattern migth
 be observed in a commom sequence of log status. See more informations in the 
 [Log Status](#log-status) section.
 
+### Log Action
+
+```{r}
+df_log_action <-
+  logs %>% 
+    filter(!is.na(log_action)) %>% 
+    distinct(issue_id, log_action)
+```
+
+Log action is an activity taken to make progress in solving the issue. There are 
+many possible log action to an issue. For the project analised, I found 14 
+action types. See the frequency of them in the plot below.  
+
+```{r fig.height=4.5, "Frequency of Log Action"}
+df_log_action %>%
+  mutate(log_action = replace(as.character(log_action), 
+                              log_action=="RESPONSE TO STAKEHOLDERS ON THE ISSUE", 
+                              "RESPONSE TO STAKEHOLDERS")) %>% 
+  plot_frequency(log_action, 
+                 title = "Frequency of Log Action",
+                 label.x = "Log action",
+                 breaks.y = seq(0, 4000, 400),
+                 breaks.2nd.y = seq(0, 1, .025),
+                 axis.text.x = element_text(angle = 20, hjust = 1))
+```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean.
+
+Analysing the plot above, we can note that the three top log actions are generic 
+events wherein the 2nd is the most generic action. The next three top log action 
+are related to development activities that are perform by diferent people in the
+COMPANY.
+
+An action make changes on issue's status. The following section shows the issue's 
+log status and the section [Log Action X Log Status](#log-action-x-log-status) 
+shows the relationship between both.
+
 ### Log Status
 
 ```{r}
@@ -1308,9 +1346,9 @@ df_score_top15_log_status <-
     filter(row_number() <= 15)
 ```
 
-Log status is the status of an issue after an activity (see 
-[Log Action](#log-action)) to be performed. There are many possible status to 
-an issue. The plot below shows the top 15 log status used in the project.
+Log status is the status of an issue after an activity to be performed. There 
+are many possible status to an issue. The plot below shows the top 15 log status 
+used in the project.
 
 ```{r fig.height=4.5, "Top 15 Frequency of Log Status"}
 df_log_status %>% 
@@ -1318,7 +1356,7 @@ df_log_status %>%
   plot_frequency(log_status, 
                  title = "Top 15 Frequency of Log Status",
                  label.x = "Log status",
-                 breaks.y = seq(0, 4100, 300),
+                 breaks.y = seq(0, 4100, 400),
                  breaks.2nd.y = seq(0, 1, .025),
                  axis.text.x = element_text(angle = 20, hjust = 1))
 ```
@@ -1501,3 +1539,5 @@ What makes the demand grow rapidly in 2014?
 
 An analysis of issue creations timeline by system/subsystem and issue types may 
 answer that assumption.
+
+#### Log Action X Log Status

@@ -26,16 +26,16 @@ can be accessed, respectively, in these links:
   - [Issues Data Set Documentation](issues_tracking.Rdoc.txt)
 
 The exported data set, the wrangling process scripts and an example of
-one issue tracking can be find in [data\_wrangling](data_wrangling)
-folder.
+one issue tracking can be find in [Issues Data
+Wrangling](data_wrangling).
 
 # Initial Descriptive Analysis
 
-In this section, we perform a univariate exploration of the data set,
+In this section, I perform a univariate exploration of the data set,
 first examining its structure, followed by the analysis of each variable
 starting with issue variables and ending with log variables. In each
-group (issue and log) I begin with exploration of temporal variables and
-end with the analysis of categorical and range variables.
+variable group (issue and log) I begin with exploration of temporal
+variables and end with the analysis of categorical and range variables.
 
 ### Data Set Structure
 
@@ -742,9 +742,9 @@ From here, it is started the analysis of issue logs. Lets start by
 analysing the distribution and the summaries of number of logs per issue
 in the histogram below.
 
-> **Note:** Not all the logs of an issue were visible to my user
-> (CUSTOMER) when I ran the web scraping script. This may affect some
-> analyzes.
+> **Note:** Not all the logs of an issue were visible to my system user
+> when I ran the web scraping script. This may affect some
+analyzes.
 
 <img src="project_05_files/plots/Distribution of the Number of Logs per Issue-1.png" width="86%" />
 
@@ -766,11 +766,33 @@ there shoud be an activity flow pattern to resolve an issue. This flow
 pattern migth be observed in a commom sequence of log status. See more
 informations in the [Log Status](#log-status) section.
 
+### Log Action
+
+Log action is an activity taken to make progress in solving the issue.
+There are many possible log action to an issue. For the project
+analised, I found 14 action types. See the frequency of them in the plot
+below.
+
+<img src="project_05_files/plots/Frequency of Log Action-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean.
+
+Analysing the plot above, we can note that the three top log actions are
+generic events wherein the 2nd is the most generic action. The next
+three top log action are related to development activities that are
+perform by diferent people in the COMPANY.
+
+An action make changes on issue’s status. The following section shows
+the issue’s log status and the section [Log Action X Log
+Status](#log-action-x-log-status) shows the relationship between both.
+
 ### Log Status
 
-Log status is the status of an issue after an activity (see [Log
-Action](#log-action)) to be performed. There are many possible status to
-an issue. The plot below shows the top 15 log status used in the
+Log status is the status of an issue after an activity to be performed.
+There are many possible status to an issue. The plot below shows the top
+15 log status used in the
 project.
 
 <img src="project_05_files/plots/Top 15 Frequency of Log Status-1.png" width="86%" />
@@ -889,3 +911,5 @@ What makes the demand low in 2013? What makes the demand grow rapidly in
 
 An analysis of issue creations timeline by system/subsystem and issue
 types may answer that assumption.
+
+#### Log Action X Log Status
