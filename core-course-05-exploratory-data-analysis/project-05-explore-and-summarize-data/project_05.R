@@ -472,3 +472,31 @@ plot_sankey <- function(data,
   
   return(plot_sankey)
 }
+
+plot_boxplot <- function(data, x, y,
+                         title,
+                         label.x,
+                         label.y,
+                         breaks.y = waiver(),
+                         coord.xlim = NULL,
+                         coord.ylim = NULL,
+                         axis.text.x = NULL) {
+  x_q <- substitute(x)
+  y_q <- substitute(y)
+  
+  plot_box <-
+    data %>% 
+    ggplot(aes_string(x = deparse(x_q), y = deparse(y_q))) + 
+    geom_boxplot(color = DEFAULT_COLOR, alpha = DEFAULT_ALFA) +
+    scale_y_continuous(breaks = breaks.y) +
+    coord_cartesian(xlim = coord.xlim, ylim = coord.ylim) +
+    labs(title = title,
+         x = label.x,
+         y = label.y)
+  
+  if(!is.null(axis.text.x)) {
+    plot_box <- plot_box + theme(axis.text.x = axis.text.x)
+  }
+
+  return(plot_box)
+}

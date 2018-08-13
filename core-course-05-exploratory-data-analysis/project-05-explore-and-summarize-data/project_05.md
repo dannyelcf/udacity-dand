@@ -738,7 +738,7 @@ since the most issues have FINISHED status.
 
 ### Issue Logs
 
-From here, it is started the analysis of issue logs. Lets start by
+From here, it is started the analysis of issue logs. Let’s start by
 analysing the distribution and the summaries of number of logs per issue
 in the histogram below.
 
@@ -763,30 +763,27 @@ issues.
 
 The representative narrow range of logs in an issue makes us think that
 there shoud be an activity flow pattern to resolve an issue. This flow
-pattern migth be observed in a commom sequence of log status. See more
-informations in the [Log Status](#log-status) section.
+pattern migth be observed in a commom sequence of [Log
+Status](#log-status).
 
-### Log Action
+### Log Creation Date
 
-Log action is an activity taken to make progress in solving the issue.
-There are many possible log action to an issue. For the project
-analised, I found 14 action types. See the frequency of them in the plot
-below.
+Before analysing the common sequence of [Log Status](#log-status) and
+following the pattern of starting with temporal variables, I will show
+how the behaviour of `log_creation_date` variable is.
 
-<img src="project_05_files/plots/Frequency of Log Action-1.png" width="86%" />
+The plot below shows the distribution of the log creation time laspe (in
+days scale) between logs of the same
+issue.
 
-> **Note:** In the plot above, the black dashed lines represent the 1st
-> and 3rd quartile, the black and red solid lines represent,
-> respectivaly, median and mean.
+<img src="project_05_files/plots/Distribution of the Log Creation Time Lapse-1.png" width="86%" />
 
-Analysing the plot above, we can note that the three top log actions are
-generic events wherein the 2nd is the most generic action. The next
-three top log action are related to development activities that are
-perform by diferent people in the COMPANY.
+> The plot above has been zoomed in y-axis to reduce outliers display.
 
-An action make changes on issue’s status. The following section shows
-the issue’s log status and the section [Log Action X Log
-Status](#log-action-x-log-status) shows the relationship between both.
+We note that the time lapse between logs is large at beginning of an
+issue and decreases in the next logs. This means that the issues take
+long time to start (about 1 week). But once initiated, it take less time
+between activities.
 
 ### Log Status
 
@@ -858,6 +855,29 @@ this because in the day-to-day project the workflow was basically:
 
 Note that a flow with validation error in stage environment do not exist
 in top 10 flows. This is because error in stage environment were rare.
+
+### Log Action
+
+Log action is an activity taken to make progress in solving the issue.
+One action triggers on a status change of the an issue. I There are many
+possible log action to an issue. For the project analised, I found 14
+action types. See the frequency of them in the plot
+below.
+
+<img src="project_05_files/plots/Frequency of Log Action-1.png" width="86%" />
+
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean.
+
+Analysing the plot above, we can note that the three top log actions are
+generic events wherein the 2nd is the most generic action. The next
+three top log action are related to development activities that are
+perform by diferent people in the COMPANY.
+
+An action make changes on issue’s status. The following section shows
+the issue’s log status and the section [Log Action X Log
+Status](#log-action-x-log-status) shows the relationship between both.
 
 ### Log Build Info
 

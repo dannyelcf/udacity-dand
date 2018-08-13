@@ -1248,7 +1248,7 @@ df_number_logs_per_issue <-
     summarise(score = sum(!is.na(log_creation_date)))
 ```
 
-From here, it is started the analysis of issue logs. Lets start by analysing the 
+From here, it is started the analysis of issue logs. Let's start by analysing the 
 distribution and the summaries of number of logs per issue in the histogram below.
 
 > **Note:** Not all the logs of an issue were visible to my system user when I 
@@ -1287,46 +1287,57 @@ low, approximately `r amount_upper_outiler`% of issues.
 
 The representative narrow range of logs in an issue makes us think that there 
 shoud be an activity flow pattern to resolve an issue. This flow pattern migth 
-be observed in a commom sequence of log status. See more informations in the 
-[Log Status](#log-status) section.
+be observed in a commom sequence of [Log Status](#log-status).
 
-### Log Action
+### Log Creation Date
 
 ```{r}
-df_log_action <-
+df_log_timelapse_days <- 
   logs %>% 
-    filter(!is.na(log_action)) %>% 
-    distinct(issue_id, log_action)
+    select(issue_id, log_creation_date) %>% 
+    filter(!is.na(log_creation_date)) %>%
+    arrange(issue_id, log_creation_date) %>% 
+    group_by(issue_id) %>% 
+    mutate(next_log_creation_date = lead(log_creation_date)) %>%
+    mutate(log_creation_date = as.Date(as.character(log_creation_date,
+                                                    format="%Y-%m-%d")),
+           next_log_creation_date = as.Date(as.character(next_log_creation_date,
+                                                         format="%Y-%m-%d"))) %>% 
+    filter(!is.na(next_log_creation_date)) %>% 
+    mutate(timelapse_days = as.numeric(difftime(next_log_creation_date, 
+                                               log_creation_date, 
+                                               units = "days")),
+           log_hop = paste0(stringr::str_pad(row_number(issue_id), 
+                                              2, "left", "0"), 
+                             "-", 
+                             stringr::str_pad(row_number(issue_id) + 1, 
+                                              2, "left", "0"))) %>%
+    select(issue_id, log_hop, timelapse_days) 
 ```
 
-Log action is an activity taken to make progress in solving the issue. There are 
-many possible log action to an issue. For the project analised, I found 14 
-action types. See the frequency of them in the plot below.  
+Before analysing the common sequence of [Log Status](#log-status) and following 
+the pattern of starting with temporal variables, I will show how the behaviour 
+of `log_creation_date` variable is.
 
-```{r fig.height=4.5, "Frequency of Log Action"}
-df_log_action %>%
-  mutate(log_action = replace(as.character(log_action), 
-                              log_action=="RESPONSE TO STAKEHOLDERS ON THE ISSUE", 
-                              "RESPONSE TO STAKEHOLDERS")) %>% 
-  plot_frequency(log_action, 
-                 title = "Frequency of Log Action",
-                 label.x = "Log action",
-                 breaks.y = seq(0, 4000, 400),
-                 breaks.2nd.y = seq(0, 1, .025),
-                 axis.text.x = element_text(angle = 20, hjust = 1))
+The plot below shows the distribution of the log creation time laspe (in days 
+scale) between logs of the same issue.
+
+```{r "Distribution of the Log Creation Time Lapse"}
+df_log_timelapse_days %>% 
+  plot_boxplot(log_hop, timelapse_days,
+               title = "Distribution of the Log Creation Time Lapse",
+               label.x = "Log hops",
+               label.y = "Time lapse (in days)",
+               breaks.y = seq(0, 25, 2),
+               coord.ylim = c(0, 25),
+               axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
-quartile, the black and red solid lines represent, respectivaly, median and mean.
+> The plot above has been zoomed in y-axis to reduce outliers display.
 
-Analysing the plot above, we can note that the three top log actions are generic 
-events wherein the 2nd is the most generic action. The next three top log action 
-are related to development activities that are perform by diferent people in the
-COMPANY.
-
-An action make changes on issue's status. The following section shows the issue's 
-log status and the section [Log Action X Log Status](#log-action-x-log-status) 
-shows the relationship between both.
+We note that the time lapse between logs is large at beginning of an issue and 
+decreases in the next logs. This means that the issues take long time to start 
+(about 1 week). But once initiated, it take less time between activities.
 
 ### Log Status
 
@@ -1457,6 +1468,45 @@ production environment.
 
 Note that a flow with validation error in stage environment do not exist in top 
 10 flows. This is because error in stage environment were rare.
+
+### Log Action
+
+```{r}
+df_log_action <-
+  logs %>% 
+    filter(!is.na(log_action)) %>% 
+    distinct(issue_id, log_action)
+```
+
+Log action is an activity taken to make progress in solving the issue. One 
+action triggers on a status change of the an issue. I There are many possible 
+log action to an issue. For the project analised, I found 14 action types. See 
+the frequency of them in the plot below.  
+
+```{r fig.height=4.5, "Frequency of Log Action"}
+df_log_action %>%
+  mutate(log_action = replace(as.character(log_action), 
+                              log_action=="RESPONSE TO STAKEHOLDERS ON THE ISSUE", 
+                              "RESPONSE TO STAKEHOLDERS")) %>% 
+  plot_frequency(log_action, 
+                 title = "Frequency of Log Action",
+                 label.x = "Log action",
+                 breaks.y = seq(0, 4000, 400),
+                 breaks.2nd.y = seq(0, 1, .025),
+                 axis.text.x = element_text(angle = 20, hjust = 1))
+```
+
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean.
+
+Analysing the plot above, we can note that the three top log actions are generic 
+events wherein the 2nd is the most generic action. The next three top log action 
+are related to development activities that are perform by diferent people in the
+COMPANY.
+
+An action make changes on issue's status. The following section shows the issue's 
+log status and the section [Log Action X Log Status](#log-action-x-log-status) 
+shows the relationship between both.
 
 ### Log Build Info
 
