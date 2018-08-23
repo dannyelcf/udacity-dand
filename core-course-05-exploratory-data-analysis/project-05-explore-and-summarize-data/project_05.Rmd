@@ -1576,6 +1576,29 @@ Now, we may realize that the most common situation is a system's version to have
 1 issue, after between 2 and 5 issues and then greater than 6 issues (25% of all
 system's versions).
 
+### Log Progress
+
+```{r}
+df_log_progress <- 
+  logs %>% 
+    select(issue_id, log_progress) %>% 
+    filter(!is.na(log_progress)) %>%
+    arrange(issue_id, log_progress) %>% 
+    group_by(issue_id) %>% 
+    mutate(log_order = paste0(stringr::str_pad(row_number(issue_id), 
+                                               2, "left", "0")))
+```
+
+```{r "Distribution of the Log Progress by Issue's Log Order"}
+df_log_progress %>% 
+  plot_boxplot(log_order, log_progress,
+               title = "Distribution of the Log Progress by Issue's Log Order",
+               label.x = "Log order",
+               label.y = "Log progress (%)",
+               breaks.y = seq(0, 100, 10),
+               axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
 ### Reflections on Data Set Summaries
 
 What is the commom flow of the log states? (Data Set Structure)
