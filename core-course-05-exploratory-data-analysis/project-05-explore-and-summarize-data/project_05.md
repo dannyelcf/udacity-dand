@@ -916,7 +916,22 @@ in.
 
 Now, we may realize that the most common situation is a system’s version
 to have 1 issue, after between 2 and 5 issues and then greater than 6
-issues (25% of all system’s versions).
+issues (25% of all system’s
+versions).
+
+### Log Progress
+
+<img src="project_05_files/plots/Distribution of the Log Progress by Issue's Log Order-1.png" width="86%" />
+
+### Log Time Spent
+
+<img src="project_05_files/plots/Distribution of the Log Time Spent by Issue's Log Order-1.png" width="86%" />
+
+### Log Created By
+
+<img src="project_05_files/plots/Top 15 Frequency of Log's Creator-1.png" width="86%" />
+
+<img src="project_05_files/plots/Heatmap of the Log's Creator by Issue's Log Order-1.png" width="86%" />
 
 ### Reflections on Data Set Summaries
 

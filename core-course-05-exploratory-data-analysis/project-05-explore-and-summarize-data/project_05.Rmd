@@ -1017,7 +1017,7 @@ df_issue_created_by %>%
   filter(issue_created_by %in% 
            df_score_top15_issue_created_by$issue_created_by) %>%
   plot_frequency(issue_created_by, 
-                 title = "Top 15 Frequency of Issue by Creator",
+                 title = "Top 15 Frequency of Issue's Creator",
                  label.x = "Issue creator",
                  breaks.y = seq(0, 1400, 100),
                  breaks.2nd.y = seq(0, 1, .025),
@@ -1597,6 +1597,82 @@ df_log_progress %>%
                label.y = "Log progress (%)",
                breaks.y = seq(0, 100, 10),
                axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Log Time Spent
+
+```{r}
+df_log_time_spent <- 
+  logs %>% 
+    select(issue_id, log_time_spent) %>% 
+    filter(!is.na(log_time_spent)) %>%
+    mutate(log_time_spent = log_time_spent / (60 * 60)) %>% 
+    arrange(issue_id, log_time_spent) %>% 
+    group_by(issue_id) %>% 
+    mutate(log_order = paste0(stringr::str_pad(row_number(issue_id), 
+                                               2, "left", "0")))
+```
+
+```{r "Distribution of the Log Time Spent by Issue's Log Order"}
+df_log_time_spent %>% 
+  plot_boxplot(log_order, log_time_spent,
+               title = "Distribution of the Log Time Spent by Issue's Log Order",
+               label.x = "Log order",
+               label.y = "Log time spent (per hour)",
+               coord.ylim = c(0, 16), 
+               breaks.y = seq(0, 16, 1),
+               axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Log Created By
+
+```{r}
+df_log_created_by <- 
+  logs %>% 
+    select(issue_id, log_created_by) %>% 
+    filter(!is.na(log_created_by)) %>%
+    arrange(issue_id, log_created_by) %>% 
+    group_by(issue_id) %>% 
+    mutate(log_order = paste0(stringr::str_pad(row_number(issue_id), 
+                                               2, "left", "0")),
+           log_created_by = first_last_names(log_created_by)) 
+```
+
+```{r}
+df_score_top15_log_created_by <- 
+  df_log_created_by %>%
+    group_by(log_created_by) %>% 
+    summarise(score = n()) %>% 
+    arrange(desc(score)) %>% 
+    ungroup() %>% 
+    filter(row_number() <= 15)
+```
+
+```{r fig.height=4.5, "Top 15 Frequency of Log's Creator"}
+df_log_created_by %>% 
+  filter(log_created_by %in% 
+           df_score_top15_log_created_by$log_created_by) %>%
+  plot_frequency(log_created_by, 
+                 title = "Top 15 Frequency of Log's Creator",
+                 label.x = "Log creator",
+                 breaks.y = seq(0, 3000, 200),
+                 breaks.2nd.y = seq(0, 1, .025),
+                 axis.text.x = element_text(angle = 20, hjust = 1))
+```
+
+```{r fig.height=4.5, "Heatmap of the Log's Creator by Issue's Log Order"}
+df_log_created_by %>% 
+  inner_join(df_score_top15_log_created_by, by="log_created_by") %>%
+  group_by(log_created_by, score, log_order) %>% 
+  count() %>% 
+  filter(log_order %in% paste0(stringr::str_pad(seq(1, 20, 1), 
+                                                2, "left", "0"))) %>% 
+  arrange(desc(score)) %>% 
+  ggplot(aes(reorder( log_created_by, -score), log_order)) +
+    geom_tile(aes(fill = n)) +
+    scale_fill_gradient(low = "white", high = "black") +
+    theme(axis.text.x = element_text(angle = 20, hjust = 1),
+          panel.grid.major.y = element_blank()) 
 ```
 
 ### Reflections on Data Set Summaries
