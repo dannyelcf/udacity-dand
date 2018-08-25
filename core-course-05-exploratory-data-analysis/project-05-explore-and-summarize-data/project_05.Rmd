@@ -1675,6 +1675,30 @@ df_log_created_by %>%
           panel.grid.major.y = element_blank()) 
 ```
 
+### Log SVN Revision
+
+```{r}
+df_has_svn_revision <- 
+  logs %>% 
+    select(issue_id, log_svn_revision) %>%
+    mutate(has_svn_revision = if_else(condition = is.na(log_svn_revision),
+                                      true = FALSE, false = TRUE)) %>% 
+    group_by(issue_id) %>% 
+    summarise(has_svn_revision = max(has_svn_revision)) %>% 
+    mutate(has_svn_revision = if_else(condition = (has_svn_revision == 0),
+                                      true = "No", false = "Yes")) %>% 
+    arrange(issue_id) 
+```
+
+```{r "Frequency of Issues with SVN Revision"}
+df_has_svn_revision %>% 
+  plot_frequency(has_svn_revision, 
+                 title = "Frequency of Issues with SVN Revision",
+                 label.x = "Has SVN Revision?",
+                 breaks.y = seq(0, 4000, 300),
+                 breaks.2nd.y = seq(0, 1, .1))
+```
+
 ### Reflections on Data Set Summaries
 
 What is the commom flow of the log states? (Data Set Structure)

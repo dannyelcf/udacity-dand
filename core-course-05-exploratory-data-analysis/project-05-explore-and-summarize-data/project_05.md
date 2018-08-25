@@ -933,6 +933,10 @@ versions).
 
 <img src="project_05_files/plots/Heatmap of the Log's Creator by Issue's Log Order-1.png" width="86%" />
 
+### Log SVN Revision
+
+<img src="project_05_files/plots/Frequency of Issues with SVN Revision-1.png" width="86%" />
+
 ### Reflections on Data Set Summaries
 
 What is the commom flow of the log states? (Data Set Structure)
