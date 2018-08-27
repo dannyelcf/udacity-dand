@@ -1589,6 +1589,12 @@ df_log_progress <-
                                                2, "left", "0")))
 ```
 
+Log progress is an attribute of a log that represents the rate of progress of 
+the completion of one activity. Its range value is 0% (lowest) and 100% 
+(highest).
+
+The plot below shows the distribution of the log progress by issue's log order.
+
 ```{r "Distribution of the Log Progress by Issue's Log Order"}
 df_log_progress %>% 
   plot_boxplot(log_order, log_progress,
@@ -1598,6 +1604,11 @@ df_log_progress %>%
                breaks.y = seq(0, 100, 10),
                axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+Analysing the plot above, we may note that the most of log progress values vary 
+among 0%, 90% and 100%. Most log progress variability occurs in the first three 
+log. And, as the order of logs increases, the progress tends to be high (it 
+tends to 100%).
 
 ### Log Time Spent
 
@@ -1613,6 +1624,12 @@ df_log_time_spent <-
                                                2, "left", "0")))
 ```
 
+Log time spent is an attribute of a log that represents the total time spent 
+(in seconds) to solving one activity to the issue.
+
+The plot below shows the distribution of the log time spent (in hours) by each 
+issue's log order.
+
 ```{r "Distribution of the Log Time Spent by Issue's Log Order"}
 df_log_time_spent %>% 
   plot_boxplot(log_order, log_time_spent,
@@ -1623,6 +1640,12 @@ df_log_time_spent %>%
                breaks.y = seq(0, 16, 1),
                axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+Seeing the plot above we may note that there are only first fourteen logs order 
+in the x axis. This means that only the first fourteen logs have log time spent
+information. Now, observing the boxplots, we note that time spent to solving one 
+activity increases as the log order increases. This may means that the initial 
+activities are easier than middle and final activities.
 
 ### Log Created By
 
@@ -1636,9 +1659,7 @@ df_log_created_by <-
     mutate(log_order = paste0(stringr::str_pad(row_number(issue_id), 
                                                2, "left", "0")),
            log_created_by = first_last_names(log_created_by)) 
-```
 
-```{r}
 df_score_top15_log_created_by <- 
   df_log_created_by %>%
     group_by(log_created_by) %>% 
@@ -1647,6 +1668,9 @@ df_score_top15_log_created_by <-
     ungroup() %>% 
     filter(row_number() <= 15)
 ```
+
+Log created by represents the name of person who created the log in the issue. 
+The plot below shows the top 15 log creators in the project.
 
 ```{r fig.height=4.5, "Top 15 Frequency of Log's Creator"}
 df_log_created_by %>% 
@@ -1660,20 +1684,17 @@ df_log_created_by %>%
                  axis.text.x = element_text(angle = 20, hjust = 1))
 ```
 
-```{r fig.height=4.5, "Heatmap of the Log's Creator by Issue's Log Order"}
-df_log_created_by %>% 
-  inner_join(df_score_top15_log_created_by, by="log_created_by") %>%
-  group_by(log_created_by, score, log_order) %>% 
-  count() %>% 
-  filter(log_order %in% paste0(stringr::str_pad(seq(1, 20, 1), 
-                                                2, "left", "0"))) %>% 
-  arrange(desc(score)) %>% 
-  ggplot(aes(reorder( log_created_by, -score), log_order)) +
-    geom_tile(aes(fill = n)) +
-    scale_fill_gradient(low = "white", high = "black") +
-    theme(axis.text.x = element_text(angle = 20, hjust = 1),
-          panel.grid.major.y = element_blank()) 
-```
+> **Note:** In the plot above, the black dashed lines represent the 1st and 3rd 
+quartile, the black and red solid lines represent, respectivaly, median and mean
+and the black dotted line represent the upper threshold to the outliers 
+(3rd qu. + 1.5 IQR).
+
+Analysing the plot above we note that RAMON RODRIGUES is whom registered the 
+most of the logs. He is also the 1st top issue creator, as we saw in the 
+[Issue Created By](#issue-created-by) section. But differently of the issue 
+created by, the log created by has as 2nd, 3rd and 4th top position COMPANY 
+employees. This may means that issues frequently pass by one of these employees 
+before return to the CUSTOMER.
 
 ### Log SVN Revision
 
@@ -1690,6 +1711,12 @@ df_has_svn_revision <-
     arrange(issue_id) 
 ```
 
+Log SVN revision represents the number of SVN revision when an activity involved 
+changes in the source code of the subsystem.
+
+The plot bellow shows the frequency of issues with one or more logs whith SVN 
+revision number.
+
 ```{r "Frequency of Issues with SVN Revision"}
 df_has_svn_revision %>% 
   plot_frequency(has_svn_revision, 
@@ -1698,6 +1725,9 @@ df_has_svn_revision %>%
                  breaks.y = seq(0, 4000, 300),
                  breaks.2nd.y = seq(0, 1, .1))
 ```
+
+We note that about only 25% of issues solution involved changes in the source 
+code of a subsystem.
 
 ### Reflections on Data Set Summaries
 

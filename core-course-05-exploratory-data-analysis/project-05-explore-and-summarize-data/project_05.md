@@ -916,26 +916,75 @@ in.
 
 Now, we may realize that the most common situation is a system’s version
 to have 1 issue, after between 2 and 5 issues and then greater than 6
-issues (25% of all system’s
-versions).
+issues (25% of all system’s versions).
 
 ### Log Progress
 
+Log progress is an attribute of a log that represents the rate of
+progress of the completion of one activity. Its range value is 0%
+(lowest) and 100% (highest).
+
+The plot below shows the distribution of the log progress by issue’s log
+order.
+
 <img src="project_05_files/plots/Distribution of the Log Progress by Issue's Log Order-1.png" width="86%" />
+
+Analysing the plot above, we may note that the most of log progress
+values vary among 0%, 90% and 100%. Most log progress variability occurs
+in the first three log. And, as the order of logs increases, the
+progress tends to be high (it tends to 100%).
 
 ### Log Time Spent
 
+Log time spent is an attribute of a log that represents the total time
+spent (in seconds) to solving one activity to the issue.
+
+The plot below shows the distribution of the log time spent (in hours)
+by each issue’s log
+order.
+
 <img src="project_05_files/plots/Distribution of the Log Time Spent by Issue's Log Order-1.png" width="86%" />
+
+Seeing the plot above we may note that there are only first fourteen
+logs order in the x axis. This means that only the first fourteen logs
+have log time spent information. Now, observing the boxplots, we note
+that time spent to solving one activity increases as the log order
+increases. This may means that the initial activities are easier than
+middle and final activities.
 
 ### Log Created By
 
+Log created by represents the name of person who created the log in the
+issue. The plot below shows the top 15 log creators in the
+project.
+
 <img src="project_05_files/plots/Top 15 Frequency of Log's Creator-1.png" width="86%" />
 
-<img src="project_05_files/plots/Heatmap of the Log's Creator by Issue's Log Order-1.png" width="86%" />
+> **Note:** In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean and the black dotted line represent the
+> upper threshold to the outliers (3rd qu. + 1.5 IQR).
+
+Analysing the plot above we note that RAMON RODRIGUES is whom registered
+the most of the logs. He is also the 1st top issue creator, as we saw in
+the [Issue Created By](#issue-created-by) section. But differently of
+the issue created by, the log created by has as 2nd, 3rd and 4th top
+position COMPANY employees. This may means that issues frequently pass
+by one of these employees before return to the CUSTOMER.
 
 ### Log SVN Revision
 
+Log SVN revision represents the number of SVN revision when an activity
+involved changes in the source code of the subsystem.
+
+The plot bellow shows the frequency of issues with one or more logs
+whith SVN revision
+number.
+
 <img src="project_05_files/plots/Frequency of Issues with SVN Revision-1.png" width="86%" />
+
+We note that about only 25% of issues solution involved changes in the
+source code of a subsystem.
 
 ### Reflections on Data Set Summaries
 
