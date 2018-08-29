@@ -7,8 +7,8 @@ This project aims to explore a data set containing 22125 observations of
 issues tracking and their history logs. The data set represents 5 years
 of project management which aimed maintenance and customization of many
 integrated systems ([SIG](https://docs.info.ufrn.br)) for the academic,
-administrative and human resources management at the Universidade
-Federal de Goiás ([UFG](https://www.ufg.br)).
+administrative and human resources management at Universidade Federal de
+Goiás ([UFG](https://www.ufg.br)).
 
 A proprietary issue tracking system
 ([SIGProject](https://sigproject.esig.com.br)) was used to manage
@@ -33,8 +33,8 @@ Wrangling](data_wrangling).
 
 In this section, I perform a univariate exploration of the data set,
 first examining its structure, followed by the analysis of each variable
-starting with issue variables and ending with log variables. In each
-variable group (issue and log) I begin with exploration of temporal
+starting with issue variables and ending with issue’s log variables. In
+each variable group (issue and log) I begin with exploration of temporal
 variables and end with the analysis of categorical and range variables.
 
 ### Data Set Structure
@@ -375,7 +375,7 @@ later changed to one week sprints.
 ### Issue Time Spent
 
 Issue time spent is the total time spent solving the issue. It is a
-derivation of the sum of `log_time_spent`. In the dataset, issue time
+derivation of the sum of `log_time_spent`. In the data set, issue time
 spent is represented in seconds. The plot below shows its distribution
 per
 hour.
@@ -983,15 +983,25 @@ number.
 
 <img src="project_05_files/plots/Frequency of Issues with SVN Revision-1.png" width="86%" />
 
+> **Note**: In the plot above, the black dashed lines represent the 1st
+> and 3rd quartile, the black and red solid lines represent,
+> respectivaly, median and mean.
+
 We note that about only 25% of issues solution involved changes in the
 source code of a subsystem.
 
-### Reflections on Data Set Summaries
+### Reflections on Initial Descriptive Analysis
 
-What is the commom flow of the log states? (Data Set Structure)
+Here I finish the initial descriptive analysis. We have seen the
+structure of the data set and the behavior of each variable in
+isolation. We observed patterns and trends in issues creation along the
+project. We observed also that the most of issues are of the MAINTENANCE
+type; SIGAA system; GRADUAÇÃO subsytem; HIGH priority scale; and spent
+about 1h to end. Moreover, we have seen that there is a pattern in
+issues solution’s flow, flow size and time lapse among issue’s log.
 
-What makes the demand low in 2013? What makes the demand grow rapidly in
-2014?
+In the next section I have analysed the association among two or more
+variables.
 
 ### Association Between Variables
 
