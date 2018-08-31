@@ -1504,10 +1504,6 @@ events wherein the 2nd is the most generic action. The next three top log action
 are related to development activities that are perform by diferent people in the
 COMPANY.
 
-An action make changes on issue's status. The following section shows the issue's 
-log status and the section [Log Action X Log Status](#log-action-x-log-status) 
-shows the relationship between both.
-
 ### Log Build Info
 
 ```{r}
@@ -1741,13 +1737,26 @@ of issues are of the MAINTENANCE type; SIGAA system; GRADUAÇÃO subsytem; HIGH
 priority scale; and spent about 1h to end. Moreover, we have seen that there is
 a pattern in issues solution's flow, flow size and time lapse among issue's log.
 
-In the next section I have analysed the association among two or more variables.
+In the next section, I have analysed the association among two or more variables
+of the data set.
 
 ### Association Between Variables
+
+#### Issue Type X SVN
+
+#### Log Status X Log Created By
+
+#### Issue Creation Date X Issue Subsystem
 
 #### Issue Creation Date X Issue Subsystem X Issue Type
 
 An analysis of issue creations timeline by system/subsystem and issue types may 
 answer that assumption.
 
-#### Log Action X Log Status
+#### Issue Creation Date X Issue End Date (CFD)
+
+#### Issue Creation Date X Issue End Date (Scatter)
+
+#### (Issue Creation Date - Issue End Date) X Issue Subsystem
+
+#### Issue Deadline Date - Issue End Date (Chart positive/negative)
